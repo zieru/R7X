@@ -16,7 +16,7 @@ class RenameandaddRecordingsTable extends Migration
         //
         Schema::table('recording_tbllaporan', function (Blueprint $table) {
             $table->integer('bot')->nullable(true);
-            $table->string('tipe_layanan',32);
+            $table->string('tipe_layanan',32)->nullable(false);
             $table->dropColumn('description');
 
         });
