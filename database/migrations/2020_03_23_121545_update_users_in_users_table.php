@@ -16,7 +16,7 @@ class UpdateUsersInUsersTable extends Migration
         Schema::table('users', function(Blueprint $table)
         {
             $table->string('username',32)->nullable();
-            $table->integer('area');
+            $table->integer('area')->nullable();
             $table->integer('mediaselid');
         });
     }
