@@ -21,12 +21,11 @@ import VueProgressBar from 'vue-progressbar'
 // you can change colors here based on your needs
 // and please dont forget to recompile scripts
 Vue.use(Vuetify);
-
 // this is the progress bar settings, you
 // can change colors here to fit on your needs or match
 // your theming above
 Vue.use(VueProgressBar,{
-    color: colors.grey.lighten1,
+    color: colors.red.darken4,
     failedColor: colors.red.base,
     thickness: '5px',
     transition: {
@@ -47,9 +46,19 @@ import store from '../common/Store';
 import eventBus from '../common/Event';
 import formatters from '../common/Formatters';
 import AxiosAjaxDetct from '../common/AxiosAjaxDetect';
-
+// As a plugin
+/*import VueMask from 'v-mask'
+Vue.use(VueMask);
+import VueTheMask from 'vue-the-mask';
+Vue.use(VueTheMask);*/
 Vue.use(formatters);
 Vue.use(eventBus);
+/*
+const themeCache = new LRU({
+    max: 10,
+    maxAge: 1000 * 60 * 60, // 1 hour
+})
+*/
 
 const admin = new Vue({
     vuetify: new Vuetify({
@@ -67,7 +76,17 @@ const admin = new Vue({
         },
         icons: {
             iconfont: 'mdi'
-        }
+        },
+        options: {
+            customProperties: true,
+
+            /*themeCache,*/
+            minifyTheme: function (css) {
+                return process.env.NODE_ENV === 'production'
+                    ? css.replace(/[\r\n|\r|\n]/g, '')
+                    : css
+            },
+        },
     }),
     el: '#admin',
     eventBus,

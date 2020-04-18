@@ -21,6 +21,12 @@ const router = new Router({
             component: require('./recordingbrowser/Home'),
         },
         {
+            name: 'caserecording.list',
+            path: '/caserecording',
+            component: require('./caserecording/Home'),
+        },
+
+        {
             path: '/users',
             component: require('./users/Users'),
             children: [

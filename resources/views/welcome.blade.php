@@ -84,13 +84,9 @@
 
     <div class="content">
         <div class="title m-b-md">
-            <img class="swiss" src="{{url('img/camper-swiss-knife.jpg')}}">
+            <img class="swiss" src="{{asset('img/bg-container.jpg')}}">
         </div>
 
-        <div class="links">
-            <h1>Laravel <span style="color: #F4D8D8">Starter Kit</span></h1>
-            <h4>Powered by VueJS + Material Design</h4>
-        </div>
     </div>
 </div>
 </body>

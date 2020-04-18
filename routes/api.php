@@ -16,3 +16,13 @@ use Illuminate\Http\Request;
 /*Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });*/
+/*Route::post('/caserecording/createnew', 'CaseRecording@createnew');
+Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function() {
+    Route::post('/caserecording/createnew', 'CaseRecording@createnew');
+    Route::get('/caserecording/createnew', 'CaseRecording@createnew');
+});*/
+Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function() {
+    Route::post('/caserecording/createnew', 'CaseRecording@Store');
+    Route::get('/caserecording', 'CaseRecording@index');
+});
+

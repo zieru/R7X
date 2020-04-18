@@ -51,7 +51,7 @@ class SinglePageController extends AdminController
                 'nav_type' => MenuItem::$NAV_TYPE_NAV,
                 'icon'=>'mdi-phone-log',
                 'route_type'=>'vue',
-                'route_name'=>'recordingbrowser.list',
+                'route_name'=>'caserecording.list',
                 'visible'=>true,
             ]),
             new MenuItem([

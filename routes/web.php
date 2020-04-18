@@ -35,5 +35,6 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     Route::resource('groups','GroupController');
     Route::resource('permissions','PermissionController');
     Route::resource('files','FileController');
+    Route::resource('caserecording','FileController');
     Route::resource('file-groups','FileGroupController');
 });

@@ -32,11 +32,13 @@
             <v-navigation-drawer
                     :clipped="$vuetify.breakpoint.lgAndUp"
 
-                    color="grey lighten-4"
+                    color="gray lighten-4"
                     v-model="drawer"
+                    elevation="24"
+                    dense
                     app
                     left>
-                <v-list dense color="secondary">
+                <v-list dense>
                     <v-list-item class="px-2">
                         <v-list-item-avatar>
                             <v-icon>mdi-account</v-icon>
@@ -118,7 +120,7 @@
                 <v-avatar tile> <v-img src="http://172.28.136.242/myportal/assets/logo.svg" alt="homepage" class="logo" style="filter: invert(42%) sepia(93%) saturate(1352%) hue-rotate(87deg) brightness(119%) contrast(0%);; padding: 8px;"></v-img></v-avatar>
             </v-app-bar>
 
-            <v-content>
+            <v-content style="background: #F5F5F5">
                 <div>
                     <v-breadcrumbs :items="getBreadcrumbs" divider=">" large>
                         <template v-slot:item="props">
@@ -135,14 +137,16 @@
                 </div>
                 <v-divider></v-divider>
                 <transition name="fade">
-                    <router-view></router-view>
+                    <router-view ></router-view>
                 </transition>
 
 
             </v-content>
             <v-footer
                     absolute
-                    class="justify-center" color="white" inset app
+                    class="justify-center"
+                    {{--color="white"--}}
+                    inset app
             >
                 <v-row
                         justify="center"

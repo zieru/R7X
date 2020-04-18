@@ -53,7 +53,6 @@
                     description: self.description
                 };
 
-
                 self.isLoading = true;
 
                 axios.post('/admin/file-groups',payload).then(function(response) {
