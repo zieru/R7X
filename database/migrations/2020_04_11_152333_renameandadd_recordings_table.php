@@ -15,10 +15,13 @@ class RenameandaddRecordingsTable extends Migration
     {
         //
         Schema::table('recording_tbllaporan', function (Blueprint $table) {
-            $table->renameColumn('lastresponse_user_id', 'lastresponse_userid');
-            $table->dropColumn('description');
             $table->integer('bot')->nullable(true);
             $table->string('tipe_layanan',32);
+            $table->dropColumn('description');
+
+        });
+        Schema::table('recording_tbllaporan', function (Blueprint $table) {
+            $table->renameColumn('lastresponse_user_id', 'lastresponse_userid');
         });
     }
 
