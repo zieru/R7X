@@ -17,7 +17,7 @@ class UpdateUsersInUsersTable extends Migration
         {
             $table->string('username',32)->nullable();
             $table->integer('area')->nullable();
-            $table->integer('mediaselid');
+            $table->integer('mediaselid')->nullable();
         });
     }
 
