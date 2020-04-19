@@ -929,128 +929,118 @@ function updateLink (link, options, obj) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vuex__ = __webpack_require__(195);
 
 
-
 __WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_1_vuex__["a" /* default */]);
-
 /* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_1_vuex__["a" /* default */].Store({
-    state: {
-
-        // breadcrumbs
-        breadcrumbs: [],
-
-        // loader
-        showLoader: false,
-
-        // snackbar
-        showSnackbar: false,
-        snackbarMessage: '',
-        snackbarColor: '',
-        snackbarDuration: 3000,
-
-        // dialog
-        dialogShow: false,
-        dialogType: '',
-        dialogTitle: '',
-        dialogMessage: '',
-        dialogIcon: null,
-        dialogOkCb: function dialogOkCb() {},
-        dialogCancelCb: function dialogCancelCb() {}
-    },
-    mutations: {
-
-        // breadcrumbs
-        setBreadcrumbs: function setBreadcrumbs(state, items) {
-            items.unshift({ label: 'Home', to: { name: 'dashboard' } });
-            state.breadcrumbs = items;
-        },
-
-
-        // loader
-        showLoader: function showLoader(state) {
-            //state.showLoader = true
-        },
-        hideLoader: function hideLoader(state) {
-            state.showLoader = false;
-        },
-
-
-        // snackbar
-        showSnackbar: function showSnackbar(state, data) {
-            state.snackbarDuration = data.duration || 3000;
-            state.snackbarMessage = data.message || 'No message.';
-            state.snackbarColor = data.color || 'info';
-            state.showSnackbar = true;
-        },
-        hideSnackbar: function hideSnackbar(state) {
-            state.showSnackbar = false;
-        },
-
-
-        // dialog
-        showDialog: function showDialog(state, data) {
-            state.dialogType = data.type || 'confirm';
-            state.dialogTitle = data.title;
-            state.dialogMessage = data.message;
-            state.dialogIcon = data.icon || null;
-            state.dialogOkCb = data.okCb || function () {};
-            state.dialogCancelCb = data.cancelCb || function () {};
-            state.dialogShow = true;
-        },
-        hideDialog: function hideDialog(state) {
-            state.dialogShow = false;
-        },
-        dialogOk: function dialogOk(state) {
-            state.dialogOkCb();
-            state.dialogShow = false;
-        },
-        dialogCancel: function dialogCancel(state) {
-            state.dialogCancelCb();
-            state.dialogShow = false;
+  state: {
+    // breadcrumbs
+    breadcrumbs: [],
+    // loader
+    showLoader: false,
+    // snackbar
+    showSnackbar: false,
+    snackbarMessage: '',
+    snackbarColor: '',
+    snackbarDuration: 3000,
+    // dialog
+    dialogShow: false,
+    dialogType: '',
+    dialogTitle: '',
+    dialogMessage: '',
+    dialogIcon: null,
+    dialogOkCb: function dialogOkCb() {},
+    dialogCancelCb: function dialogCancelCb() {}
+  },
+  mutations: {
+    // breadcrumbs
+    setBreadcrumbs: function setBreadcrumbs(state, items) {
+      items.unshift({
+        label: 'Home',
+        to: {
+          name: 'dashboard'
         }
+      });
+      state.breadcrumbs = items;
     },
-    getters: {
+    // loader
+    showLoader: function showLoader(state) {//state.showLoader = true
+    },
+    hideLoader: function hideLoader(state) {
+      state.showLoader = false;
+    },
+    // snackbar
+    showSnackbar: function showSnackbar(state, data) {
+      state.snackbarDuration = data.duration || 3000;
+      state.snackbarMessage = data.message || 'No message.';
+      state.snackbarColor = data.color || 'info';
+      state.showSnackbar = true;
+    },
+    hideSnackbar: function hideSnackbar(state) {
+      state.showSnackbar = false;
+    },
+    // dialog
+    showDialog: function showDialog(state, data) {
+      state.dialogType = data.type || 'confirm';
+      state.dialogTitle = data.title;
+      state.dialogMessage = data.message;
+      state.dialogIcon = data.icon || null;
 
-        // get breadcrumbs
-        getBreadcrumbs: function getBreadcrumbs(state) {
-            return state.breadcrumbs;
-        },
+      state.dialogOkCb = data.okCb || function () {};
 
-        // loader
-        showLoader: function showLoader(state) {
-            return state.showLoader;
-        },
+      state.dialogCancelCb = data.cancelCb || function () {};
 
-        // snackbar
-        showSnackbar: function showSnackbar(state) {
-            return state.showSnackbar;
-        },
-        snackbarMessage: function snackbarMessage(state) {
-            return state.snackbarMessage;
-        },
-        snackbarColor: function snackbarColor(state) {
-            return state.snackbarColor;
-        },
-        snackbarDuration: function snackbarDuration(state) {
-            return state.snackbarDuration;
-        },
-
-        // dialog
-        showDialog: function showDialog(state) {
-            return state.dialogShow;
-        },
-        dialogType: function dialogType(state) {
-            return state.dialogType;
-        },
-        dialogTitle: function dialogTitle(state) {
-            return state.dialogTitle;
-        },
-        dialogMessage: function dialogMessage(state) {
-            return state.dialogMessage;
-        },
-        dialogIcon: function dialogIcon(state) {
-            return state.dialogIcon;
-        }
+      state.dialogShow = true;
+    },
+    hideDialog: function hideDialog(state) {
+      state.dialogShow = false;
+    },
+    dialogOk: function dialogOk(state) {
+      state.dialogOkCb();
+      state.dialogShow = false;
+    },
+    dialogCancel: function dialogCancel(state) {
+      state.dialogCancelCb();
+      state.dialogShow = false;
     }
+  },
+  getters: {
+    // get breadcrumbs
+    getBreadcrumbs: function getBreadcrumbs(state) {
+      return state.breadcrumbs;
+    },
+    // loader
+    showLoader: function showLoader(state) {
+      return state.showLoader;
+    },
+    // snackbar
+    showSnackbar: function showSnackbar(state) {
+      return state.showSnackbar;
+    },
+    snackbarMessage: function snackbarMessage(state) {
+      return state.snackbarMessage;
+    },
+    snackbarColor: function snackbarColor(state) {
+      return state.snackbarColor;
+    },
+    snackbarDuration: function snackbarDuration(state) {
+      return state.snackbarDuration;
+    },
+    // dialog
+    showDialog: function showDialog(state) {
+      return state.dialogShow;
+    },
+    dialogType: function dialogType(state) {
+      return state.dialogType;
+    },
+    dialogTitle: function dialogTitle(state) {
+      return state.dialogTitle;
+    },
+    dialogMessage: function dialogMessage(state) {
+      return state.dialogMessage;
+    },
+    dialogIcon: function dialogIcon(state) {
+      return state.dialogIcon;
+    }
+  }
 }));
 
 /***/ }),
@@ -1089,53 +1079,50 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
  * includes Vue and other libraries. It is a great starting point when
  * building robust, powerful web applications using Vue and Laravel.
  */
+ // vendor
 
-
-// vendor
 __webpack_require__(151);
-window.Vue = __webpack_require__(5);
 
-// 3rd party
-
+window.Vue = __webpack_require__(5); // 3rd party
 
 
 
 
 
-// this is the vuetify theming options
+ // this is the vuetify theming options
 // you can change colors here based on your needs
 // and please dont forget to recompile scripts
-__WEBPACK_IMPORTED_MODULE_3_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_4_vuetify___default.a);
-// this is the progress bar settings, you
+
+__WEBPACK_IMPORTED_MODULE_3_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_4_vuetify___default.a); // this is the progress bar settings, you
 // can change colors here to fit on your needs or match
 // your theming above
+
 __WEBPACK_IMPORTED_MODULE_3_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_5_vue_progressbar___default.a, {
-    color: __WEBPACK_IMPORTED_MODULE_0_vuetify_lib_util_colors__["a" /* default */].red.darken4,
-    failedColor: __WEBPACK_IMPORTED_MODULE_0_vuetify_lib_util_colors__["a" /* default */].red.base,
-    thickness: '5px',
-    transition: {
-        speed: '0.2s',
-        opacity: '0.6s',
-        termination: 300
-    },
-    autoRevert: true,
-    inverse: false
-});
+  color: __WEBPACK_IMPORTED_MODULE_0_vuetify_lib_util_colors__["a" /* default */].red.darken4,
+  failedColor: __WEBPACK_IMPORTED_MODULE_0_vuetify_lib_util_colors__["a" /* default */].red.base,
+  thickness: '5px',
+  transition: {
+    speed: '0.2s',
+    opacity: '0.6s',
+    termination: 300
+  },
+  autoRevert: true,
+  inverse: false
+}); // global component registrations here
 
-// global component registrations here
-__WEBPACK_IMPORTED_MODULE_3_vue___default.a.component('fade-loader', __webpack_require__(188));
-
-// app
+__WEBPACK_IMPORTED_MODULE_3_vue___default.a.component('fade-loader', __webpack_require__(188)); // app
 
 
 
 
 
-// As a plugin
+ // As a plugin
+
 /*import VueMask from 'v-mask'
 Vue.use(VueMask);
 import VueTheMask from 'vue-the-mask';
 Vue.use(VueTheMask);*/
+
 __WEBPACK_IMPORTED_MODULE_3_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_9__common_Formatters__["a" /* default */]);
 __WEBPACK_IMPORTED_MODULE_3_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_8__common_Event__["a" /* default */]);
 /*
@@ -1146,127 +1133,121 @@ const themeCache = new LRU({
 */
 
 var admin = new __WEBPACK_IMPORTED_MODULE_3_vue___default.a({
-    vuetify: new __WEBPACK_IMPORTED_MODULE_4_vuetify___default.a({
-        theme: {
-            themes: {
-                light: {
-                    primary: __WEBPACK_IMPORTED_MODULE_0_vuetify_lib_util_colors__["a" /* default */].red.darken4,
-                    info: '#4c86b5',
-                    success: '#17b535',
-                    secondary: __WEBPACK_IMPORTED_MODULE_0_vuetify_lib_util_colors__["a" /* default */].grey.lighten4,
-                    accent: __WEBPACK_IMPORTED_MODULE_0_vuetify_lib_util_colors__["a" /* default */].red.darken2,
-                    error: '#b71c1c'
-                }
-            }
-        },
-        icons: {
-            iconfont: 'mdi'
-        },
-        options: {
-            customProperties: true,
-
-            /*themeCache,*/
-            minifyTheme: function minifyTheme(css) {
-                return  false ? css.replace(/[\r\n|\r|\n]/g, '') : css;
-            }
+  vuetify: new __WEBPACK_IMPORTED_MODULE_4_vuetify___default.a({
+    theme: {
+      themes: {
+        light: {
+          primary: __WEBPACK_IMPORTED_MODULE_0_vuetify_lib_util_colors__["a" /* default */].red.darken4,
+          info: '#4c86b5',
+          success: '#17b535',
+          secondary: __WEBPACK_IMPORTED_MODULE_0_vuetify_lib_util_colors__["a" /* default */].grey.lighten4,
+          accent: __WEBPACK_IMPORTED_MODULE_0_vuetify_lib_util_colors__["a" /* default */].red.darken2,
+          error: '#b71c1c'
         }
-    }),
-    el: '#admin',
-    eventBus: __WEBPACK_IMPORTED_MODULE_8__common_Event__["a" /* default */],
-    router: __WEBPACK_IMPORTED_MODULE_6__router__["a" /* default */],
-    store: __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */],
-    data: function data() {
-        return {
-            drawer: true
-        };
+      }
     },
-    mounted: function mounted() {
-
-        var self = this;
-
-        // progress bar top
-        __WEBPACK_IMPORTED_MODULE_10__common_AxiosAjaxDetect__["a" /* default */].init(function () {
-            self.$Progress.start();
-        }, function () {
-            self.$Progress.finish();
-        });
+    icons: {
+      iconfont: 'mdi'
     },
+    options: {
+      customProperties: true,
 
-    computed: {
-        getBreadcrumbs: function getBreadcrumbs() {
-            return __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].getters.getBreadcrumbs;
-        },
-        showLoader: function showLoader() {
-            return __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].getters.showLoader;
-        },
-
-        showSnackbar: {
-            get: function get() {
-                return __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].getters.showSnackbar;
-            },
-            set: function set(val) {
-                if (!val) __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].commit('hideSnackbar');
-            }
-        },
-        snackbarMessage: function snackbarMessage() {
-            return __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].getters.snackbarMessage;
-        },
-        snackbarColor: function snackbarColor() {
-            return __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].getters.snackbarColor;
-        },
-        snackbarDuration: function snackbarDuration() {
-            return __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].getters.snackbarDuration;
-        },
-
-
-        // dialog
-        showDialog: {
-            get: function get() {
-                return __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].getters.showDialog;
-            },
-            set: function set(val) {
-                if (!val) __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].commit('hideDialog');
-            }
-        },
-        dialogType: function dialogType() {
-            return __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].getters.dialogType;
-        },
-        dialogTitle: function dialogTitle() {
-            return __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].getters.dialogTitle;
-        },
-        dialogMessage: function dialogMessage() {
-            return __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].getters.dialogMessage;
-        },
-        dialogIcon: function dialogIcon() {
-            return __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].getters.dialogIcon;
-        }
-    },
-    methods: {
-        menuClick: function menuClick(routeName, routeType) {
-
-            var rn = routeType || 'vue';
-
-            if (rn === 'vue') {
-
-                this.$router.push({ name: routeName });
-            }
-            if (rn === 'full_load') {
-
-                window.location.href = routeName;
-            }
-        },
-        clickLogout: function clickLogout(logoutUrl, afterLogoutRedirectUrl) {
-            axios.post(logoutUrl).then(function (r) {
-                window.location.href = afterLogoutRedirectUrl;
-            });
-        },
-        dialogOk: function dialogOk() {
-            __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].commit('dialogOk');
-        },
-        dialogCancel: function dialogCancel() {
-            __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].commit('dialogCancel');
-        }
+      /*themeCache,*/
+      minifyTheme: function minifyTheme(css) {
+        return  false ? css.replace(/[\r\n|\r|\n]/g, '') : css;
+      }
     }
+  }),
+  el: '#admin',
+  eventBus: __WEBPACK_IMPORTED_MODULE_8__common_Event__["a" /* default */],
+  router: __WEBPACK_IMPORTED_MODULE_6__router__["a" /* default */],
+  store: __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */],
+  data: function data() {
+    return {
+      drawer: true
+    };
+  },
+  mounted: function mounted() {
+    var self = this; // progress bar top
+
+    __WEBPACK_IMPORTED_MODULE_10__common_AxiosAjaxDetect__["a" /* default */].init(function () {
+      self.$Progress.start();
+    }, function () {
+      self.$Progress.finish();
+    });
+  },
+  computed: {
+    getBreadcrumbs: function getBreadcrumbs() {
+      return __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].getters.getBreadcrumbs;
+    },
+    showLoader: function showLoader() {
+      return __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].getters.showLoader;
+    },
+    showSnackbar: {
+      get: function get() {
+        return __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].getters.showSnackbar;
+      },
+      set: function set(val) {
+        if (!val) __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].commit('hideSnackbar');
+      }
+    },
+    snackbarMessage: function snackbarMessage() {
+      return __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].getters.snackbarMessage;
+    },
+    snackbarColor: function snackbarColor() {
+      return __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].getters.snackbarColor;
+    },
+    snackbarDuration: function snackbarDuration() {
+      return __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].getters.snackbarDuration;
+    },
+    // dialog
+    showDialog: {
+      get: function get() {
+        return __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].getters.showDialog;
+      },
+      set: function set(val) {
+        if (!val) __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].commit('hideDialog');
+      }
+    },
+    dialogType: function dialogType() {
+      return __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].getters.dialogType;
+    },
+    dialogTitle: function dialogTitle() {
+      return __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].getters.dialogTitle;
+    },
+    dialogMessage: function dialogMessage() {
+      return __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].getters.dialogMessage;
+    },
+    dialogIcon: function dialogIcon() {
+      return __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].getters.dialogIcon;
+    }
+  },
+  methods: {
+    menuClick: function menuClick(routeName, routeType) {
+      var rn = routeType || 'vue';
+
+      if (rn === 'vue') {
+        this.$router.push({
+          name: routeName
+        });
+      }
+
+      if (rn === 'full_load') {
+        window.location.href = routeName;
+      }
+    },
+    clickLogout: function clickLogout(logoutUrl, afterLogoutRedirectUrl) {
+      axios.post(logoutUrl).then(function (r) {
+        window.location.href = afterLogoutRedirectUrl;
+      });
+    },
+    dialogOk: function dialogOk() {
+      __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].commit('dialogOk');
+    },
+    dialogCancel: function dialogCancel() {
+      __WEBPACK_IMPORTED_MODULE_7__common_Store__["a" /* default */].commit('dialogCancel');
+    }
+  }
 });
 
 /***/ }),
@@ -1599,11 +1580,9 @@ const shades = Object.freeze({
 /* 151 */
 /***/ (function(module, exports, __webpack_require__) {
 
-
 window._ = __webpack_require__(9);
 window.moment = __webpack_require__(0);
 window.Dropzone = __webpack_require__(137);
-
 /**
  * We'll load jQuery and the Bootstrap jQuery plugin which provides support
  * for JavaScript based Bootstrap features such as modals and tabs. This
@@ -1615,17 +1594,15 @@ try {
 
   __webpack_require__(154);
 } catch (e) {}
-
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
  * to our Laravel back-end. This library automatically handles sending the
  * CSRF token as a header based on the value of the "XSRF" token cookie.
  */
 
+
 window.axios = __webpack_require__(138);
-
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-
 /**
  * Next we will register the CSRF Token as a common header with Axios so that
  * all outgoing HTTP requests automatically have it attached. This is just
@@ -1640,17 +1617,13 @@ if (token) {
 } else {
   console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
 }
-
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
  * for events that are broadcast by Laravel. Echo and event broadcasting
  * allows your team to easily build robust real-time web applications.
  */
-
 // import Echo from 'laravel-echo'
-
 // window.Pusher = require('pusher-js');
-
 // window.Echo = new Echo({
 //     broadcaster: 'pusher',
 //     key: 'your-pusher-key'
@@ -56756,31 +56729,28 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-
   name: 'MoonLoader',
-
   props: {
     loading: {
       type: Boolean,
-      default: true
+      "default": true
     },
     color: {
       type: String,
-      default: '#5dc596'
+      "default": '#5dc596'
     },
     size: {
       type: String,
-      default: '60px'
+      "default": '60px'
     },
     margin: {
       type: String,
-      default: '2px'
+      "default": '2px'
     },
     radius: {
       type: String,
-      default: '100%'
+      "default": '100%'
     }
   },
   data: function data() {
@@ -56792,7 +56762,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       }
     };
   },
-
   computed: {
     moonSize: function moonSize() {
       return parseFloat(this.size) / 7;
@@ -56816,7 +56785,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       };
     }
   }
-
 });
 
 /***/ }),
@@ -56876,96 +56844,97 @@ if (false) {
 
 
 
-
 __WEBPACK_IMPORTED_MODULE_0_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_1_vue_router__["default"]);
-
 var router = new __WEBPACK_IMPORTED_MODULE_1_vue_router__["default"]({
-    routes: [{
-        path: '/',
-        redirect: '/dashboard'
+  routes: [{
+    path: '/',
+    redirect: '/dashboard'
+  }, {
+    name: 'dashboard',
+    path: '/dashboard',
+    component: __webpack_require__(196)
+  }, {
+    name: 'recordingbrowser.list',
+    path: '/recordingBrowser',
+    component: __webpack_require__(204)
+  }, {
+    name: 'caserecording.list',
+    path: '/caserecording',
+    component: __webpack_require__(231)
+  }, {
+    path: '/users',
+    component: __webpack_require__(265),
+    children: [{
+      path: '/',
+      name: 'users.list',
+      component: __webpack_require__(268)
     }, {
-        name: 'dashboard',
-        path: '/dashboard',
-        component: __webpack_require__(196)
+      path: 'create',
+      name: 'users.create',
+      component: __webpack_require__(271)
     }, {
-        name: 'recordingbrowser.list',
-        path: '/recordingBrowser',
-        component: __webpack_require__(204)
+      path: 'edit/:id',
+      name: 'users.edit',
+      component: __webpack_require__(274),
+      props: function props(route) {
+        return {
+          propUserId: route.params.id
+        };
+      }
     }, {
-        name: 'caserecording.list',
-        path: '/caserecording',
-        component: __webpack_require__(231)
+      path: 'groups',
+      name: 'users.groups.list',
+      component: __webpack_require__(277)
     }, {
-        path: '/users',
-        component: __webpack_require__(265),
-        children: [{
-            path: '/',
-            name: 'users.list',
-            component: __webpack_require__(268)
-        }, {
-            path: 'create',
-            name: 'users.create',
-            component: __webpack_require__(271)
-        }, {
-            path: 'edit/:id',
-            name: 'users.edit',
-            component: __webpack_require__(274),
-            props: function props(route) {
-                return { propUserId: route.params.id };
-            }
-        }, {
-            path: 'groups',
-            name: 'users.groups.list',
-            component: __webpack_require__(277)
-        }, {
-            path: 'groups/create',
-            name: 'users.groups.create',
-            component: __webpack_require__(280)
-        }, {
-            path: 'groups/edit/:id',
-            name: 'users.groups.edit',
-            component: __webpack_require__(283),
-            props: function props(route) {
-                return { propGroupId: route.params.id };
-            }
-        }, {
-            path: 'permissions',
-            name: 'users.permissions.list',
-            component: __webpack_require__(286)
-        }, {
-            path: 'permissions/create',
-            name: 'users.permissions.create',
-            component: __webpack_require__(289)
-        }, {
-            path: 'permissions/edit/:id',
-            name: 'users.permissions.edit',
-            component: __webpack_require__(292),
-            props: function props(route) {
-                return { propPermissionId: route.params.id };
-            }
-        }]
+      path: 'groups/create',
+      name: 'users.groups.create',
+      component: __webpack_require__(280)
     }, {
-        name: 'files',
-        path: '/files',
-        component: __webpack_require__(295)
+      path: 'groups/edit/:id',
+      name: 'users.groups.edit',
+      component: __webpack_require__(283),
+      props: function props(route) {
+        return {
+          propGroupId: route.params.id
+        };
+      }
     }, {
-        name: 'settings',
-        path: '/settings',
-        component: __webpack_require__(319)
+      path: 'permissions',
+      name: 'users.permissions.list',
+      component: __webpack_require__(286)
+    }, {
+      path: 'permissions/create',
+      name: 'users.permissions.create',
+      component: __webpack_require__(289)
+    }, {
+      path: 'permissions/edit/:id',
+      name: 'users.permissions.edit',
+      component: __webpack_require__(292),
+      props: function props(route) {
+        return {
+          propPermissionId: route.params.id
+        };
+      }
     }]
+  }, {
+    name: 'files',
+    path: '/files',
+    component: __webpack_require__(295)
+  }, {
+    name: 'settings',
+    path: '/settings',
+    component: __webpack_require__(319)
+  }]
 });
-
 router.beforeEach(function (to, from, next) {
-    __WEBPACK_IMPORTED_MODULE_2__common_Store__["a" /* default */].commit('showLoader');
-    next();
+  __WEBPACK_IMPORTED_MODULE_2__common_Store__["a" /* default */].commit('showLoader');
+  next();
 });
-
 router.afterEach(function (to, from) {
-    setTimeout(function () {
-        __WEBPACK_IMPORTED_MODULE_2__common_Store__["a" /* default */].commit('hideLoader');
-    }, 1000);
+  setTimeout(function () {
+    __WEBPACK_IMPORTED_MODULE_2__common_Store__["a" /* default */].commit('hideLoader');
+  }, 1000);
 });
-
 /* harmony default export */ __webpack_exports__["a"] = (router);
 
 /***/ }),
@@ -58114,17 +58083,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-
-    components: {
-        'comingsoonblock': __WEBPACK_IMPORTED_MODULE_0__ComingSoon___default.a
-    },
-    mounted: function mounted() {
-        var self = this;
-
-        self.$store.commit('setBreadcrumbs', [{ label: 'Dashboard', name: '' }]);
-    }
+  components: {
+    'comingsoonblock': __WEBPACK_IMPORTED_MODULE_0__ComingSoon___default.a
+  },
+  mounted: function mounted() {
+    var self = this;
+    self.$store.commit('setBreadcrumbs', [{
+      label: 'Dashboard',
+      name: ''
+    }]);
+  }
 });
 
 /***/ }),
@@ -58400,9 +58369,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    name: "ComingSoon"
+  name: "ComingSoon"
 });
 
 /***/ }),
@@ -59684,38 +59652,37 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    components: {
-        FileSearch: __WEBPACK_IMPORTED_MODULE_1__components_FileSearchForm_vue___default.a,
-        FileUpload: __WEBPACK_IMPORTED_MODULE_2__components_FileUpload_vue___default.a,
-        FileGroupLists: __WEBPACK_IMPORTED_MODULE_0__components_FileGroupLists_vue___default.a,
-        FileLists: __WEBPACK_IMPORTED_MODULE_3__components_FileLists_vue___default.a
-    },
-    mounted: function mounted() {
-        var self = this;
-
-        self.$store.commit('setBreadcrumbs', [{ label: 'Recording Browser', name: '' }]);
-    },
-
-    computed: {
-        dateRangeText: function dateRangeText() {
-            return this.dates.join(' ~ ');
-        }
-    },
-    data: function data() {
-        return {
-            dates: ['2019-09-10', '2019-09-20'],
-            active: 'filesearch'
-        };
-    },
-
-    watch: {
-        active: function active(v) {
-            console.log('active tab: ' + v);
-        }
-    },
-    methods: {}
+  components: {
+    FileSearch: __WEBPACK_IMPORTED_MODULE_1__components_FileSearchForm_vue___default.a,
+    FileUpload: __WEBPACK_IMPORTED_MODULE_2__components_FileUpload_vue___default.a,
+    FileGroupLists: __WEBPACK_IMPORTED_MODULE_0__components_FileGroupLists_vue___default.a,
+    FileLists: __WEBPACK_IMPORTED_MODULE_3__components_FileLists_vue___default.a
+  },
+  mounted: function mounted() {
+    var self = this;
+    self.$store.commit('setBreadcrumbs', [{
+      label: 'Recording Browser',
+      name: ''
+    }]);
+  },
+  computed: {
+    dateRangeText: function dateRangeText() {
+      return this.dates.join(' ~ ');
+    }
+  },
+  data: function data() {
+    return {
+      dates: ['2019-09-10', '2019-09-20'],
+      active: 'filesearch'
+    };
+  },
+  watch: {
+    active: function active(v) {
+      console.log('active tab: ' + v);
+    }
+  },
+  methods: {}
 });
 
 /***/ }),
@@ -59864,131 +59831,145 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 
 
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    components: {
-        FileGroupAdd: __WEBPACK_IMPORTED_MODULE_0__FileGroupAdd_vue___default.a,
-        FileGroupEdit: __WEBPACK_IMPORTED_MODULE_1__FileGroupEdit_vue___default.a
-    },
-    data: function data() {
-        return {
-            headers: [{ text: 'Action', value: false, align: 'left', sortable: false }, { text: 'Group Name', value: 'name', align: 'left', sortable: false }, { text: 'Description', value: 'description', align: 'left', sortable: false }, { text: 'Total Files', value: 'file_count', align: 'left', sortable: false }, { text: 'Date Created', value: 'created_at', align: 'left', sortable: false }],
-            items: [],
-            totalItems: 0,
-            pagination: {
-                rowsPerPage: 10
-            },
-
-            filters: {
-                name: ''
-            },
-
-            dialogs: {
-                edit: {
-                    fileGroup: {},
-                    show: false
-                },
-                add: {
-                    show: false
-                }
-            }
-        };
-    },
-    mounted: function mounted() {
-        console.log('pages.files.components.FileGroupLists.vue');
-
-        var self = this;
-
-        self.$eventBus.$on(['FILE_GROUP_ADDED', 'FILE_GROUP_UPDATED', 'FILE_GROUP_DELETED'], function () {
-            self.loadFileGroups(function () {});
-        });
-    },
-
-    watch: {
-        'filters.name': _.debounce(function (v) {
-            this.loadFileGroups(function () {});
-        }, 500),
-        'pagination.page': function paginationPage() {
-            this.loadFileGroups(function () {});
+  components: {
+    FileGroupAdd: __WEBPACK_IMPORTED_MODULE_0__FileGroupAdd_vue___default.a,
+    FileGroupEdit: __WEBPACK_IMPORTED_MODULE_1__FileGroupEdit_vue___default.a
+  },
+  data: function data() {
+    return {
+      headers: [{
+        text: 'Action',
+        value: false,
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Group Name',
+        value: 'name',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Description',
+        value: 'description',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Total Files',
+        value: 'file_count',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Date Created',
+        value: 'created_at',
+        align: 'left',
+        sortable: false
+      }],
+      items: [],
+      totalItems: 0,
+      pagination: {
+        rowsPerPage: 10
+      },
+      filters: {
+        name: ''
+      },
+      dialogs: {
+        edit: {
+          fileGroup: {},
+          show: false
         },
-        'pagination.rowsPerPage': function paginationRowsPerPage() {
-            this.loadFileGroups(function () {});
+        add: {
+          show: false
         }
+      }
+    };
+  },
+  mounted: function mounted() {
+    console.log('pages.files.components.FileGroupLists.vue');
+    var self = this;
+    self.$eventBus.$on(['FILE_GROUP_ADDED', 'FILE_GROUP_UPDATED', 'FILE_GROUP_DELETED'], function () {
+      self.loadFileGroups(function () {});
+    });
+  },
+  watch: {
+    'filters.name': _.debounce(function (v) {
+      this.loadFileGroups(function () {});
+    }, 500),
+    'pagination.page': function paginationPage() {
+      this.loadFileGroups(function () {});
     },
-    methods: {
-        trash: function trash(group) {
-            var self = this;
-
-            self.$store.commit('showDialog', {
-                type: "confirm",
-                title: "Confirm Deletion",
-                message: "Are you sure you want to delete this file group?",
-                okCb: function okCb() {
-
-                    axios.delete('/admin/file-groups/' + group.id).then(function (response) {
-
-                        self.$store.commit('showSnackbar', {
-                            message: response.data.message,
-                            color: 'success',
-                            duration: 3000
-                        });
-
-                        self.$eventBus.$emit('FILE_GROUP_DELETED');
-                    }).catch(function (error) {
-                        if (error.response) {
-                            self.$store.commit('showSnackbar', {
-                                message: error.response.data.message,
-                                color: 'error',
-                                duration: 3000
-                            });
-                        } else if (error.request) {
-                            console.log(error.request);
-                        } else {
-                            console.log('Error', error.message);
-                        }
-                    });
-                },
-                cancelCb: function cancelCb() {
-                    console.log("CANCEL");
-                }
-            });
-        },
-        showDialog: function showDialog(dialog, data) {
-
-            var self = this;
-
-            switch (dialog) {
-                case 'file_group_edit':
-                    self.dialogs.edit.fileGroup = data;
-                    setTimeout(function () {
-                        self.dialogs.edit.show = true;
-                    }, 500);
-                    break;
-                case 'file_group_add':
-                    setTimeout(function () {
-                        self.dialogs.add.show = true;
-                    }, 500);
-                    break;
-            }
-        },
-        loadFileGroups: function loadFileGroups(cb) {
-
-            var self = this;
-
-            var params = {
-                name: self.filters.name,
-                page: self.pagination.page,
-                per_page: self.pagination.rowsPerPage
-            };
-
-            axios.get('/admin/file-groups', { params: params }).then(function (response) {
-                self.items = response.data.data.data;
-                self.totalItems = response.data.data.total;
-                self.pagination.totalItems = response.data.data.total;
-                (cb || Function)();
-            });
-        }
+    'pagination.rowsPerPage': function paginationRowsPerPage() {
+      this.loadFileGroups(function () {});
     }
+  },
+  methods: {
+    trash: function trash(group) {
+      var self = this;
+      self.$store.commit('showDialog', {
+        type: "confirm",
+        title: "Confirm Deletion",
+        message: "Are you sure you want to delete this file group?",
+        okCb: function okCb() {
+          axios["delete"]('/admin/file-groups/' + group.id).then(function (response) {
+            self.$store.commit('showSnackbar', {
+              message: response.data.message,
+              color: 'success',
+              duration: 3000
+            });
+            self.$eventBus.$emit('FILE_GROUP_DELETED');
+          })["catch"](function (error) {
+            if (error.response) {
+              self.$store.commit('showSnackbar', {
+                message: error.response.data.message,
+                color: 'error',
+                duration: 3000
+              });
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              console.log('Error', error.message);
+            }
+          });
+        },
+        cancelCb: function cancelCb() {
+          console.log("CANCEL");
+        }
+      });
+    },
+    showDialog: function showDialog(dialog, data) {
+      var self = this;
+
+      switch (dialog) {
+        case 'file_group_edit':
+          self.dialogs.edit.fileGroup = data;
+          setTimeout(function () {
+            self.dialogs.edit.show = true;
+          }, 500);
+          break;
+
+        case 'file_group_add':
+          setTimeout(function () {
+            self.dialogs.add.show = true;
+          }, 500);
+          break;
+      }
+    },
+    loadFileGroups: function loadFileGroups(cb) {
+      var self = this;
+      var params = {
+        name: self.filters.name,
+        page: self.pagination.page,
+        per_page: self.pagination.rowsPerPage
+      };
+      axios.get('/admin/file-groups', {
+        params: params
+      }).then(function (response) {
+        self.items = response.data.data.data;
+        self.totalItems = response.data.data.total;
+        self.pagination.totalItems = response.data.data.total;
+        (cb || Function)();
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -60069,68 +60050,60 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    data: function data() {
-        return {
-            valid: false,
-            isLoading: false,
-            name: '',
-            nameRules: [function (v) {
-                return !!v || 'Name is required';
-            }],
-            description: '',
-            descriptionRules: [function (v) {
-                return !!v || 'Description is required';
-            }]
-        };
-    },
-    mounted: function mounted() {
-        console.log('pages.files.components.FileGroupAdd.vue');
+  data: function data() {
+    return {
+      valid: false,
+      isLoading: false,
+      name: '',
+      nameRules: [function (v) {
+        return !!v || 'Name is required';
+      }],
+      description: '',
+      descriptionRules: [function (v) {
+        return !!v || 'Description is required';
+      }]
+    };
+  },
+  mounted: function mounted() {
+    console.log('pages.files.components.FileGroupAdd.vue');
+    var self = this;
+  },
+  methods: {
+    save: function save() {
+      var self = this;
+      var payload = {
+        name: self.name,
+        description: self.description
+      };
+      self.isLoading = true;
+      axios.post('/admin/file-groups', payload).then(function (response) {
+        self.$store.commit('showSnackbar', {
+          message: response.data.message,
+          color: 'success',
+          duration: 3000
+        });
+        self.isLoading = false;
+        self.$eventBus.$emit('FILE_GROUP_ADDED'); // reset
 
-        var self = this;
-    },
+        self.$refs.fileGroupFormAdd.reset();
+      })["catch"](function (error) {
+        self.isLoading = false;
 
-    methods: {
-        save: function save() {
-            var self = this;
-
-            var payload = {
-                name: self.name,
-                description: self.description
-            };
-
-            self.isLoading = true;
-
-            axios.post('/admin/file-groups', payload).then(function (response) {
-
-                self.$store.commit('showSnackbar', {
-                    message: response.data.message,
-                    color: 'success',
-                    duration: 3000
-                });
-
-                self.isLoading = false;
-                self.$eventBus.$emit('FILE_GROUP_ADDED');
-
-                // reset
-                self.$refs.fileGroupFormAdd.reset();
-            }).catch(function (error) {
-                self.isLoading = false;
-                if (error.response) {
-                    self.$store.commit('showSnackbar', {
-                        message: error.response.data.message,
-                        color: 'error',
-                        duration: 3000
-                    });
-                } else if (error.request) {
-                    console.log(error.request);
-                } else {
-                    console.log('Error', error.message);
-                }
-            });
+        if (error.response) {
+          self.$store.commit('showSnackbar', {
+            message: error.response.data.message,
+            color: 'error',
+            duration: 3000
+          });
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log('Error', error.message);
         }
+      });
     }
+  }
 });
 
 /***/ }),
@@ -60341,86 +60314,77 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    props: {
-        propFileGroupId: {
-            required: true
-        }
-    },
-    data: function data() {
-        return {
-            valid: false,
-            isLoading: false,
-            name: '',
-            nameRules: [function (v) {
-                return !!v || 'Name is required';
-            }],
-            description: '',
-            descriptionRules: [function (v) {
-                return !!v || 'Description is required';
-            }]
-        };
-    },
-    mounted: function mounted() {
-        console.log('pages.files.components.FileGroupEdit.vue');
-
-        var self = this;
-    },
-
-    watch: {
-        propFileGroupId: function propFileGroupId(v) {
-            if (v) this.loadFileGroup(function () {});
-        }
-    },
-    methods: {
-        save: function save() {
-            var self = this;
-
-            var payload = {
-                name: self.name,
-                description: self.description
-            };
-
-            self.isLoading = true;
-
-            axios.put('/admin/file-groups/' + self.propFileGroupId, payload).then(function (response) {
-
-                self.$store.commit('showSnackbar', {
-                    message: response.data.message,
-                    color: 'success',
-                    duration: 3000
-                });
-
-                self.isLoading = false;
-                self.$eventBus.$emit('FILE_GROUP_UPDATED');
-            }).catch(function (error) {
-                self.isLoading = false;
-                if (error.response) {
-                    self.$store.commit('showSnackbar', {
-                        message: error.response.data.message,
-                        color: 'error',
-                        duration: 3000
-                    });
-                } else if (error.request) {
-                    console.log(error.request);
-                } else {
-                    console.log('Error', error.message);
-                }
-            });
-        },
-        loadFileGroup: function loadFileGroup(cb) {
-
-            var self = this;
-
-            axios.get('/admin/file-groups/' + self.propFileGroupId).then(function (response) {
-                var Group = response.data.data;
-                self.name = Group.name;
-                self.description = Group.description;
-                cb();
-            });
-        }
+  props: {
+    propFileGroupId: {
+      required: true
     }
+  },
+  data: function data() {
+    return {
+      valid: false,
+      isLoading: false,
+      name: '',
+      nameRules: [function (v) {
+        return !!v || 'Name is required';
+      }],
+      description: '',
+      descriptionRules: [function (v) {
+        return !!v || 'Description is required';
+      }]
+    };
+  },
+  mounted: function mounted() {
+    console.log('pages.files.components.FileGroupEdit.vue');
+    var self = this;
+  },
+  watch: {
+    propFileGroupId: function propFileGroupId(v) {
+      if (v) this.loadFileGroup(function () {});
+    }
+  },
+  methods: {
+    save: function save() {
+      var self = this;
+      var payload = {
+        name: self.name,
+        description: self.description
+      };
+      self.isLoading = true;
+      axios.put('/admin/file-groups/' + self.propFileGroupId, payload).then(function (response) {
+        self.$store.commit('showSnackbar', {
+          message: response.data.message,
+          color: 'success',
+          duration: 3000
+        });
+        self.isLoading = false;
+        self.$eventBus.$emit('FILE_GROUP_UPDATED');
+      })["catch"](function (error) {
+        self.isLoading = false;
+
+        if (error.response) {
+          self.$store.commit('showSnackbar', {
+            message: error.response.data.message,
+            color: 'error',
+            duration: 3000
+          });
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log('Error', error.message);
+        }
+      });
+    },
+    loadFileGroup: function loadFileGroup(cb) {
+      var self = this;
+      axios.get('/admin/file-groups/' + self.propFileGroupId).then(function (response) {
+        var Group = response.data.data;
+        self.name = Group.name;
+        self.description = Group.description;
+        cb();
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -61069,173 +61033,184 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    computed: {
-        dateRangeText: function dateRangeText() {
-            return this.dates.join(' ~ ');
-        }
-    },
-    components: {},
-    data: function data() {
-        return {
-
-            dates: [new Date().toISOString().substr(0, 10), new Date().toISOString().substr(0, 10)],
-            picker: new Date().toISOString().substr(0, 10),
-            headers: [{ text: 'Action', value: false, align: 'left', sortable: false }, { text: 'Thumb', value: 'thumb', align: 'left', sortable: false }, { text: 'Name', value: 'name', align: 'left', sortable: false }, { text: 'Size', value: 'size', align: 'left', sortable: false }, { text: 'Found In', value: 'group', align: 'left', sortable: false }, { text: 'Date Created', value: 'created_at', align: 'left', sortable: false }],
-            items: [],
-            totalItems: 0,
-            pagination: {
-                rowsPerPage: 10
-            },
-
-            filters: {
-                name: '',
-                selectedGroupIds: '',
-                fileGroupId: [],
-                fileGroupsHolder: []
-            },
-
-            dialogs: {
-                view: {
-                    file: {},
-                    show: false
-                }
-            }
-        };
-    },
-    mounted: function mounted() {
-        console.log('pages.files.components.FileLists.vue');
-
-        var self = this;
-
-        self.$eventBus.$on(['FILE_DELETED', 'FILE_UPLOADED'], function () {
-            self.loadFiles(function () {});
-        });
-    },
-
-    watch: {
-        'filters.fileGroupId': _.debounce(function (v) {
-
-            var selected = [];
-
-            _.each(v, function (v, k) {
-                if (v) selected.push(k);
-            });
-
-            this.filters.selectedGroupIds = selected.join(',');
-        }, 500),
-        'filters.selectedGroupIds': function filtersSelectedGroupIds(v) {
-            this.loadFiles(function () {});
-        },
-
-        'filters.name': _.debounce(function (v) {
-            this.loadFiles(function () {});
-        }, 500),
-        'pagination.page': function paginationPage() {
-            this.loadFiles(function () {});
-        },
-        'pagination.rowsPerPage': function paginationRowsPerPage() {
-            this.loadFiles(function () {});
-        }
-    },
-    methods: {
-        getFullUrl: function getFullUrl(file, width, action) {
-
-            var w = width || 4000;
-            var act = action || 'resize';
-
-            return LSK_APP.APP_URL + '/files/' + file.id + '/preview?w=' + w + '&action=' + act;
-        },
-        downloadFile: function downloadFile(file) {
-            window.open(LSK_APP.APP_URL + '/files/' + file.id + '/download?file_token=' + file.file_token);
-        },
-        showDialog: function showDialog(dialog, data) {
-
-            var self = this;
-
-            switch (dialog) {
-                case 'file_show':
-                    self.dialogs.view.file = data;
-                    setTimeout(function () {
-                        self.dialogs.view.show = true;
-                    }, 500);
-                    break;
-            }
-        },
-        trash: function trash(file) {
-            var self = this;
-
-            self.$store.commit('showDialog', {
-                type: "confirm",
-                title: "Confirm Deletion",
-                message: "Are you sure you want to delete this file?",
-                okCb: function okCb() {
-
-                    axios.delete('/admin/files/' + file.id).then(function (response) {
-
-                        self.$store.commit('showSnackbar', {
-                            message: response.data.message,
-                            color: 'success',
-                            duration: 3000
-                        });
-
-                        self.$eventBus.$emit('FILE_DELETED');
-
-                        // maybe the action took place from view file
-                        // lets close it.
-                        self.dialogs.view.show = false;
-                    }).catch(function (error) {
-                        if (error.response) {
-                            self.$store.commit('showSnackbar', {
-                                message: error.response.data.message,
-                                color: 'error',
-                                duration: 3000
-                            });
-                        } else if (error.request) {
-                            console.log(error.request);
-                        } else {
-                            console.log('Error', error.message);
-                        }
-                    });
-                },
-                cancelCb: function cancelCb() {
-                    console.log("CANCEL");
-                }
-            });
-        },
-        loadFileGroups: function loadFileGroups(cb) {
-
-            var self = this;
-
-            var params = {
-                paginate: 'no'
-            };
-
-            axios.get('/admin/file-groups', { params: params }).then(function (response) {
-                self.filters.fileGroupsHolder = response.data.data;
-                cb();
-            });
-        },
-        loadFiles: function loadFiles(cb) {
-
-            var self = this;
-
-            var params = {
-                name: self.filters.name,
-                file_group_id: self.filters.selectedGroupIds,
-                page: self.pagination.page,
-                per_page: self.pagination.rowsPerPage
-            };
-
-            axios.get('/admin/files', { params: params }).then(function (response) {
-                self.items = response.data.data.data;
-                self.totalItems = response.data.data.total;
-                self.pagination.totalItems = response.data.data.total;
-                (cb || Function)();
-            });
-        }
+  computed: {
+    dateRangeText: function dateRangeText() {
+      return this.dates.join(' ~ ');
     }
+  },
+  components: {},
+  data: function data() {
+    return {
+      dates: [new Date().toISOString().substr(0, 10), new Date().toISOString().substr(0, 10)],
+      picker: new Date().toISOString().substr(0, 10),
+      headers: [{
+        text: 'Action',
+        value: false,
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Thumb',
+        value: 'thumb',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Name',
+        value: 'name',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Size',
+        value: 'size',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Found In',
+        value: 'group',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Date Created',
+        value: 'created_at',
+        align: 'left',
+        sortable: false
+      }],
+      items: [],
+      totalItems: 0,
+      pagination: {
+        rowsPerPage: 10
+      },
+      filters: {
+        name: '',
+        selectedGroupIds: '',
+        fileGroupId: [],
+        fileGroupsHolder: []
+      },
+      dialogs: {
+        view: {
+          file: {},
+          show: false
+        }
+      }
+    };
+  },
+  mounted: function mounted() {
+    console.log('pages.files.components.FileLists.vue');
+    var self = this;
+    self.$eventBus.$on(['FILE_DELETED', 'FILE_UPLOADED'], function () {
+      self.loadFiles(function () {});
+    });
+  },
+  watch: {
+    'filters.fileGroupId': _.debounce(function (v) {
+      var selected = [];
+
+      _.each(v, function (v, k) {
+        if (v) selected.push(k);
+      });
+
+      this.filters.selectedGroupIds = selected.join(',');
+    }, 500),
+    'filters.selectedGroupIds': function filtersSelectedGroupIds(v) {
+      this.loadFiles(function () {});
+    },
+    'filters.name': _.debounce(function (v) {
+      this.loadFiles(function () {});
+    }, 500),
+    'pagination.page': function paginationPage() {
+      this.loadFiles(function () {});
+    },
+    'pagination.rowsPerPage': function paginationRowsPerPage() {
+      this.loadFiles(function () {});
+    }
+  },
+  methods: {
+    getFullUrl: function getFullUrl(file, width, action) {
+      var w = width || 4000;
+      var act = action || 'resize';
+      return LSK_APP.APP_URL + "/files/" + file.id + "/preview?w=" + w + "&action=" + act;
+    },
+    downloadFile: function downloadFile(file) {
+      window.open(LSK_APP.APP_URL + '/files/' + file.id + '/download?file_token=' + file.file_token);
+    },
+    showDialog: function showDialog(dialog, data) {
+      var self = this;
+
+      switch (dialog) {
+        case 'file_show':
+          self.dialogs.view.file = data;
+          setTimeout(function () {
+            self.dialogs.view.show = true;
+          }, 500);
+          break;
+      }
+    },
+    trash: function trash(file) {
+      var self = this;
+      self.$store.commit('showDialog', {
+        type: "confirm",
+        title: "Confirm Deletion",
+        message: "Are you sure you want to delete this file?",
+        okCb: function okCb() {
+          axios["delete"]('/admin/files/' + file.id).then(function (response) {
+            self.$store.commit('showSnackbar', {
+              message: response.data.message,
+              color: 'success',
+              duration: 3000
+            });
+            self.$eventBus.$emit('FILE_DELETED'); // maybe the action took place from view file
+            // lets close it.
+
+            self.dialogs.view.show = false;
+          })["catch"](function (error) {
+            if (error.response) {
+              self.$store.commit('showSnackbar', {
+                message: error.response.data.message,
+                color: 'error',
+                duration: 3000
+              });
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              console.log('Error', error.message);
+            }
+          });
+        },
+        cancelCb: function cancelCb() {
+          console.log("CANCEL");
+        }
+      });
+    },
+    loadFileGroups: function loadFileGroups(cb) {
+      var self = this;
+      var params = {
+        paginate: 'no'
+      };
+      axios.get('/admin/file-groups', {
+        params: params
+      }).then(function (response) {
+        self.filters.fileGroupsHolder = response.data.data;
+        cb();
+      });
+    },
+    loadFiles: function loadFiles(cb) {
+      var self = this;
+      var params = {
+        name: self.filters.name,
+        file_group_id: self.filters.selectedGroupIds,
+        page: self.pagination.page,
+        per_page: self.pagination.rowsPerPage
+      };
+      axios.get('/admin/files', {
+        params: params
+      }).then(function (response) {
+        self.items = response.data.data.data;
+        self.totalItems = response.data.data.total;
+        self.pagination.totalItems = response.data.data.total;
+        (cb || Function)();
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -61748,108 +61723,95 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    data: function data() {
-        return {
-            dropzone: null,
-            fileGroups: [],
-            uploadTo: '',
-            addedFiles: []
-        };
+  data: function data() {
+    return {
+      dropzone: null,
+      fileGroups: [],
+      uploadTo: '',
+      addedFiles: []
+    };
+  },
+  mounted: function mounted() {
+    console.log('pages.files.components.FileUpload.vue');
+    var self = this;
+    self.loadFileGroups(function () {});
+    self.initDropzone();
+    self.$eventBus.$on(['FILE_GROUP_ADDED'], function () {
+      self.loadFileGroups(function () {});
+    });
+  },
+  methods: {
+    clear: function clear() {
+      var self = this;
+
+      _.each(self.addedFiles, function (f) {
+        self.dropzone.removeFile(f);
+      });
+
+      self.addedFiles = [];
     },
-    mounted: function mounted() {
-        console.log('pages.files.components.FileUpload.vue');
-
-        var self = this;
-
-        self.loadFileGroups(function () {});
-        self.initDropzone();
-
-        self.$eventBus.$on(['FILE_GROUP_ADDED'], function () {
-            self.loadFileGroups(function () {});
-        });
+    upload: function upload() {
+      var self = this;
+      self.dropzone.processQueue();
     },
-
-    methods: {
-        clear: function clear() {
-            var self = this;
-
-            _.each(self.addedFiles, function (f) {
-                self.dropzone.removeFile(f);
-            });
-
-            self.addedFiles = [];
+    initDropzone: function initDropzone() {
+      var self = this;
+      Dropzone.autoDiscover = false;
+      self.dropzone = new Dropzone("#fileupload", {
+        url: '/admin/files',
+        paramName: "file",
+        // The name that will be used to transfer the file
+        maxFilesize: 50,
+        // 50MB
+        uploadMultiple: true,
+        //acceptedFiles: 'image/*',
+        headers: {
+          'X-CSRF-TOKEN': _token
         },
-        upload: function upload() {
-
-            var self = this;
-
-            self.dropzone.processQueue();
+        autoProcessQueue: true,
+        init: function init() {// initial hook
         },
-        initDropzone: function initDropzone() {
-
-            var self = this;
-
-            Dropzone.autoDiscover = false;
-
-            self.dropzone = new Dropzone("#fileupload", {
-                url: '/admin/files',
-                paramName: "file", // The name that will be used to transfer the file
-                maxFilesize: 50, // 50MB
-                uploadMultiple: true,
-                //acceptedFiles: 'image/*',
-                headers: { 'X-CSRF-TOKEN': _token },
-                autoProcessQueue: true,
-                init: function init() {
-                    // initial hook
-                },
-                success: function success(file, response) {
-                    // success hook
-                }
-            });
-
-            self.dropzone.on("addedfile", function (file) {
-                if (!self.uploadTo) {
-                    self.$store.commit('showSnackbar', {
-                        message: "Please choose file group to upload the file(s)",
-                        color: 'error',
-                        duration: 3000
-                    });
-                    self.dropzone.removeFile(file);
-                } else {
-                    self.addedFiles.push(file);
-                }
-            });
-
-            self.dropzone.on('sending', function (file, xhr, formData) {
-                formData.append('file_group_id', self.uploadTo);
-            });
-
-            self.dropzone.on("complete", function (file) {
-                self.$store.commit('showSnackbar', {
-                    message: "File(s) uploaded successfully.",
-                    color: 'success',
-                    duration: 3000
-                });
-
-                self.$eventBus.$emit('FILE_UPLOADED');
-            });
-        },
-        loadFileGroups: function loadFileGroups(cb) {
-
-            var self = this;
-
-            var params = {
-                paginate: 'no'
-            };
-
-            axios.get('/admin/file-groups', { params: params }).then(function (response) {
-                self.fileGroups = response.data.data;
-                cb();
-            });
+        success: function success(file, response) {// success hook
         }
+      });
+      self.dropzone.on("addedfile", function (file) {
+        if (!self.uploadTo) {
+          self.$store.commit('showSnackbar', {
+            message: "Please choose file group to upload the file(s)",
+            color: 'error',
+            duration: 3000
+          });
+          self.dropzone.removeFile(file);
+        } else {
+          self.addedFiles.push(file);
+        }
+      });
+      self.dropzone.on('sending', function (file, xhr, formData) {
+        formData.append('file_group_id', self.uploadTo);
+      });
+      self.dropzone.on("complete", function (file) {
+        self.$store.commit('showSnackbar', {
+          message: "File(s) uploaded successfully.",
+          color: 'success',
+          duration: 3000
+        });
+        self.$eventBus.$emit('FILE_UPLOADED');
+      });
+    },
+    loadFileGroups: function loadFileGroups(cb) {
+      var self = this;
+      var params = {
+        paginate: 'no'
+      };
+      axios.get('/admin/file-groups', {
+        params: params
+      }).then(function (response) {
+        self.fileGroups = response.data.data;
+        cb();
+      });
     }
+  }
 });
 
 /***/ }),
@@ -62146,165 +62108,177 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    components: {},
-    data: function data() {
-        return {
-            headers: [{ text: 'Action', value: false, align: 'left', sortable: false }, { text: 'Thumb', value: 'thumb', align: 'left', sortable: false }, { text: 'Name', value: 'name', align: 'left', sortable: false }, { text: 'Size', value: 'size', align: 'left', sortable: false }, { text: 'Found In', value: 'group', align: 'left', sortable: false }, { text: 'Date Created', value: 'created_at', align: 'left', sortable: false }],
-            items: [],
-            totalItems: 0,
-            pagination: {
-                rowsPerPage: 10
-            },
-
-            filters: {
-                name: '',
-                selectedGroupIds: '',
-                fileGroupId: [],
-                fileGroupsHolder: []
-            },
-
-            dialogs: {
-                view: {
-                    file: {},
-                    show: false
-                }
-            }
-        };
-    },
-    mounted: function mounted() {
-        console.log('pages.files.components.FileLists.vue');
-
-        var self = this;
-
-        self.$eventBus.$on(['FILE_DELETED', 'FILE_UPLOADED'], function () {
-            self.loadFiles(function () {});
-        });
-    },
-
-    watch: {
-        'filters.fileGroupId': _.debounce(function (v) {
-
-            var selected = [];
-
-            _.each(v, function (v, k) {
-                if (v) selected.push(k);
-            });
-
-            this.filters.selectedGroupIds = selected.join(',');
-        }, 500),
-        'filters.selectedGroupIds': function filtersSelectedGroupIds(v) {
-            this.loadFiles(function () {});
-        },
-
-        'filters.name': _.debounce(function (v) {
-            this.loadFiles(function () {});
-        }, 500),
-        'pagination.page': function paginationPage() {
-            this.loadFiles(function () {});
-        },
-        'pagination.rowsPerPage': function paginationRowsPerPage() {
-            this.loadFiles(function () {});
+  components: {},
+  data: function data() {
+    return {
+      headers: [{
+        text: 'Action',
+        value: false,
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Thumb',
+        value: 'thumb',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Name',
+        value: 'name',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Size',
+        value: 'size',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Found In',
+        value: 'group',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Date Created',
+        value: 'created_at',
+        align: 'left',
+        sortable: false
+      }],
+      items: [],
+      totalItems: 0,
+      pagination: {
+        rowsPerPage: 10
+      },
+      filters: {
+        name: '',
+        selectedGroupIds: '',
+        fileGroupId: [],
+        fileGroupsHolder: []
+      },
+      dialogs: {
+        view: {
+          file: {},
+          show: false
         }
+      }
+    };
+  },
+  mounted: function mounted() {
+    console.log('pages.files.components.FileLists.vue');
+    var self = this;
+    self.$eventBus.$on(['FILE_DELETED', 'FILE_UPLOADED'], function () {
+      self.loadFiles(function () {});
+    });
+  },
+  watch: {
+    'filters.fileGroupId': _.debounce(function (v) {
+      var selected = [];
+
+      _.each(v, function (v, k) {
+        if (v) selected.push(k);
+      });
+
+      this.filters.selectedGroupIds = selected.join(',');
+    }, 500),
+    'filters.selectedGroupIds': function filtersSelectedGroupIds(v) {
+      this.loadFiles(function () {});
     },
-    methods: {
-        getFullUrl: function getFullUrl(file, width, action) {
-
-            var w = width || 4000;
-            var act = action || 'resize';
-
-            return LSK_APP.APP_URL + '/files/' + file.id + '/preview?w=' + w + '&action=' + act;
-        },
-        downloadFile: function downloadFile(file) {
-            window.open(LSK_APP.APP_URL + '/files/' + file.id + '/download?file_token=' + file.file_token);
-        },
-        showDialog: function showDialog(dialog, data) {
-
-            var self = this;
-
-            switch (dialog) {
-                case 'file_show':
-                    self.dialogs.view.file = data;
-                    setTimeout(function () {
-                        self.dialogs.view.show = true;
-                    }, 500);
-                    break;
-            }
-        },
-        trash: function trash(file) {
-            var self = this;
-
-            self.$store.commit('showDialog', {
-                type: "confirm",
-                title: "Confirm Deletion",
-                message: "Are you sure you want to delete this file?",
-                okCb: function okCb() {
-
-                    axios.delete('/admin/files/' + file.id).then(function (response) {
-
-                        self.$store.commit('showSnackbar', {
-                            message: response.data.message,
-                            color: 'success',
-                            duration: 3000
-                        });
-
-                        self.$eventBus.$emit('FILE_DELETED');
-
-                        // maybe the action took place from view file
-                        // lets close it.
-                        self.dialogs.view.show = false;
-                    }).catch(function (error) {
-                        if (error.response) {
-                            self.$store.commit('showSnackbar', {
-                                message: error.response.data.message,
-                                color: 'error',
-                                duration: 3000
-                            });
-                        } else if (error.request) {
-                            console.log(error.request);
-                        } else {
-                            console.log('Error', error.message);
-                        }
-                    });
-                },
-                cancelCb: function cancelCb() {
-                    console.log("CANCEL");
-                }
-            });
-        },
-        loadFileGroups: function loadFileGroups(cb) {
-
-            var self = this;
-
-            var params = {
-                paginate: 'no'
-            };
-
-            axios.get('/admin/file-groups', { params: params }).then(function (response) {
-                self.filters.fileGroupsHolder = response.data.data;
-                cb();
-            });
-        },
-        loadFiles: function loadFiles(cb) {
-
-            var self = this;
-
-            var params = {
-                name: self.filters.name,
-                file_group_id: self.filters.selectedGroupIds,
-                page: self.pagination.page,
-                per_page: self.pagination.rowsPerPage
-            };
-
-            axios.get('/admin/files', { params: params }).then(function (response) {
-                self.items = response.data.data.data;
-                self.totalItems = response.data.data.total;
-                self.pagination.totalItems = response.data.data.total;
-                (cb || Function)();
-            });
-        }
+    'filters.name': _.debounce(function (v) {
+      this.loadFiles(function () {});
+    }, 500),
+    'pagination.page': function paginationPage() {
+      this.loadFiles(function () {});
+    },
+    'pagination.rowsPerPage': function paginationRowsPerPage() {
+      this.loadFiles(function () {});
     }
+  },
+  methods: {
+    getFullUrl: function getFullUrl(file, width, action) {
+      var w = width || 4000;
+      var act = action || 'resize';
+      return LSK_APP.APP_URL + "/files/" + file.id + "/preview?w=" + w + "&action=" + act;
+    },
+    downloadFile: function downloadFile(file) {
+      window.open(LSK_APP.APP_URL + '/files/' + file.id + '/download?file_token=' + file.file_token);
+    },
+    showDialog: function showDialog(dialog, data) {
+      var self = this;
+
+      switch (dialog) {
+        case 'file_show':
+          self.dialogs.view.file = data;
+          setTimeout(function () {
+            self.dialogs.view.show = true;
+          }, 500);
+          break;
+      }
+    },
+    trash: function trash(file) {
+      var self = this;
+      self.$store.commit('showDialog', {
+        type: "confirm",
+        title: "Confirm Deletion",
+        message: "Are you sure you want to delete this file?",
+        okCb: function okCb() {
+          axios["delete"]('/admin/files/' + file.id).then(function (response) {
+            self.$store.commit('showSnackbar', {
+              message: response.data.message,
+              color: 'success',
+              duration: 3000
+            });
+            self.$eventBus.$emit('FILE_DELETED'); // maybe the action took place from view file
+            // lets close it.
+
+            self.dialogs.view.show = false;
+          })["catch"](function (error) {
+            if (error.response) {
+              self.$store.commit('showSnackbar', {
+                message: error.response.data.message,
+                color: 'error',
+                duration: 3000
+              });
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              console.log('Error', error.message);
+            }
+          });
+        },
+        cancelCb: function cancelCb() {
+          console.log("CANCEL");
+        }
+      });
+    },
+    loadFileGroups: function loadFileGroups(cb) {
+      var self = this;
+      var params = {
+        paginate: 'no'
+      };
+      axios.get('/admin/file-groups', {
+        params: params
+      }).then(function (response) {
+        self.filters.fileGroupsHolder = response.data.data;
+        cb();
+      });
+    },
+    loadFiles: function loadFiles(cb) {
+      var self = this;
+      var params = {
+        name: self.filters.name,
+        file_group_id: self.filters.selectedGroupIds,
+        page: self.pagination.page,
+        per_page: self.pagination.rowsPerPage
+      };
+      axios.get('/admin/files', {
+        params: params
+      }).then(function (response) {
+        self.items = response.data.data.data;
+        self.totalItems = response.data.data.total;
+        self.pagination.totalItems = response.data.data.total;
+        (cb || Function)();
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -62931,66 +62905,65 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    components: {
-        FileSearch: __WEBPACK_IMPORTED_MODULE_1__components_FileSearchForm_vue___default.a,
-        NewCaseDialog: __WEBPACK_IMPORTED_MODULE_0__components_NewCaseDialog_vue___default.a,
-        FileUpload: __WEBPACK_IMPORTED_MODULE_2__components_FileUpload_vue___default.a,
-        FileGroupLists: __WEBPACK_IMPORTED_MODULE_4__components_FileGroupLists_vue___default.a,
-        FileLists: __WEBPACK_IMPORTED_MODULE_3__components_FileLists_vue___default.a
-    },
-    mounted: function mounted() {
-
-        var self = this;
-        self.$store.commit('setBreadcrumbs', [{ label: 'Case Recording', name: '' }]);
-    },
-
-    computed: {
-        dateRangeText: function dateRangeText() {
-            return this.dates.join(' ~ ');
-        }
-    },
-    data: function data() {
-        return {
-
-            isLoading: false,
-            dates: [],
-            active: 'caserecording',
-            newcasedialog: false,
-            newcase_dialog: false,
-            dialogs: {
-                add: {
-                    show: false
-                }
-            }
-        };
-    },
-
-    watch: {
-        active: function active(v) {
-            console.log('active tab: ' + v);
-        }
-    },
-    methods: {
-        process: function process() {
-            // items is defined object inside data()
-            var valid = this.$refs.NewCaseDialog.data('valid');
-        },
-        savenewcase: function savenewcase() {
-            this.$refs.NewCase.save();
-        },
-        showDialog: function showDialog(dialog, data) {
-            var self = this;
-            switch (dialog) {
-                case 'newcase_dialog':
-                    setTimeout(function () {
-                        self.dialogs.add.show = true;
-                    }, 500);
-                    break;
-            }
-        }
+  components: {
+    FileSearch: __WEBPACK_IMPORTED_MODULE_1__components_FileSearchForm_vue___default.a,
+    NewCaseDialog: __WEBPACK_IMPORTED_MODULE_0__components_NewCaseDialog_vue___default.a,
+    FileUpload: __WEBPACK_IMPORTED_MODULE_2__components_FileUpload_vue___default.a,
+    FileGroupLists: __WEBPACK_IMPORTED_MODULE_4__components_FileGroupLists_vue___default.a,
+    FileLists: __WEBPACK_IMPORTED_MODULE_3__components_FileLists_vue___default.a
+  },
+  mounted: function mounted() {
+    var self = this;
+    self.$store.commit('setBreadcrumbs', [{
+      label: 'Case Recording',
+      name: ''
+    }]);
+  },
+  computed: {
+    dateRangeText: function dateRangeText() {
+      return this.dates.join(' ~ ');
     }
+  },
+  data: function data() {
+    return {
+      isLoading: false,
+      dates: [],
+      active: 'caserecording',
+      newcasedialog: false,
+      newcase_dialog: false,
+      dialogs: {
+        add: {
+          show: false
+        }
+      }
+    };
+  },
+  watch: {
+    active: function active(v) {
+      console.log('active tab: ' + v);
+    }
+  },
+  methods: {
+    process: function process() {
+      // items is defined object inside data()
+      var valid = this.$refs.NewCaseDialog.data('valid');
+    },
+    savenewcase: function savenewcase() {
+      this.$refs.NewCase.save();
+    },
+    showDialog: function showDialog(dialog, data) {
+      var self = this;
+
+      switch (dialog) {
+        case 'newcase_dialog':
+          setTimeout(function () {
+            self.dialogs.add.show = true;
+          }, 500);
+          break;
+      }
+    }
+  }
 });
 
 /***/ }),
@@ -63242,88 +63215,81 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    components: {},
-    props: {
-        /*mask: {
-            type: String,
-            default: '#### — #### — #### — ####'
-        },*/
-    },
-    name: "NewCaseDialog",
-    data: function data() {
-        return {
-            valid: false,
-            isLoading: false,
-            vsubject: "",
-            vpriority: false,
-            vcalldirection: "",
-            vmsisdncaller: "",
-            vmsisdnprob: "",
-            vagentid: "",
-            vremark: "",
-            nameRules: [function (v) {
-                return !!v || 'Subject is required';
-            }],
-            calldirectionRules: [function (v) {
-                return !!v || 'Choose one Call Direction';
-            }],
-            descriptionRules: [function (v) {
-                return !!v || 'Remark is required';
-            }],
-            modaldatekejadian: false,
-            itemtypecases: ['IBC CALL-IN', 'IBC CALL-OUT (CallBack)', 'OBC CALL-OUT'],
-            dates: [new Date().toISOString().substr(0, 10), new Date().toISOString().substr(0, 10)]
-        };
-    },
-    methods: {
-        save: function save() {
-            var self = this;
+  components: {},
+  props: {
+    /*mask: {
+        type: String,
+        default: '#### — #### — #### — ####'
+    },*/
+  },
+  name: "NewCaseDialog",
+  data: function data() {
+    return {
+      valid: false,
+      isLoading: false,
+      vsubject: "",
+      vpriority: false,
+      vcalldirection: "",
+      vmsisdncaller: "",
+      vmsisdnprob: "",
+      vagentid: "",
+      vremark: "",
+      nameRules: [function (v) {
+        return !!v || 'Subject is required';
+      }],
+      calldirectionRules: [function (v) {
+        return !!v || 'Choose one Call Direction';
+      }],
+      descriptionRules: [function (v) {
+        return !!v || 'Remark is required';
+      }],
+      modaldatekejadian: false,
+      itemtypecases: ['IBC CALL-IN', 'IBC CALL-OUT (CallBack)', 'OBC CALL-OUT'],
+      dates: [new Date().toISOString().substr(0, 10), new Date().toISOString().substr(0, 10)]
+    };
+  },
+  methods: {
+    save: function save() {
+      var self = this;
+      var payload = {
+        subject: self.vsubject,
+        remark: self.vremark,
+        priority: self.vpriority,
+        calldirection: self.vcalldirection,
+        agentid: self.vagentid,
+        dates: self.dates,
+        msisdncaller: self.vmsisdncaller,
+        msisdnprob: self.vmsisdnprob
+      };
+      console.log(payload);
+      self.isLoading = true;
+      axios.post('/api/admin/caserecording/createnew', payload).then(function (response) {
+        self.$store.commit('showSnackbar', {
+          message: response.data.message,
+          color: 'success',
+          duration: 3000
+        });
+        self.isLoading = false;
+        self.$eventBus.$emit('FILE_GROUP_ADDED'); // reset
+        //self.$refs.NewCaseForm.reset();
+      })["catch"](function (error) {
+        self.isLoading = false;
 
-            var payload = {
-                subject: self.vsubject,
-                remark: self.vremark,
-                priority: self.vpriority,
-                calldirection: self.vcalldirection,
-                agentid: self.vagentid,
-                dates: self.dates,
-                msisdncaller: self.vmsisdncaller,
-                msisdnprob: self.vmsisdnprob
-            };
-            console.log(payload);
-            self.isLoading = true;
-
-            axios.post('/api/admin/caserecording/createnew', payload).then(function (response) {
-
-                self.$store.commit('showSnackbar', {
-                    message: response.data.message,
-                    color: 'success',
-                    duration: 3000
-                });
-
-                self.isLoading = false;
-                self.$eventBus.$emit('FILE_GROUP_ADDED');
-
-                // reset
-                //self.$refs.NewCaseForm.reset();
-            }).catch(function (error) {
-                self.isLoading = false;
-                if (error.response) {
-                    self.$store.commit('showSnackbar', {
-                        message: error.response.data.message,
-                        color: 'error',
-                        duration: 3000
-                    });
-                } else if (error.request) {
-                    console.log(error.request);
-                } else {
-                    console.log('Error', error.message);
-                }
-            });
+        if (error.response) {
+          self.$store.commit('showSnackbar', {
+            message: error.response.data.message,
+            color: 'error',
+            duration: 3000
+          });
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log('Error', error.message);
         }
+      });
     }
-
+  }
 });
 
 /***/ }),
@@ -63920,173 +63886,184 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    computed: {
-        dateRangeText: function dateRangeText() {
-            return this.dates.join(' ~ ');
-        }
-    },
-    components: {},
-    data: function data() {
-        return {
-
-            dates: [new Date().toISOString().substr(0, 10), new Date().toISOString().substr(0, 10)],
-            picker: new Date().toISOString().substr(0, 10),
-            headers: [{ text: 'Action', value: false, align: 'left', sortable: false }, { text: 'Thumb', value: 'thumb', align: 'left', sortable: false }, { text: 'Name', value: 'name', align: 'left', sortable: false }, { text: 'Size', value: 'size', align: 'left', sortable: false }, { text: 'Found In', value: 'group', align: 'left', sortable: false }, { text: 'Date Created', value: 'created_at', align: 'left', sortable: false }],
-            items: [],
-            totalItems: 0,
-            pagination: {
-                rowsPerPage: 10
-            },
-
-            filters: {
-                name: '',
-                selectedGroupIds: '',
-                fileGroupId: [],
-                fileGroupsHolder: []
-            },
-
-            dialogs: {
-                view: {
-                    file: {},
-                    show: false
-                }
-            }
-        };
-    },
-    mounted: function mounted() {
-        console.log('pages.files.components.FileLists.vue');
-
-        var self = this;
-
-        self.$eventBus.$on(['FILE_DELETED', 'FILE_UPLOADED'], function () {
-            self.loadFiles(function () {});
-        });
-    },
-
-    watch: {
-        'filters.fileGroupId': _.debounce(function (v) {
-
-            var selected = [];
-
-            _.each(v, function (v, k) {
-                if (v) selected.push(k);
-            });
-
-            this.filters.selectedGroupIds = selected.join(',');
-        }, 500),
-        'filters.selectedGroupIds': function filtersSelectedGroupIds(v) {
-            this.loadFiles(function () {});
-        },
-
-        'filters.name': _.debounce(function (v) {
-            this.loadFiles(function () {});
-        }, 500),
-        'pagination.page': function paginationPage() {
-            this.loadFiles(function () {});
-        },
-        'pagination.rowsPerPage': function paginationRowsPerPage() {
-            this.loadFiles(function () {});
-        }
-    },
-    methods: {
-        getFullUrl: function getFullUrl(file, width, action) {
-
-            var w = width || 4000;
-            var act = action || 'resize';
-
-            return LSK_APP.APP_URL + '/files/' + file.id + '/preview?w=' + w + '&action=' + act;
-        },
-        downloadFile: function downloadFile(file) {
-            window.open(LSK_APP.APP_URL + '/files/' + file.id + '/download?file_token=' + file.file_token);
-        },
-        showDialog: function showDialog(dialog, data) {
-
-            var self = this;
-
-            switch (dialog) {
-                case 'file_show':
-                    self.dialogs.view.file = data;
-                    setTimeout(function () {
-                        self.dialogs.view.show = true;
-                    }, 500);
-                    break;
-            }
-        },
-        trash: function trash(file) {
-            var self = this;
-
-            self.$store.commit('showDialog', {
-                type: "confirm",
-                title: "Confirm Deletion",
-                message: "Are you sure you want to delete this file?",
-                okCb: function okCb() {
-
-                    axios.delete('/admin/files/' + file.id).then(function (response) {
-
-                        self.$store.commit('showSnackbar', {
-                            message: response.data.message,
-                            color: 'success',
-                            duration: 3000
-                        });
-
-                        self.$eventBus.$emit('FILE_DELETED');
-
-                        // maybe the action took place from view file
-                        // lets close it.
-                        self.dialogs.view.show = false;
-                    }).catch(function (error) {
-                        if (error.response) {
-                            self.$store.commit('showSnackbar', {
-                                message: error.response.data.message,
-                                color: 'error',
-                                duration: 3000
-                            });
-                        } else if (error.request) {
-                            console.log(error.request);
-                        } else {
-                            console.log('Error', error.message);
-                        }
-                    });
-                },
-                cancelCb: function cancelCb() {
-                    console.log("CANCEL");
-                }
-            });
-        },
-        loadFileGroups: function loadFileGroups(cb) {
-
-            var self = this;
-
-            var params = {
-                paginate: 'no'
-            };
-
-            axios.get('/admin/file-groups', { params: params }).then(function (response) {
-                self.filters.fileGroupsHolder = response.data.data;
-                cb();
-            });
-        },
-        loadFiles: function loadFiles(cb) {
-
-            var self = this;
-
-            var params = {
-                name: self.filters.name,
-                file_group_id: self.filters.selectedGroupIds,
-                page: self.pagination.page,
-                per_page: self.pagination.rowsPerPage
-            };
-
-            axios.get('/admin/files', { params: params }).then(function (response) {
-                self.items = response.data.data.data;
-                self.totalItems = response.data.data.total;
-                self.pagination.totalItems = response.data.data.total;
-                (cb || Function)();
-            });
-        }
+  computed: {
+    dateRangeText: function dateRangeText() {
+      return this.dates.join(' ~ ');
     }
+  },
+  components: {},
+  data: function data() {
+    return {
+      dates: [new Date().toISOString().substr(0, 10), new Date().toISOString().substr(0, 10)],
+      picker: new Date().toISOString().substr(0, 10),
+      headers: [{
+        text: 'Action',
+        value: false,
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Thumb',
+        value: 'thumb',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Name',
+        value: 'name',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Size',
+        value: 'size',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Found In',
+        value: 'group',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Date Created',
+        value: 'created_at',
+        align: 'left',
+        sortable: false
+      }],
+      items: [],
+      totalItems: 0,
+      pagination: {
+        rowsPerPage: 10
+      },
+      filters: {
+        name: '',
+        selectedGroupIds: '',
+        fileGroupId: [],
+        fileGroupsHolder: []
+      },
+      dialogs: {
+        view: {
+          file: {},
+          show: false
+        }
+      }
+    };
+  },
+  mounted: function mounted() {
+    console.log('pages.files.components.FileLists.vue');
+    var self = this;
+    self.$eventBus.$on(['FILE_DELETED', 'FILE_UPLOADED'], function () {
+      self.loadFiles(function () {});
+    });
+  },
+  watch: {
+    'filters.fileGroupId': _.debounce(function (v) {
+      var selected = [];
+
+      _.each(v, function (v, k) {
+        if (v) selected.push(k);
+      });
+
+      this.filters.selectedGroupIds = selected.join(',');
+    }, 500),
+    'filters.selectedGroupIds': function filtersSelectedGroupIds(v) {
+      this.loadFiles(function () {});
+    },
+    'filters.name': _.debounce(function (v) {
+      this.loadFiles(function () {});
+    }, 500),
+    'pagination.page': function paginationPage() {
+      this.loadFiles(function () {});
+    },
+    'pagination.rowsPerPage': function paginationRowsPerPage() {
+      this.loadFiles(function () {});
+    }
+  },
+  methods: {
+    getFullUrl: function getFullUrl(file, width, action) {
+      var w = width || 4000;
+      var act = action || 'resize';
+      return LSK_APP.APP_URL + "/files/" + file.id + "/preview?w=" + w + "&action=" + act;
+    },
+    downloadFile: function downloadFile(file) {
+      window.open(LSK_APP.APP_URL + '/files/' + file.id + '/download?file_token=' + file.file_token);
+    },
+    showDialog: function showDialog(dialog, data) {
+      var self = this;
+
+      switch (dialog) {
+        case 'file_show':
+          self.dialogs.view.file = data;
+          setTimeout(function () {
+            self.dialogs.view.show = true;
+          }, 500);
+          break;
+      }
+    },
+    trash: function trash(file) {
+      var self = this;
+      self.$store.commit('showDialog', {
+        type: "confirm",
+        title: "Confirm Deletion",
+        message: "Are you sure you want to delete this file?",
+        okCb: function okCb() {
+          axios["delete"]('/admin/files/' + file.id).then(function (response) {
+            self.$store.commit('showSnackbar', {
+              message: response.data.message,
+              color: 'success',
+              duration: 3000
+            });
+            self.$eventBus.$emit('FILE_DELETED'); // maybe the action took place from view file
+            // lets close it.
+
+            self.dialogs.view.show = false;
+          })["catch"](function (error) {
+            if (error.response) {
+              self.$store.commit('showSnackbar', {
+                message: error.response.data.message,
+                color: 'error',
+                duration: 3000
+              });
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              console.log('Error', error.message);
+            }
+          });
+        },
+        cancelCb: function cancelCb() {
+          console.log("CANCEL");
+        }
+      });
+    },
+    loadFileGroups: function loadFileGroups(cb) {
+      var self = this;
+      var params = {
+        paginate: 'no'
+      };
+      axios.get('/admin/file-groups', {
+        params: params
+      }).then(function (response) {
+        self.filters.fileGroupsHolder = response.data.data;
+        cb();
+      });
+    },
+    loadFiles: function loadFiles(cb) {
+      var self = this;
+      var params = {
+        name: self.filters.name,
+        file_group_id: self.filters.selectedGroupIds,
+        page: self.pagination.page,
+        per_page: self.pagination.rowsPerPage
+      };
+      axios.get('/admin/files', {
+        params: params
+      }).then(function (response) {
+        self.items = response.data.data.data;
+        self.totalItems = response.data.data.total;
+        self.pagination.totalItems = response.data.data.total;
+        (cb || Function)();
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -64599,108 +64576,95 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    data: function data() {
-        return {
-            dropzone: null,
-            fileGroups: [],
-            uploadTo: '',
-            addedFiles: []
-        };
+  data: function data() {
+    return {
+      dropzone: null,
+      fileGroups: [],
+      uploadTo: '',
+      addedFiles: []
+    };
+  },
+  mounted: function mounted() {
+    console.log('pages.files.components.FileUpload.vue');
+    var self = this;
+    self.loadFileGroups(function () {});
+    self.initDropzone();
+    self.$eventBus.$on(['FILE_GROUP_ADDED'], function () {
+      self.loadFileGroups(function () {});
+    });
+  },
+  methods: {
+    clear: function clear() {
+      var self = this;
+
+      _.each(self.addedFiles, function (f) {
+        self.dropzone.removeFile(f);
+      });
+
+      self.addedFiles = [];
     },
-    mounted: function mounted() {
-        console.log('pages.files.components.FileUpload.vue');
-
-        var self = this;
-
-        self.loadFileGroups(function () {});
-        self.initDropzone();
-
-        self.$eventBus.$on(['FILE_GROUP_ADDED'], function () {
-            self.loadFileGroups(function () {});
-        });
+    upload: function upload() {
+      var self = this;
+      self.dropzone.processQueue();
     },
-
-    methods: {
-        clear: function clear() {
-            var self = this;
-
-            _.each(self.addedFiles, function (f) {
-                self.dropzone.removeFile(f);
-            });
-
-            self.addedFiles = [];
+    initDropzone: function initDropzone() {
+      var self = this;
+      Dropzone.autoDiscover = false;
+      self.dropzone = new Dropzone("#fileupload", {
+        url: '/admin/files',
+        paramName: "file",
+        // The name that will be used to transfer the file
+        maxFilesize: 50,
+        // 50MB
+        uploadMultiple: true,
+        //acceptedFiles: 'image/*',
+        headers: {
+          'X-CSRF-TOKEN': _token
         },
-        upload: function upload() {
-
-            var self = this;
-
-            self.dropzone.processQueue();
+        autoProcessQueue: true,
+        init: function init() {// initial hook
         },
-        initDropzone: function initDropzone() {
-
-            var self = this;
-
-            Dropzone.autoDiscover = false;
-
-            self.dropzone = new Dropzone("#fileupload", {
-                url: '/admin/files',
-                paramName: "file", // The name that will be used to transfer the file
-                maxFilesize: 50, // 50MB
-                uploadMultiple: true,
-                //acceptedFiles: 'image/*',
-                headers: { 'X-CSRF-TOKEN': _token },
-                autoProcessQueue: true,
-                init: function init() {
-                    // initial hook
-                },
-                success: function success(file, response) {
-                    // success hook
-                }
-            });
-
-            self.dropzone.on("addedfile", function (file) {
-                if (!self.uploadTo) {
-                    self.$store.commit('showSnackbar', {
-                        message: "Please choose file group to upload the file(s)",
-                        color: 'error',
-                        duration: 3000
-                    });
-                    self.dropzone.removeFile(file);
-                } else {
-                    self.addedFiles.push(file);
-                }
-            });
-
-            self.dropzone.on('sending', function (file, xhr, formData) {
-                formData.append('file_group_id', self.uploadTo);
-            });
-
-            self.dropzone.on("complete", function (file) {
-                self.$store.commit('showSnackbar', {
-                    message: "File(s) uploaded successfully.",
-                    color: 'success',
-                    duration: 3000
-                });
-
-                self.$eventBus.$emit('FILE_UPLOADED');
-            });
-        },
-        loadFileGroups: function loadFileGroups(cb) {
-
-            var self = this;
-
-            var params = {
-                paginate: 'no'
-            };
-
-            axios.get('/admin/file-groups', { params: params }).then(function (response) {
-                self.fileGroups = response.data.data;
-                cb();
-            });
+        success: function success(file, response) {// success hook
         }
+      });
+      self.dropzone.on("addedfile", function (file) {
+        if (!self.uploadTo) {
+          self.$store.commit('showSnackbar', {
+            message: "Please choose file group to upload the file(s)",
+            color: 'error',
+            duration: 3000
+          });
+          self.dropzone.removeFile(file);
+        } else {
+          self.addedFiles.push(file);
+        }
+      });
+      self.dropzone.on('sending', function (file, xhr, formData) {
+        formData.append('file_group_id', self.uploadTo);
+      });
+      self.dropzone.on("complete", function (file) {
+        self.$store.commit('showSnackbar', {
+          message: "File(s) uploaded successfully.",
+          color: 'success',
+          duration: 3000
+        });
+        self.$eventBus.$emit('FILE_UPLOADED');
+      });
+    },
+    loadFileGroups: function loadFileGroups(cb) {
+      var self = this;
+      var params = {
+        paginate: 'no'
+      };
+      axios.get('/admin/file-groups', {
+        params: params
+      }).then(function (response) {
+        self.fileGroups = response.data.data;
+        cb();
+      });
     }
+  }
 });
 
 /***/ }),
@@ -64999,235 +64963,232 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
-    computed: {
-        cssProps: function cssProps() {
-            return {
-                '--primary-color': this.$vuetify.theme.dark
-            };
-        }
-    },
-    components: {},
-    data: function data() {
-        return {
-            filter_status: null,
-            loading: true,
-            tableloading: true,
-            headers: [{ text: 'Judul', align: 'start', value: 'judul', sortable: true, filterable: true }, { text: 'MSISDN', value: 'msisdn_menghubungi', sortable: false, filterable: true }, { text: 'MSISDN', value: 'msisdn_bermasalah', sortable: true, filterable: true }],
-            items: [],
-            totalItems: 0,
-            pagination: {
-                rowsPerPage: 10
-            },
-
-            filters: {
-                name: '',
-                selectedGroupIds: '',
-                fileGroupId: [],
-                fileGroupsHolder: []
-            },
-
-            dialogs: {
-                view: {
-                    file: {},
-                    show: false
-                }
-            }
-        };
-    },
-    mounted: function mounted() {
-        console.log('pages.files.components.FileLists.vue');
-
-        var self = this;
-
-        self.$eventBus.$on(['FILE_DELETED', 'FILE_UPLOADED'], function () {
-            self.loadFiles(function () {});
-        });
-    },
-
-    watch: {
-
-        filter_status: {
-            handler: function handler() {}
-        },
-        pagination: {
-            handler: function handler() {
-                this.loadFiles(function () {});
-            },
-
-            deep: true
-        },
-
-        'filters.fileGroupId': _.debounce(function (v) {
-
-            var selected = [];
-
-            _.each(v, function (v, k) {
-                if (v) selected.push(k);
-            });
-
-            this.filters.selectedGroupIds = selected.join(',');
-        }, 500),
-        'search': _.debounce(function () {
-            var self = this;
-            self.loadFiles(function () {});
-        }, 700),
-        'filters.selectedGroupIds': function filtersSelectedGroupIds(v) {
-            this.loadFiles(function () {});
-        },
-
-        'filters.name': _.debounce(function (v) {
-            this.loadFiles(function () {});
-        }, 500),
-        'pagination.page': function paginationPage() {
-            this.loadFiles(function () {});
-        },
-        'pagination.rowsPerPage': function paginationRowsPerPage() {
-            this.loadFiles(function () {});
-        },
-        items: function items() {
-            this.loading = false;
-            this.tableloading = false;
-        }
-    },
-    methods: {
-        getFullUrl: function getFullUrl(file, width, action) {
-
-            var w = width || 4000;
-            var act = action || 'resize';
-
-            return LSK_APP.APP_URL + '/files/' + file.id + '/preview?w=' + w + '&action=' + act;
-        },
-        downloadFile: function downloadFile(file) {
-            window.open(LSK_APP.APP_URL + '/files/' + file.id + '/download?file_token=' + file.file_token);
-        },
-        showDialog: function showDialog(dialog, data) {
-
-            var self = this;
-
-            switch (dialog) {
-                case 'file_show':
-                    self.dialogs.view.file = data;
-                    setTimeout(function () {
-                        self.dialogs.view.show = true;
-                    }, 500);
-                    break;
-            }
-        },
-        trash: function trash(file) {
-            var self = this;
-
-            self.$store.commit('showDialog', {
-                type: "confirm",
-                title: "Confirm Deletion",
-                message: "Are you sure you want to delete this file?",
-                okCb: function okCb() {
-
-                    axios.delete('/admin/files/' + file.id).then(function (response) {
-
-                        self.$store.commit('showSnackbar', {
-                            message: response.data.message,
-                            color: 'success',
-                            duration: 3000
-                        });
-
-                        self.$eventBus.$emit('FILE_DELETED');
-
-                        // maybe the action took place from view file
-                        // lets close it.
-                        self.dialogs.view.show = false;
-                    }).catch(function (error) {
-                        if (error.response) {
-                            self.$store.commit('showSnackbar', {
-                                message: error.response.data.message,
-                                color: 'error',
-                                duration: 3000
-                            });
-                        } else if (error.request) {
-                            console.log(error.request);
-                        } else {
-                            console.log('Error', error.message);
-                        }
-                    });
-                },
-                cancelCb: function cancelCb() {
-                    console.log("CANCEL");
-                }
-            });
-        },
-        loadFileGroups: function loadFileGroups(cb) {
-
-            var self = this;
-
-            var params = {
-                paginate: 'no'
-            };
-
-            axios.get('/admin/file-groups', { params: params }).then(function (response) {
-                self.filters.fileGroupsHolder = response.data.data;
-                cb();
-            });
-        },
-        loadFiles: function loadFiles(cb) {
-            var self = this;
-            self.loading = true;
-            var targetIndex = '';
-            if (self.headers.findIndex(function (item) {
-                return item.value === self.pagination.sortBy[0] < 0;
-            })) {
-                targetIndex = '';
-            } else {
-                targetIndex = self.headers.findIndex(function (item) {
-                    return item.value === self.pagination.sortBy[0];
-                });
-            }
-            var direction = self.pagination.sortDesc[0] ? 'desc' : 'asc';
-            var params = {
-                "search[value]": self.filters.name,
-                file_group_id: self.filters.selectedGroupIds,
-                draw: self.pagination.page,
-                length: self.pagination.itemsPerPage,
-                start: (self.pagination.page / self.pagination.itemsPerPage * self.pagination.itemsPerPage - 1) * self.pagination.itemsPerPage,
-                'order[0][dir]': direction,
-                'order[0][column]': targetIndex
-            };
-            function search(nameKey, myArray) {
-                for (var i = 0; i < myArray.length; i++) {
-                    if (myArray[i].name === nameKey) {
-                        return myArray[i];
-                    }
-                }
-            }
-
-            /*Object.keys(self.pagination.sortBy).find(key => self.pagination.sortBy[value] === value)*/
-            $.each(self.headers, function (key, value) {
-                params['columns[' + key + '][data]'] = value.value;
-                params['columns[' + key + '][searchable]'] = value.filterable;
-                params['columns[' + key + '][orderable]'] = value.sortable;
-            });
-
-            this.pagination;
-
-            axios.get('/api/admin/caserecording', { params: params }).then(function (response) {
-                self.items = response.data.data;
-                self.totalItems = response.data.recordsFiltered;
-                self.pagination.totalItems = self.totalItems;
-                (cb || Function)();
-            }).catch(function (error) {
-                console.log(error.response);
-                if (error.response && error.response.status != 200) {
-                    self.$store.commit('showSnackbar', {
-                        message: error.response.status + ':' + error.response.statusText + ' Please Reload Your Browser',
-                        color: 'error',
-                        duration: 10000
-                    });
-                };
-                self.loading = false;
-                self.tableloading = false;
-            });
-        }
+  computed: {
+    cssProps: function cssProps() {
+      return {
+        '--primary-color': this.$vuetify.theme.dark
+      };
     }
+  },
+  components: {},
+  data: function data() {
+    return {
+      filter_status: null,
+      loading: true,
+      tableloading: true,
+      headers: [{
+        text: 'Judul',
+        align: 'start',
+        value: 'judul',
+        sortable: true,
+        filterable: true
+      }, {
+        text: 'Status',
+        align: 'start',
+        value: 'ket',
+        sortable: true,
+        filterable: true
+      }, {
+        text: 'MSISDN',
+        value: 'msisdn_menghubungi',
+        sortable: false,
+        filterable: true
+      }, {
+        text: 'MSISDN',
+        value: 'msisdn_bermasalah',
+        sortable: true,
+        filterable: true
+      }],
+      items: [],
+      totalItems: 0,
+      pagination: {
+        rowsPerPage: 10
+      },
+      filters: {
+        name: '',
+        selectedGroupIds: '',
+        fileGroupId: [],
+        fileGroupsHolder: []
+      },
+      dialogs: {
+        view: {
+          file: {},
+          show: false
+        }
+      }
+    };
+  },
+  mounted: function mounted() {
+    console.log('pages.files.components.FileLists.vue');
+    var self = this;
+    self.$eventBus.$on(['FILE_DELETED', 'FILE_UPLOADED'], function () {
+      self.loadFiles(function () {});
+    });
+  },
+  watch: {
+    filter_status: {
+      handler: function handler() {
+        var self = this;
+        self.loadFiles(function () {});
+      }
+    },
+    pagination: {
+      handler: function handler() {
+        this.loadFiles(function () {});
+      },
+      deep: true
+    },
+    'filters.fileGroupId': _.debounce(function (v) {
+      var selected = [];
+
+      _.each(v, function (v, k) {
+        if (v) selected.push(k);
+      });
+
+      this.filters.selectedGroupIds = selected.join(',');
+    }, 500),
+    'search': _.debounce(function () {
+      var self = this;
+      self.loadFiles(function () {});
+    }, 700),
+    'filters.selectedGroupIds': function filtersSelectedGroupIds(v) {
+      this.loadFiles(function () {});
+    },
+    'filters.name': _.debounce(function (v) {
+      this.loadFiles(function () {});
+    }, 500),
+    'pagination.page': function paginationPage() {
+      this.loadFiles(function () {});
+    },
+    'pagination.rowsPerPage': function paginationRowsPerPage() {
+      this.loadFiles(function () {});
+    },
+    items: function items() {
+      this.loading = false;
+      this.tableloading = false;
+    }
+  },
+  methods: {
+    getFullUrl: function getFullUrl(file, width, action) {
+      var w = width || 4000;
+      var act = action || 'resize';
+      return LSK_APP.APP_URL + "/files/" + file.id + "/preview?w=" + w + "&action=" + act;
+    },
+    downloadFile: function downloadFile(file) {
+      window.open(LSK_APP.APP_URL + '/files/' + file.id + '/download?file_token=' + file.file_token);
+    },
+    showDialog: function showDialog(dialog, data) {
+      var self = this;
+
+      switch (dialog) {
+        case 'file_show':
+          self.dialogs.view.file = data;
+          setTimeout(function () {
+            self.dialogs.view.show = true;
+          }, 500);
+          break;
+      }
+    },
+    trash: function trash(file) {
+      var self = this;
+      self.$store.commit('showDialog', {
+        type: "confirm",
+        title: "Confirm Deletion",
+        message: "Are you sure you want to delete this file?",
+        okCb: function okCb() {
+          axios["delete"]('/admin/files/' + file.id).then(function (response) {
+            self.$store.commit('showSnackbar', {
+              message: response.data.message,
+              color: 'success',
+              duration: 3000
+            });
+            self.$eventBus.$emit('FILE_DELETED'); // maybe the action took place from view file
+            // lets close it.
+
+            self.dialogs.view.show = false;
+          })["catch"](function (error) {
+            if (error.response) {
+              self.$store.commit('showSnackbar', {
+                message: error.response.data.message,
+                color: 'error',
+                duration: 3000
+              });
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              console.log('Error', error.message);
+            }
+          });
+        },
+        cancelCb: function cancelCb() {
+          console.log("CANCEL");
+        }
+      });
+    },
+    loadFileGroups: function loadFileGroups(cb) {
+      var self = this;
+      var params = {
+        paginate: 'no'
+      };
+      axios.get('/admin/file-groups', {
+        params: params
+      }).then(function (response) {
+        self.filters.fileGroupsHolder = response.data.data;
+        cb();
+      });
+    },
+    loadFiles: function loadFiles(cb) {
+      var self = this;
+      self.loading = true;
+      var filter_status = null;
+      if (self.filter_status) filter_status = self.filter_status;
+      var targetIndex = '';
+      Math.sign(self.headers.findIndex(function (item) {
+        return item.value === self.pagination.sortBy[0];
+      }) <= 0) ? targetIndex = '' : targetIndex = self.headers.findIndex(function (item) {
+        return item.value === self.pagination.sortBy[0];
+      });
+      var direction = self.pagination.sortDesc[0] ? 'desc' : 'asc';
+      var params = {
+        "search[value]": self.filters.name,
+        status: filter_status,
+        draw: self.pagination.page,
+        length: self.pagination.itemsPerPage,
+        start: (self.pagination.page / self.pagination.itemsPerPage * self.pagination.itemsPerPage - 1) * self.pagination.itemsPerPage,
+        'order[0][dir]': direction,
+        'order[0][column]': targetIndex
+      };
+      $.each(self.headers, function (key, value) {
+        params['columns[' + key + '][data]'] = value.value;
+        params['columns[' + key + '][searchable]'] = value.filterable;
+        params['columns[' + key + '][orderable]'] = value.sortable;
+      });
+      axios.get('/api/admin/caserecording', {
+        params: params
+      }).then(function (response) {
+        self.items = response.data.data;
+        self.totalItems = response.data.recordsFiltered;
+        self.pagination.totalItems = self.totalItems;
+        (cb || Function)();
+      })["catch"](function (error) {
+        console.log(error.response);
+
+        if (error.response && error.response.status != 200) {
+          self.$store.commit('showSnackbar', {
+            message: error.response.status + ':' + error.response.statusText + ' Please Reload Your Browser',
+            color: 'error',
+            duration: 10000
+          });
+        }
+
+        ;
+        self.loading = false;
+        self.tableloading = false;
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -65303,6 +65264,18 @@ var render = function() {
                         attrs: { small: "", value: "new", loading: _vm.loading }
                       },
                       [_vm._v("New")]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "v-btn",
+                      {
+                        attrs: {
+                          small: "",
+                          value: "uploaded",
+                          loading: _vm.loading
+                        }
+                      },
+                      [_vm._v("Uploaded")]
                     ),
                     _vm._v(" "),
                     _c(
@@ -65702,131 +65675,145 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 
 
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    components: {
-        FileGroupAdd: __WEBPACK_IMPORTED_MODULE_0__FileGroupAdd_vue___default.a,
-        FileGroupEdit: __WEBPACK_IMPORTED_MODULE_1__FileGroupEdit_vue___default.a
-    },
-    data: function data() {
-        return {
-            headers: [{ text: 'Action', value: false, align: 'left', sortable: false }, { text: 'Group Name', value: 'name', align: 'left', sortable: false }, { text: 'Description', value: 'description', align: 'left', sortable: false }, { text: 'Total Files', value: 'file_count', align: 'left', sortable: false }, { text: 'Date Created', value: 'created_at', align: 'left', sortable: false }],
-            items: [],
-            totalItems: 0,
-            pagination: {
-                rowsPerPage: 10
-            },
-
-            filters: {
-                name: ''
-            },
-
-            dialogs: {
-                edit: {
-                    fileGroup: {},
-                    show: false
-                },
-                add: {
-                    show: false
-                }
-            }
-        };
-    },
-    mounted: function mounted() {
-        console.log('pages.files.components.FileGroupLists.vue');
-
-        var self = this;
-
-        self.$eventBus.$on(['FILE_GROUP_ADDED', 'FILE_GROUP_UPDATED', 'FILE_GROUP_DELETED'], function () {
-            self.loadFileGroups(function () {});
-        });
-    },
-
-    watch: {
-        'filters.name': _.debounce(function (v) {
-            this.loadFileGroups(function () {});
-        }, 500),
-        'pagination.page': function paginationPage() {
-            this.loadFileGroups(function () {});
+  components: {
+    FileGroupAdd: __WEBPACK_IMPORTED_MODULE_0__FileGroupAdd_vue___default.a,
+    FileGroupEdit: __WEBPACK_IMPORTED_MODULE_1__FileGroupEdit_vue___default.a
+  },
+  data: function data() {
+    return {
+      headers: [{
+        text: 'Action',
+        value: false,
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Group Name',
+        value: 'name',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Description',
+        value: 'description',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Total Files',
+        value: 'file_count',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Date Created',
+        value: 'created_at',
+        align: 'left',
+        sortable: false
+      }],
+      items: [],
+      totalItems: 0,
+      pagination: {
+        rowsPerPage: 10
+      },
+      filters: {
+        name: ''
+      },
+      dialogs: {
+        edit: {
+          fileGroup: {},
+          show: false
         },
-        'pagination.rowsPerPage': function paginationRowsPerPage() {
-            this.loadFileGroups(function () {});
+        add: {
+          show: false
         }
+      }
+    };
+  },
+  mounted: function mounted() {
+    console.log('pages.files.components.FileGroupLists.vue');
+    var self = this;
+    self.$eventBus.$on(['FILE_GROUP_ADDED', 'FILE_GROUP_UPDATED', 'FILE_GROUP_DELETED'], function () {
+      self.loadFileGroups(function () {});
+    });
+  },
+  watch: {
+    'filters.name': _.debounce(function (v) {
+      this.loadFileGroups(function () {});
+    }, 500),
+    'pagination.page': function paginationPage() {
+      this.loadFileGroups(function () {});
     },
-    methods: {
-        trash: function trash(group) {
-            var self = this;
-
-            self.$store.commit('showDialog', {
-                type: "confirm",
-                title: "Confirm Deletion",
-                message: "Are you sure you want to delete this file group?",
-                okCb: function okCb() {
-
-                    axios.delete('/admin/file-groups/' + group.id).then(function (response) {
-
-                        self.$store.commit('showSnackbar', {
-                            message: response.data.message,
-                            color: 'success',
-                            duration: 3000
-                        });
-
-                        self.$eventBus.$emit('FILE_GROUP_DELETED');
-                    }).catch(function (error) {
-                        if (error.response) {
-                            self.$store.commit('showSnackbar', {
-                                message: error.response.data.message,
-                                color: 'error',
-                                duration: 3000
-                            });
-                        } else if (error.request) {
-                            console.log(error.request);
-                        } else {
-                            console.log('Error', error.message);
-                        }
-                    });
-                },
-                cancelCb: function cancelCb() {
-                    console.log("CANCEL");
-                }
-            });
-        },
-        showDialog: function showDialog(dialog, data) {
-
-            var self = this;
-
-            switch (dialog) {
-                case 'file_group_edit':
-                    self.dialogs.edit.fileGroup = data;
-                    setTimeout(function () {
-                        self.dialogs.edit.show = true;
-                    }, 500);
-                    break;
-                case 'file_group_add':
-                    setTimeout(function () {
-                        self.dialogs.add.show = true;
-                    }, 500);
-                    break;
-            }
-        },
-        loadFileGroups: function loadFileGroups(cb) {
-
-            var self = this;
-
-            var params = {
-                name: self.filters.name,
-                page: self.pagination.page,
-                per_page: self.pagination.rowsPerPage
-            };
-
-            axios.get('/admin/file-groups', { params: params }).then(function (response) {
-                self.items = response.data.data.data;
-                self.totalItems = response.data.data.total;
-                self.pagination.totalItems = response.data.data.total;
-                (cb || Function)();
-            });
-        }
+    'pagination.rowsPerPage': function paginationRowsPerPage() {
+      this.loadFileGroups(function () {});
     }
+  },
+  methods: {
+    trash: function trash(group) {
+      var self = this;
+      self.$store.commit('showDialog', {
+        type: "confirm",
+        title: "Confirm Deletion",
+        message: "Are you sure you want to delete this file group?",
+        okCb: function okCb() {
+          axios["delete"]('/admin/file-groups/' + group.id).then(function (response) {
+            self.$store.commit('showSnackbar', {
+              message: response.data.message,
+              color: 'success',
+              duration: 3000
+            });
+            self.$eventBus.$emit('FILE_GROUP_DELETED');
+          })["catch"](function (error) {
+            if (error.response) {
+              self.$store.commit('showSnackbar', {
+                message: error.response.data.message,
+                color: 'error',
+                duration: 3000
+              });
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              console.log('Error', error.message);
+            }
+          });
+        },
+        cancelCb: function cancelCb() {
+          console.log("CANCEL");
+        }
+      });
+    },
+    showDialog: function showDialog(dialog, data) {
+      var self = this;
+
+      switch (dialog) {
+        case 'file_group_edit':
+          self.dialogs.edit.fileGroup = data;
+          setTimeout(function () {
+            self.dialogs.edit.show = true;
+          }, 500);
+          break;
+
+        case 'file_group_add':
+          setTimeout(function () {
+            self.dialogs.add.show = true;
+          }, 500);
+          break;
+      }
+    },
+    loadFileGroups: function loadFileGroups(cb) {
+      var self = this;
+      var params = {
+        name: self.filters.name,
+        page: self.pagination.page,
+        per_page: self.pagination.rowsPerPage
+      };
+      axios.get('/admin/file-groups', {
+        params: params
+      }).then(function (response) {
+        self.items = response.data.data.data;
+        self.totalItems = response.data.data.total;
+        self.pagination.totalItems = response.data.data.total;
+        (cb || Function)();
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -65907,68 +65894,60 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    data: function data() {
-        return {
-            valid: false,
-            isLoading: false,
-            name: '',
-            nameRules: [function (v) {
-                return !!v || 'Name is required';
-            }],
-            description: '',
-            descriptionRules: [function (v) {
-                return !!v || 'Description is required';
-            }]
-        };
-    },
-    mounted: function mounted() {
-        console.log('pages.files.components.FileGroupAdd.vue');
+  data: function data() {
+    return {
+      valid: false,
+      isLoading: false,
+      name: '',
+      nameRules: [function (v) {
+        return !!v || 'Name is required';
+      }],
+      description: '',
+      descriptionRules: [function (v) {
+        return !!v || 'Description is required';
+      }]
+    };
+  },
+  mounted: function mounted() {
+    console.log('pages.files.components.FileGroupAdd.vue');
+    var self = this;
+  },
+  methods: {
+    save: function save() {
+      var self = this;
+      var payload = {
+        name: self.name,
+        description: self.description
+      };
+      self.isLoading = true;
+      axios.post('/admin/file-groups', payload).then(function (response) {
+        self.$store.commit('showSnackbar', {
+          message: response.data.message,
+          color: 'success',
+          duration: 3000
+        });
+        self.isLoading = false;
+        self.$eventBus.$emit('FILE_GROUP_ADDED'); // reset
 
-        var self = this;
-    },
+        self.$refs.fileGroupFormAdd.reset();
+      })["catch"](function (error) {
+        self.isLoading = false;
 
-    methods: {
-        save: function save() {
-            var self = this;
-
-            var payload = {
-                name: self.name,
-                description: self.description
-            };
-
-            self.isLoading = true;
-
-            axios.post('/admin/file-groups', payload).then(function (response) {
-
-                self.$store.commit('showSnackbar', {
-                    message: response.data.message,
-                    color: 'success',
-                    duration: 3000
-                });
-
-                self.isLoading = false;
-                self.$eventBus.$emit('FILE_GROUP_ADDED');
-
-                // reset
-                self.$refs.fileGroupFormAdd.reset();
-            }).catch(function (error) {
-                self.isLoading = false;
-                if (error.response) {
-                    self.$store.commit('showSnackbar', {
-                        message: error.response.data.message,
-                        color: 'error',
-                        duration: 3000
-                    });
-                } else if (error.request) {
-                    console.log(error.request);
-                } else {
-                    console.log('Error', error.message);
-                }
-            });
+        if (error.response) {
+          self.$store.commit('showSnackbar', {
+            message: error.response.data.message,
+            color: 'error',
+            duration: 3000
+          });
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log('Error', error.message);
         }
+      });
     }
+  }
 });
 
 /***/ }),
@@ -66179,86 +66158,77 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    props: {
-        propFileGroupId: {
-            required: true
-        }
-    },
-    data: function data() {
-        return {
-            valid: false,
-            isLoading: false,
-            name: '',
-            nameRules: [function (v) {
-                return !!v || 'Name is required';
-            }],
-            description: '',
-            descriptionRules: [function (v) {
-                return !!v || 'Description is required';
-            }]
-        };
-    },
-    mounted: function mounted() {
-        console.log('pages.files.components.FileGroupEdit.vue');
-
-        var self = this;
-    },
-
-    watch: {
-        propFileGroupId: function propFileGroupId(v) {
-            if (v) this.loadFileGroup(function () {});
-        }
-    },
-    methods: {
-        save: function save() {
-            var self = this;
-
-            var payload = {
-                name: self.name,
-                description: self.description
-            };
-
-            self.isLoading = true;
-
-            axios.put('/admin/file-groups/' + self.propFileGroupId, payload).then(function (response) {
-
-                self.$store.commit('showSnackbar', {
-                    message: response.data.message,
-                    color: 'success',
-                    duration: 3000
-                });
-
-                self.isLoading = false;
-                self.$eventBus.$emit('FILE_GROUP_UPDATED');
-            }).catch(function (error) {
-                self.isLoading = false;
-                if (error.response) {
-                    self.$store.commit('showSnackbar', {
-                        message: error.response.data.message,
-                        color: 'error',
-                        duration: 3000
-                    });
-                } else if (error.request) {
-                    console.log(error.request);
-                } else {
-                    console.log('Error', error.message);
-                }
-            });
-        },
-        loadFileGroup: function loadFileGroup(cb) {
-
-            var self = this;
-
-            axios.get('/admin/file-groups/' + self.propFileGroupId).then(function (response) {
-                var Group = response.data.data;
-                self.name = Group.name;
-                self.description = Group.description;
-                cb();
-            });
-        }
+  props: {
+    propFileGroupId: {
+      required: true
     }
+  },
+  data: function data() {
+    return {
+      valid: false,
+      isLoading: false,
+      name: '',
+      nameRules: [function (v) {
+        return !!v || 'Name is required';
+      }],
+      description: '',
+      descriptionRules: [function (v) {
+        return !!v || 'Description is required';
+      }]
+    };
+  },
+  mounted: function mounted() {
+    console.log('pages.files.components.FileGroupEdit.vue');
+    var self = this;
+  },
+  watch: {
+    propFileGroupId: function propFileGroupId(v) {
+      if (v) this.loadFileGroup(function () {});
+    }
+  },
+  methods: {
+    save: function save() {
+      var self = this;
+      var payload = {
+        name: self.name,
+        description: self.description
+      };
+      self.isLoading = true;
+      axios.put('/admin/file-groups/' + self.propFileGroupId, payload).then(function (response) {
+        self.$store.commit('showSnackbar', {
+          message: response.data.message,
+          color: 'success',
+          duration: 3000
+        });
+        self.isLoading = false;
+        self.$eventBus.$emit('FILE_GROUP_UPDATED');
+      })["catch"](function (error) {
+        self.isLoading = false;
+
+        if (error.response) {
+          self.$store.commit('showSnackbar', {
+            message: error.response.data.message,
+            color: 'error',
+            duration: 3000
+          });
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log('Error', error.message);
+        }
+      });
+    },
+    loadFileGroup: function loadFileGroup(cb) {
+      var self = this;
+      axios.get('/admin/file-groups/' + self.propFileGroupId).then(function (response) {
+        var Group = response.data.data;
+        self.name = Group.name;
+        self.description = Group.description;
+        cb();
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -66873,16 +66843,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    data: function data() {
-        return {
-            active: ''
-        };
-    },
-    mounted: function mounted() {
-        var self = this;
-    }
+  data: function data() {
+    return {
+      active: ''
+    };
+  },
+  mounted: function mounted() {
+    var self = this;
+  }
 });
 
 /***/ }),
@@ -67129,152 +67098,182 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    data: function data() {
-        return {
-            headers: [{ text: 'Action', value: false, align: 'left', sortable: false }, { text: 'Name', value: 'name', align: 'left', sortable: false }, { text: 'Username', value: 'username', align: 'left', sortable: false }, { text: 'Email', value: 'email', align: 'left', sortable: false }, { text: 'Permissions', value: 'permissions', align: 'left', sortable: false }, { text: 'Groups', value: 'groups', align: 'left', sortable: false }, { text: 'Last Login', value: 'last_login', align: 'left', sortable: false }, { text: 'Active', value: 'active', align: 'center', sortable: false }],
-            items: [],
-            totalItems: 0,
-            pagination: {
-                itemsPerPage: 10
-            },
-
-            filters: {
-                name: '',
-                email: '',
-                groupId: [],
-                groupOptions: []
-            },
-
-            dialogs: {
-                showPermissions: {
-                    items: [],
-                    show: false
-                }
-            }
-        };
-    },
-    mounted: function mounted() {
-        var self = this;
-
-        self.loadGroups(function () {});
-
-        self.$eventBus.$on(['USER_ADDED', 'USER_UPDATED', 'USER_DELETED', 'GROUP_ADDED'], function () {
-            self.loadUsers(function () {});
-        });
-
-        self.$store.commit('setBreadcrumbs', [{ label: 'Users', to: { name: 'users.list' } }]);
-    },
-
-    watch: {
-        pagination: {
-            handler: function handler() {
-                this.loadUsers(function () {});
-            }
-        },
-        'filters.name': _.debounce(function () {
-            var self = this;
-            self.loadUsers(function () {});
-        }, 700),
-        'filters.email': _.debounce(function () {
-            var self = this;
-            self.loadUsers(function () {});
-        }, 700),
-        'filters.groupId': _.debounce(function () {
-            var self = this;
-            self.loadUsers(function () {});
-        }, 700)
-    },
-    methods: {
-        trash: function trash(user) {
-            var self = this;
-
-            self.$store.commit('showDialog', {
-                type: "confirm",
-                icon: 'warning',
-                title: "Confirm Deletion",
-                message: "Are you sure you want to delete this user?",
-                okCb: function okCb() {
-
-                    axios.delete('/admin/users/' + user.id).then(function (response) {
-
-                        self.$store.commit('showSnackbar', {
-                            message: response.data.message,
-                            color: 'success',
-                            duration: 3000
-                        });
-
-                        self.$eventBus.$emit('USER_DELETED');
-                    }).catch(function (error) {
-
-                        self.$store.commit('hideLoader');
-
-                        if (error.response) {
-                            self.$store.commit('showSnackbar', {
-                                message: error.response.data.message,
-                                color: 'error',
-                                duration: 3000
-                            });
-                        } else if (error.request) {
-                            console.log(error.request);
-                        } else {
-                            console.log('Error', error.message);
-                        }
-                    });
-                },
-                cancelCb: function cancelCb() {
-                    console.log("CANCEL");
-                }
-            });
-        },
-        showDialog: function showDialog(dialog, data) {
-
-            var self = this;
-
-            switch (dialog) {
-                case 'user_permissions':
-                    self.dialogs.showPermissions.items = data;
-                    setTimeout(function () {
-                        self.dialogs.showPermissions.show = true;
-                    }, 500);
-                    break;
-            }
-        },
-        loadUsers: function loadUsers(cb) {
-
-            var self = this;
-
-            var params = {
-                name: self.filters.name,
-                username: self.filters.username,
-                email: self.filters.email,
-                group_id: self.filters.groupId.join(","),
-                page: self.pagination.page,
-                per_page: self.pagination.itemsPerPage
-            };
-
-            axios.get('/admin/users', { params: params }).then(function (response) {
-                self.items = response.data.data.data;
-                self.totalItems = response.data.data.total;
-                self.pagination.totalItems = response.data.data.total;
-                (cb || Function)();
-            });
-        },
-        loadGroups: function loadGroups(cb) {
-
-            var self = this;
-
-            var params = {
-                paginate: 'no'
-            };
-
-            axios.get('/admin/groups', { params: params }).then(function (response) {
-                self.filters.groupOptions = response.data.data;
-                cb();
-            });
+  data: function data() {
+    return {
+      headers: [{
+        text: 'Action',
+        value: false,
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Name',
+        value: 'name',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Username',
+        value: 'username',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Email',
+        value: 'email',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Permissions',
+        value: 'permissions',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Groups',
+        value: 'groups',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Last Login',
+        value: 'last_login',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Active',
+        value: 'active',
+        align: 'center',
+        sortable: false
+      }],
+      items: [],
+      totalItems: 0,
+      pagination: {
+        itemsPerPage: 10
+      },
+      filters: {
+        name: '',
+        email: '',
+        groupId: [],
+        groupOptions: []
+      },
+      dialogs: {
+        showPermissions: {
+          items: [],
+          show: false
         }
+      }
+    };
+  },
+  mounted: function mounted() {
+    var self = this;
+    self.loadGroups(function () {});
+    self.$eventBus.$on(['USER_ADDED', 'USER_UPDATED', 'USER_DELETED', 'GROUP_ADDED'], function () {
+      self.loadUsers(function () {});
+    });
+    self.$store.commit('setBreadcrumbs', [{
+      label: 'Users',
+      to: {
+        name: 'users.list'
+      }
+    }]);
+  },
+  watch: {
+    pagination: {
+      handler: function handler() {
+        this.loadUsers(function () {});
+      }
+    },
+    'filters.name': _.debounce(function () {
+      var self = this;
+      self.loadUsers(function () {});
+    }, 700),
+    'filters.email': _.debounce(function () {
+      var self = this;
+      self.loadUsers(function () {});
+    }, 700),
+    'filters.groupId': _.debounce(function () {
+      var self = this;
+      self.loadUsers(function () {});
+    }, 700)
+  },
+  methods: {
+    trash: function trash(user) {
+      var self = this;
+      self.$store.commit('showDialog', {
+        type: "confirm",
+        icon: 'warning',
+        title: "Confirm Deletion",
+        message: "Are you sure you want to delete this user?",
+        okCb: function okCb() {
+          axios["delete"]('/admin/users/' + user.id).then(function (response) {
+            self.$store.commit('showSnackbar', {
+              message: response.data.message,
+              color: 'success',
+              duration: 3000
+            });
+            self.$eventBus.$emit('USER_DELETED');
+          })["catch"](function (error) {
+            self.$store.commit('hideLoader');
+
+            if (error.response) {
+              self.$store.commit('showSnackbar', {
+                message: error.response.data.message,
+                color: 'error',
+                duration: 3000
+              });
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              console.log('Error', error.message);
+            }
+          });
+        },
+        cancelCb: function cancelCb() {
+          console.log("CANCEL");
+        }
+      });
+    },
+    showDialog: function showDialog(dialog, data) {
+      var self = this;
+
+      switch (dialog) {
+        case 'user_permissions':
+          self.dialogs.showPermissions.items = data;
+          setTimeout(function () {
+            self.dialogs.showPermissions.show = true;
+          }, 500);
+          break;
+      }
+    },
+    loadUsers: function loadUsers(cb) {
+      var self = this;
+      var params = {
+        name: self.filters.name,
+        username: self.filters.username,
+        email: self.filters.email,
+        group_id: self.filters.groupId.join(","),
+        page: self.pagination.page,
+        per_page: self.pagination.itemsPerPage
+      };
+      axios.get('/admin/users', {
+        params: params
+      }).then(function (response) {
+        self.items = response.data.data.data;
+        self.totalItems = response.data.data.total;
+        self.pagination.totalItems = response.data.data.total;
+        (cb || Function)();
+      });
+    },
+    loadGroups: function loadGroups(cb) {
+      var self = this;
+      var params = {
+        paginate: 'no'
+      };
+      axios.get('/admin/groups', {
+        params: params
+      }).then(function (response) {
+        self.filters.groupOptions = response.data.data;
+        cb();
+      });
     }
+  }
 });
 
 /***/ }),
@@ -68049,171 +68048,168 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    data: function data() {
-
-        var self = this;
-
-        return {
-            valid: false,
-            name: '',
-            nameRules: [function (v) {
-                return !!v || 'Name is required';
-            }],
-            email: '',
-            emailRules: [function (v) {
-                return !!v || 'E-mail is required';
-            }, function (v) {
-                return (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid'
-                );
-            }],
-            password: '',
-            passwordRules: [function (v) {
-                return !!v || 'Password is required';
-            }, function (v) {
-                return v && v.length >= 8 || 'Password must be atleast 8 characters.';
-            }],
-            passwordConfirm: '',
-            passwordConfirmRules: [function (v) {
-                return !(v !== self.password) || 'Password do not match.';
-            }],
-            permissions: [],
-            groups: [],
-            active: '',
-            options: {
-                permissions: [],
-                permissionValues: [{ label: 'Allow', value: 1 }, { label: 'Deny', value: -1 }, { label: 'Inherit', value: 0 }],
-                groups: []
-            },
-            selectedPermission: {},
-            selectedPermissionValue: 0,
-
-            alert: {
-                show: false,
-                icon: '',
-                color: '',
-                message: ''
-            }
-        };
+  data: function data() {
+    var self = this;
+    return {
+      valid: false,
+      name: '',
+      nameRules: [function (v) {
+        return !!v || 'Name is required';
+      }],
+      email: '',
+      emailRules: [function (v) {
+        return !!v || 'E-mail is required';
+      }, function (v) {
+        return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid';
+      }],
+      password: '',
+      passwordRules: [function (v) {
+        return !!v || 'Password is required';
+      }, function (v) {
+        return v && v.length >= 8 || 'Password must be atleast 8 characters.';
+      }],
+      passwordConfirm: '',
+      passwordConfirmRules: [function (v) {
+        return !(v !== self.password) || 'Password do not match.';
+      }],
+      permissions: [],
+      groups: [],
+      active: '',
+      options: {
+        permissions: [],
+        permissionValues: [{
+          label: 'Allow',
+          value: 1
+        }, {
+          label: 'Deny',
+          value: -1
+        }, {
+          label: 'Inherit',
+          value: 0
+        }],
+        groups: []
+      },
+      selectedPermission: {},
+      selectedPermissionValue: 0,
+      alert: {
+        show: false,
+        icon: '',
+        color: '',
+        message: ''
+      }
+    };
+  },
+  mounted: function mounted() {
+    console.log('components.UserFormAdd.vue');
+    var self = this;
+    self.loadPermissions(function (cb) {});
+    self.loadGroups(function (cb) {});
+    self.$store.commit('setBreadcrumbs', [{
+      label: 'Users',
+      to: {
+        name: 'users.list'
+      }
+    }, {
+      label: 'Create',
+      to: ''
+    }]);
+  },
+  methods: {
+    removePermission: function removePermission(i) {
+      var self = this;
+      self.permissions.splice(i, 1);
     },
-    mounted: function mounted() {
-        console.log('components.UserFormAdd.vue');
+    save: function save() {
+      var self = this;
+      var payload = {
+        name: self.name,
+        email: self.email,
+        password: self.password,
+        active: self.active ? moment().format('YYYY-MM-DD') : null,
+        permissions: self.permissions,
+        groups: self.groups
+      };
+      self.$store.commit('showLoader');
+      axios.post('/admin/users', payload).then(function (response) {
+        self.$store.commit('showSnackbar', {
+          message: response.data.message,
+          color: 'success',
+          duration: 3000
+        });
+        self.$eventBus.$emit('USER_ADDED');
+        self.$store.commit('hideLoader'); // reset
 
-        var self = this;
+        self.$refs.userFormAdd.reset();
+        self.permissions = [];
+      })["catch"](function (error) {
+        self.$store.commit('hideLoader');
 
-        self.loadPermissions(function (cb) {});
-        self.loadGroups(function (cb) {});
-
-        self.$store.commit('setBreadcrumbs', [{ label: 'Users', to: { name: 'users.list' } }, { label: 'Create', to: '' }]);
-    },
-
-    methods: {
-        removePermission: function removePermission(i) {
-
-            var self = this;
-
-            self.permissions.splice(i, 1);
-        },
-        save: function save() {
-
-            var self = this;
-
-            var payload = {
-                name: self.name,
-                email: self.email,
-                password: self.password,
-                active: self.active ? moment().format('YYYY-MM-DD') : null,
-                permissions: self.permissions,
-                groups: self.groups
-            };
-            self.$store.commit('showLoader');
-
-            axios.post('/admin/users', payload).then(function (response) {
-
-                self.$store.commit('showSnackbar', {
-                    message: response.data.message,
-                    color: 'success',
-                    duration: 3000
-                });
-
-                self.$eventBus.$emit('USER_ADDED');
-                self.$store.commit('hideLoader');
-
-                // reset
-                self.$refs.userFormAdd.reset();
-                self.permissions = [];
-            }).catch(function (error) {
-
-                self.$store.commit('hideLoader');
-
-                if (error.response) {
-                    self.$store.commit('showSnackbar', {
-                        message: error.response.data.message,
-                        color: 'error',
-                        duration: 3000
-                    });
-                } else if (error.request) {
-                    console.log(error.request);
-                } else {
-                    console.log('Error', error.message);
-                }
-            });
-        },
-        addSpecialPermission: function addSpecialPermission() {
-            var self = this;
-
-            _.each(self.options.permissions, function (p) {
-
-                if (self.selectedPermission === p.key) {
-
-                    if (!self.existsInPermissions(self.selectedPermission)) {
-                        p.value = self.selectedPermissionValue;
-                        self.permissions.push(p);
-                    }
-                }
-            });
-        },
-        existsInPermissions: function existsInPermissions(permissionKey) {
-            var self = this;
-            var found = false;
-            _.each(self.permissions, function (p) {
-                if (p.key === permissionKey) found = true;
-            });
-            return found;
-        },
-        loadPermissions: function loadPermissions(cb) {
-
-            var self = this;
-
-            var params = {
-                paginate: 'no'
-            };
-
-            axios.get('/admin/permissions', { params: params }).then(function (response) {
-                self.options.permissions = response.data.data;
-                cb();
-            });
-        },
-        loadGroups: function loadGroups(cb) {
-
-            var self = this;
-
-            var params = {
-                paginate: 'no'
-            };
-
-            axios.get('/admin/groups', { params: params }).then(function (response) {
-                self.options.groups = response.data.data;
-
-                _.each(self.options.groups, function (g) {
-                    g.selected = false;
-                });
-
-                cb();
-            });
+        if (error.response) {
+          self.$store.commit('showSnackbar', {
+            message: error.response.data.message,
+            color: 'error',
+            duration: 3000
+          });
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log('Error', error.message);
         }
+      });
+    },
+    addSpecialPermission: function addSpecialPermission() {
+      var self = this;
+
+      _.each(self.options.permissions, function (p) {
+        if (self.selectedPermission === p.key) {
+          if (!self.existsInPermissions(self.selectedPermission)) {
+            p.value = self.selectedPermissionValue;
+            self.permissions.push(p);
+          }
+        }
+      });
+    },
+    existsInPermissions: function existsInPermissions(permissionKey) {
+      var self = this;
+      var found = false;
+
+      _.each(self.permissions, function (p) {
+        if (p.key === permissionKey) found = true;
+      });
+
+      return found;
+    },
+    loadPermissions: function loadPermissions(cb) {
+      var self = this;
+      var params = {
+        paginate: 'no'
+      };
+      axios.get('/admin/permissions', {
+        params: params
+      }).then(function (response) {
+        self.options.permissions = response.data.data;
+        cb();
+      });
+    },
+    loadGroups: function loadGroups(cb) {
+      var self = this;
+      var params = {
+        paginate: 'no'
+      };
+      axios.get('/admin/groups', {
+        params: params
+      }).then(function (response) {
+        self.options.groups = response.data.data;
+
+        _.each(self.options.groups, function (g) {
+          g.selected = false;
+        });
+
+        cb();
+      });
     }
+  }
 });
 
 /***/ }),
@@ -68803,210 +68799,203 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    props: {
-        propUserId: {
-            required: true
-        }
-    },
-    data: function data() {
-
-        var self = this;
-
-        return {
-            valid: false,
-            name: '',
-            nameRules: [function (v) {
-                return !!v || 'Name is required';
-            }],
-            email: '',
-            emailRules: [function (v) {
-                return !!v || 'E-mail is required';
-            }, function (v) {
-                return (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid'
-                );
-            }],
-            password: '',
-            passwordRules: [function (v) {
-                if (v && v.length > 0 && v.length < 8) {
-                    return 'Password needs minimum of 8 characters.';
-                }
-                return true;
-            }],
-            passwordConfirm: '',
-            passwordConfirmRules: [function (v) {
-                return !(v !== self.password) || 'Password do not match.';
-            }],
-            permissions: [],
-            groups: [],
-            active: '',
-            options: {
-                permissions: [],
-                permissionValues: [{ label: 'Allow', value: 1 }, { label: 'Deny', value: -1 }, { label: 'Inherit', value: 0 }],
-                groups: []
-            },
-            selectedPermission: {},
-            selectedPermissionValue: 0,
-
-            alert: {
-                show: false,
-                icon: '',
-                color: '',
-                message: ''
-            }
-        };
-    },
-    mounted: function mounted() {
-        console.log('components.edit.vue');
-
-        var self = this;
-
-        self.loadPermissions(function () {
-            self.loadGroups(function () {});
-        });
-
-        self.$eventBus.$on(['GROUP_ADDED'], function () {
-            self.loadGroups(function () {});
-        });
-
-        this.loadUser(function () {});
-    },
-
-    methods: {
-        removePermission: function removePermission(i) {
-
-            var self = this;
-
-            self.permissions.splice(i, 1);
-        },
-        save: function save() {
-
-            var self = this;
-
-            var payload = {
-                name: self.name,
-                email: self.email,
-                password: self.password ? self.password : null,
-                active: self.active,
-                permissions: self.permissions,
-                groups: self.groups
-            };
-
-            console.log(payload);
-            console.log(self.active);
-
-            self.$store.commit('showLoader');
-
-            axios.put('/admin/users/' + self.propUserId, payload).then(function (response) {
-
-                self.$store.commit('showSnackbar', {
-                    message: response.data.message,
-                    color: 'success',
-                    duration: 3000
-                });
-
-                self.$eventBus.$emit('USER_UPDATED');
-                self.$store.commit('hideLoader');
-            }).catch(function (error) {
-
-                self.$store.commit('hideLoader');
-
-                if (error.response) {
-                    self.$store.commit('showSnackbar', {
-                        message: error.response.data.message,
-                        color: 'error',
-                        duration: 3000
-                    });
-                } else if (error.request) {
-                    console.log(error.request);
-                } else {
-                    console.log('Error', error.message);
-                }
-            });
-        },
-        addSpecialPermission: function addSpecialPermission() {
-            var self = this;
-
-            _.each(self.options.permissions, function (p) {
-
-                if (self.selectedPermission === p.key) {
-
-                    if (!self.existsInPermissions(self.selectedPermission)) {
-                        p.value = self.selectedPermissionValue;
-                        self.permissions.push(p);
-                    }
-                }
-            });
-
-            console.log(self.permissions);
-        },
-        existsInPermissions: function existsInPermissions(permissionKey) {
-            var self = this;
-            var found = false;
-            _.each(self.permissions, function (p) {
-                if (p.key === permissionKey) found = true;
-            });
-            return found;
-        },
-        loadUser: function loadUser(cb) {
-
-            var self = this;
-
-            // reset first
-            self.groups = [];
-
-            axios.get('/admin/users/' + self.propUserId).then(function (response) {
-                var User = response.data.data;
-
-                self.name = User.name;
-                self.email = User.email;
-                self.active = User.active !== null;
-                self.permissions = User.permissions;
-
-                // groups
-                _.each(User.groups, function (g) {
-                    self.groups[g.id] = true;
-                });
-
-                self.$store.commit('setBreadcrumbs', [{ label: 'Users', to: { name: 'users.list' } }, { label: User.name, to: '' }, { label: 'Edit', to: '' }]);
-                console.log(User);
-
-                cb();
-            });
-        },
-        loadPermissions: function loadPermissions(cb) {
-
-            var self = this;
-
-            var params = {
-                paginate: 'no'
-            };
-
-            axios.get('/admin/permissions', { params: params }).then(function (response) {
-                self.options.permissions = response.data.data;
-                cb();
-            });
-        },
-        loadGroups: function loadGroups(cb) {
-
-            var self = this;
-
-            var params = {
-                paginate: 'no'
-            };
-
-            axios.get('/admin/groups', { params: params }).then(function (response) {
-                self.options.groups = response.data.data;
-
-                _.each(self.options.groups, function (g) {
-                    g.selected = false;
-                });
-
-                cb();
-            });
-        }
+  props: {
+    propUserId: {
+      required: true
     }
+  },
+  data: function data() {
+    var self = this;
+    return {
+      valid: false,
+      name: '',
+      nameRules: [function (v) {
+        return !!v || 'Name is required';
+      }],
+      email: '',
+      emailRules: [function (v) {
+        return !!v || 'E-mail is required';
+      }, function (v) {
+        return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid';
+      }],
+      password: '',
+      passwordRules: [function (v) {
+        if (v && v.length > 0 && v.length < 8) {
+          return 'Password needs minimum of 8 characters.';
+        }
+
+        return true;
+      }],
+      passwordConfirm: '',
+      passwordConfirmRules: [function (v) {
+        return !(v !== self.password) || 'Password do not match.';
+      }],
+      permissions: [],
+      groups: [],
+      active: '',
+      options: {
+        permissions: [],
+        permissionValues: [{
+          label: 'Allow',
+          value: 1
+        }, {
+          label: 'Deny',
+          value: -1
+        }, {
+          label: 'Inherit',
+          value: 0
+        }],
+        groups: []
+      },
+      selectedPermission: {},
+      selectedPermissionValue: 0,
+      alert: {
+        show: false,
+        icon: '',
+        color: '',
+        message: ''
+      }
+    };
+  },
+  mounted: function mounted() {
+    console.log('components.edit.vue');
+    var self = this;
+    self.loadPermissions(function () {
+      self.loadGroups(function () {});
+    });
+    self.$eventBus.$on(['GROUP_ADDED'], function () {
+      self.loadGroups(function () {});
+    });
+    this.loadUser(function () {});
+  },
+  methods: {
+    removePermission: function removePermission(i) {
+      var self = this;
+      self.permissions.splice(i, 1);
+    },
+    save: function save() {
+      var self = this;
+      var payload = {
+        name: self.name,
+        email: self.email,
+        password: self.password ? self.password : null,
+        active: self.active,
+        permissions: self.permissions,
+        groups: self.groups
+      };
+      console.log(payload);
+      console.log(self.active);
+      self.$store.commit('showLoader');
+      axios.put('/admin/users/' + self.propUserId, payload).then(function (response) {
+        self.$store.commit('showSnackbar', {
+          message: response.data.message,
+          color: 'success',
+          duration: 3000
+        });
+        self.$eventBus.$emit('USER_UPDATED');
+        self.$store.commit('hideLoader');
+      })["catch"](function (error) {
+        self.$store.commit('hideLoader');
+
+        if (error.response) {
+          self.$store.commit('showSnackbar', {
+            message: error.response.data.message,
+            color: 'error',
+            duration: 3000
+          });
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log('Error', error.message);
+        }
+      });
+    },
+    addSpecialPermission: function addSpecialPermission() {
+      var self = this;
+
+      _.each(self.options.permissions, function (p) {
+        if (self.selectedPermission === p.key) {
+          if (!self.existsInPermissions(self.selectedPermission)) {
+            p.value = self.selectedPermissionValue;
+            self.permissions.push(p);
+          }
+        }
+      });
+
+      console.log(self.permissions);
+    },
+    existsInPermissions: function existsInPermissions(permissionKey) {
+      var self = this;
+      var found = false;
+
+      _.each(self.permissions, function (p) {
+        if (p.key === permissionKey) found = true;
+      });
+
+      return found;
+    },
+    loadUser: function loadUser(cb) {
+      var self = this; // reset first
+
+      self.groups = [];
+      axios.get('/admin/users/' + self.propUserId).then(function (response) {
+        var User = response.data.data;
+        self.name = User.name;
+        self.email = User.email;
+        self.active = User.active !== null;
+        self.permissions = User.permissions; // groups
+
+        _.each(User.groups, function (g) {
+          self.groups[g.id] = true;
+        });
+
+        self.$store.commit('setBreadcrumbs', [{
+          label: 'Users',
+          to: {
+            name: 'users.list'
+          }
+        }, {
+          label: User.name,
+          to: ''
+        }, {
+          label: 'Edit',
+          to: ''
+        }]);
+        console.log(User);
+        cb();
+      });
+    },
+    loadPermissions: function loadPermissions(cb) {
+      var self = this;
+      var params = {
+        paginate: 'no'
+      };
+      axios.get('/admin/permissions', {
+        params: params
+      }).then(function (response) {
+        self.options.permissions = response.data.data;
+        cb();
+      });
+    },
+    loadGroups: function loadGroups(cb) {
+      var self = this;
+      var params = {
+        paginate: 'no'
+      };
+      axios.get('/admin/groups', {
+        params: params
+      }).then(function (response) {
+        self.options.groups = response.data.data;
+
+        _.each(self.options.groups, function (g) {
+          g.selected = false;
+        });
+
+        cb();
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -69554,119 +69543,140 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    data: function data() {
-        return {
-            headers: [{ text: 'Action', value: false, align: 'left', sortable: false }, { text: 'Name', value: 'name', align: 'left', sortable: false }, { text: 'Permissions', value: 'permissions', align: 'left', sortable: false }, { text: 'Total Members', value: 'members_count', align: 'left', sortable: false }, { text: 'Date Created', value: 'created_at', align: 'left', sortable: false }],
-            items: [],
-            totalItems: 0,
-            pagination: {
-                rowsPerPage: 10
-            },
-
-            filters: {
-                name: ''
-            },
-
-            dialogs: {
-                showPermissions: {
-                    items: [],
-                    show: false
-                }
-            }
-        };
-    },
-    mounted: function mounted() {
-        var self = this;
-
-        self.$store.commit('setBreadcrumbs', [{ label: 'Users', to: { name: 'users.list' } }, { label: 'Groups', to: '' }]);
-    },
-
-    watch: {
-        'pagination.page': function paginationPage() {
-            this.loadGroups();
-        },
-        'pagination.rowsPerPage': function paginationRowsPerPage() {
-            this.loadGroups();
-        },
-        'filters.name': _.debounce(function () {
-            var self = this;
-            self.loadGroups();
-        }, 700)
-    },
-    methods: {
-        trash: function trash(group) {
-            var self = this;
-
-            self.$store.commit('showDialog', {
-                type: "confirm",
-                title: "Confirm Deletion",
-                message: "Are you sure you want to delete this group?",
-                okCb: function okCb() {
-
-                    axios.delete('/admin/groups/' + group.id).then(function (response) {
-
-                        self.$store.commit('showSnackbar', {
-                            message: response.data.message,
-                            color: 'success',
-                            duration: 3000
-                        });
-
-                        self.$eventBus.$emit('GROUP_DELETED');
-                    }).catch(function (error) {
-
-                        self.$store.commit('hideLoader');
-
-                        if (error.response) {
-                            self.$store.commit('showSnackbar', {
-                                message: error.response.data.message,
-                                color: 'error',
-                                duration: 3000
-                            });
-                        } else if (error.request) {
-                            console.log(error.request);
-                        } else {
-                            console.log('Error', error.message);
-                        }
-                    });
-                },
-                cancelCb: function cancelCb() {
-                    console.log("CANCEL");
-                }
-            });
-        },
-        showDialog: function showDialog(dialog, data) {
-
-            var self = this;
-
-            switch (dialog) {
-                case 'group_permissions':
-                    self.dialogs.showPermissions.items = data;
-                    setTimeout(function () {
-                        self.dialogs.showPermissions.show = true;
-                    }, 500);
-                    break;
-            }
-        },
-        loadGroups: function loadGroups(cb) {
-
-            var self = this;
-
-            var params = {
-                name: self.filters.name,
-                page: self.pagination.page,
-                per_page: self.pagination.rowsPerPage
-            };
-
-            axios.get('/admin/groups', { params: params }).then(function (response) {
-                self.items = response.data.data.data;
-                self.totalItems = response.data.data.total;
-                self.pagination.totalItems = response.data.data.total;
-                (cb || Function)();
-            });
+  data: function data() {
+    return {
+      headers: [{
+        text: 'Action',
+        value: false,
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Name',
+        value: 'name',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Permissions',
+        value: 'permissions',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Total Members',
+        value: 'members_count',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Date Created',
+        value: 'created_at',
+        align: 'left',
+        sortable: false
+      }],
+      items: [],
+      totalItems: 0,
+      pagination: {
+        rowsPerPage: 10
+      },
+      filters: {
+        name: ''
+      },
+      dialogs: {
+        showPermissions: {
+          items: [],
+          show: false
         }
+      }
+    };
+  },
+  mounted: function mounted() {
+    var self = this;
+    self.$store.commit('setBreadcrumbs', [{
+      label: 'Users',
+      to: {
+        name: 'users.list'
+      }
+    }, {
+      label: 'Groups',
+      to: ''
+    }]);
+  },
+  watch: {
+    'pagination.page': function paginationPage() {
+      this.loadGroups();
+    },
+    'pagination.rowsPerPage': function paginationRowsPerPage() {
+      this.loadGroups();
+    },
+    'filters.name': _.debounce(function () {
+      var self = this;
+      self.loadGroups();
+    }, 700)
+  },
+  methods: {
+    trash: function trash(group) {
+      var self = this;
+      self.$store.commit('showDialog', {
+        type: "confirm",
+        title: "Confirm Deletion",
+        message: "Are you sure you want to delete this group?",
+        okCb: function okCb() {
+          axios["delete"]('/admin/groups/' + group.id).then(function (response) {
+            self.$store.commit('showSnackbar', {
+              message: response.data.message,
+              color: 'success',
+              duration: 3000
+            });
+            self.$eventBus.$emit('GROUP_DELETED');
+          })["catch"](function (error) {
+            self.$store.commit('hideLoader');
+
+            if (error.response) {
+              self.$store.commit('showSnackbar', {
+                message: error.response.data.message,
+                color: 'error',
+                duration: 3000
+              });
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              console.log('Error', error.message);
+            }
+          });
+        },
+        cancelCb: function cancelCb() {
+          console.log("CANCEL");
+        }
+      });
+    },
+    showDialog: function showDialog(dialog, data) {
+      var self = this;
+
+      switch (dialog) {
+        case 'group_permissions':
+          self.dialogs.showPermissions.items = data;
+          setTimeout(function () {
+            self.dialogs.showPermissions.show = true;
+          }, 500);
+          break;
+      }
+    },
+    loadGroups: function loadGroups(cb) {
+      var self = this;
+      var params = {
+        name: self.filters.name,
+        page: self.pagination.page,
+        per_page: self.pagination.rowsPerPage
+      };
+      axios.get('/admin/groups', {
+        params: params
+      }).then(function (response) {
+        self.items = response.data.data.data;
+        self.totalItems = response.data.data.total;
+        self.pagination.totalItems = response.data.data.total;
+        (cb || Function)();
+      });
     }
+  }
 });
 
 /***/ }),
@@ -70091,117 +70101,123 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    data: function data() {
-        return {
-            valid: false,
-            name: '',
-            nameRules: [function (v) {
-                return !!v || 'Name is required';
-            }],
-            permissions: [],
-            selectedPermission: {},
-            selectedPermissionValue: 0,
-
-            options: {
-                permissions: [],
-                permissionValues: [{ label: 'Allow', value: 1 }, { label: 'Deny', value: -1 }]
-            }
-        };
+  data: function data() {
+    return {
+      valid: false,
+      name: '',
+      nameRules: [function (v) {
+        return !!v || 'Name is required';
+      }],
+      permissions: [],
+      selectedPermission: {},
+      selectedPermissionValue: 0,
+      options: {
+        permissions: [],
+        permissionValues: [{
+          label: 'Allow',
+          value: 1
+        }, {
+          label: 'Deny',
+          value: -1
+        }]
+      }
+    };
+  },
+  mounted: function mounted() {
+    var self = this;
+    self.loadPermissions(function () {});
+    self.$store.commit('setBreadcrumbs', [{
+      label: 'Users',
+      to: {
+        name: 'users.list'
+      }
+    }, {
+      label: 'Groups',
+      to: {
+        name: 'users.groups.list'
+      }
+    }, {
+      label: 'Create',
+      to: ''
+    }]);
+  },
+  methods: {
+    remove: function remove(i) {
+      this.permissions.splice(i, 1);
     },
-    mounted: function mounted() {
-        var self = this;
+    save: function save() {
+      var self = this;
+      var payload = {
+        name: self.name,
+        permissions: self.permissions
+      };
+      self.$store.commit('showLoader');
+      axios.post('/admin/groups', payload).then(function (response) {
+        self.$store.commit('showSnackbar', {
+          message: response.data.message,
+          color: 'success',
+          duration: 3000
+        });
+        self.$store.commit('hideLoader');
+        self.$eventBus.$emit('GROUP_ADDED'); // reset
 
-        self.loadPermissions(function () {});
+        self.$refs.groupFormAdd.reset();
+        self.permissions = [];
+      })["catch"](function (error) {
+        self.$store.commit('hideLoader');
 
-        self.$store.commit('setBreadcrumbs', [{ label: 'Users', to: { name: 'users.list' } }, { label: 'Groups', to: { name: 'users.groups.list' } }, { label: 'Create', to: '' }]);
-    },
-
-    methods: {
-        remove: function remove(i) {
-            this.permissions.splice(i, 1);
-        },
-        save: function save() {
-
-            var self = this;
-
-            var payload = {
-                name: self.name,
-                permissions: self.permissions
-            };
-
-            self.$store.commit('showLoader');
-
-            axios.post('/admin/groups', payload).then(function (response) {
-
-                self.$store.commit('showSnackbar', {
-                    message: response.data.message,
-                    color: 'success',
-                    duration: 3000
-                });
-                self.$store.commit('hideLoader');
-                self.$eventBus.$emit('GROUP_ADDED');
-
-                // reset
-                self.$refs.groupFormAdd.reset();
-                self.permissions = [];
-            }).catch(function (error) {
-
-                self.$store.commit('hideLoader');
-
-                if (error.response) {
-                    self.$store.commit('showSnackbar', {
-                        message: error.response.data.message,
-                        color: 'error',
-                        duration: 3000
-                    });
-                } else if (error.request) {
-                    console.log(error.request);
-                } else {
-                    console.log('Error', error.message);
-                }
-            });
-        },
-        addSpecialPermission: function addSpecialPermission() {
-            var self = this;
-
-            _.each(self.options.permissions, function (p) {
-
-                if (self.selectedPermission === p.key) {
-
-                    if (!self.existsInPermissions(self.selectedPermission)) {
-                        p.value = self.selectedPermissionValue;
-                        self.permissions.push(p);
-                    }
-                }
-            });
-
-            console.log(self.permissions);
-        },
-        loadPermissions: function loadPermissions(cb) {
-
-            var self = this;
-
-            var params = {
-                paginate: 'no',
-                page: self.page
-            };
-
-            axios.get('/admin/permissions', { params: params }).then(function (response) {
-                self.options.permissions = response.data.data;
-                cb();
-            });
-        },
-        existsInPermissions: function existsInPermissions(permissionKey) {
-            var self = this;
-            var found = false;
-            _.each(self.permissions, function (p) {
-                if (p.permission === permissionKey) found = true;
-            });
-            return found;
+        if (error.response) {
+          self.$store.commit('showSnackbar', {
+            message: error.response.data.message,
+            color: 'error',
+            duration: 3000
+          });
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log('Error', error.message);
         }
+      });
+    },
+    addSpecialPermission: function addSpecialPermission() {
+      var self = this;
+
+      _.each(self.options.permissions, function (p) {
+        if (self.selectedPermission === p.key) {
+          if (!self.existsInPermissions(self.selectedPermission)) {
+            p.value = self.selectedPermissionValue;
+            self.permissions.push(p);
+          }
+        }
+      });
+
+      console.log(self.permissions);
+    },
+    loadPermissions: function loadPermissions(cb) {
+      var self = this;
+      var params = {
+        paginate: 'no',
+        page: self.page
+      };
+      axios.get('/admin/permissions', {
+        params: params
+      }).then(function (response) {
+        self.options.permissions = response.data.data;
+        cb();
+      });
+    },
+    existsInPermissions: function existsInPermissions(permissionKey) {
+      var self = this;
+      var found = false;
+
+      _.each(self.permissions, function (p) {
+        if (p.permission === permissionKey) found = true;
+      });
+
+      return found;
     }
+  }
 });
 
 /***/ }),
@@ -70608,133 +70624,139 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    props: {
-        propGroupId: {
-            required: true
-        }
-    },
-    data: function data() {
-        return {
-            valid: false,
-            name: '',
-            nameRules: [function (v) {
-                return !!v || 'Name is required';
-            }],
-            permissions: [],
-            selectedPermission: {},
-            selectedPermissionValue: 0,
-
-            options: {
-                permissions: [],
-                permissionValues: [{ label: 'Allow', value: 1 }, { label: 'Deny', value: -1 }]
-            }
-        };
-    },
-    mounted: function mounted() {
-        console.log('pages.Home.vue');
-
-        var self = this;
-
-        self.loadPermissions(function () {});
-        self.loadGroup(function () {});
-    },
-
-    methods: {
-        removePermission: function removePermission(i) {
-            this.permissions.splice(i, 1);
-        },
-        save: function save() {
-
-            var self = this;
-
-            var payload = {
-                name: self.name,
-                permissions: self.permissions
-            };
-
-            self.$store.commit('showLoader');
-
-            axios.put('/admin/groups/' + self.propGroupId, payload).then(function (response) {
-
-                self.$store.commit('showSnackbar', {
-                    message: response.data.message,
-                    color: 'success',
-                    duration: 3000
-                });
-                self.$store.commit('hideLoader');
-                self.$eventBus.$emit('GROUP_UPDATED');
-            }).catch(function (error) {
-
-                self.$store.commit('hideLoader');
-
-                if (error.response) {
-                    self.$store.commit('showSnackbar', {
-                        message: error.response.data.message,
-                        color: 'error',
-                        duration: 3000
-                    });
-                } else if (error.request) {
-                    console.log(error.request);
-                } else {
-                    console.log('Error', error.message);
-                }
-            });
-        },
-        addSpecialPermission: function addSpecialPermission() {
-            var self = this;
-
-            _.each(self.options.permissions, function (p) {
-
-                if (self.selectedPermission === p.key) {
-
-                    if (!self.existsInPermissions(self.selectedPermission)) {
-                        p.value = self.selectedPermissionValue;
-                        self.permissions.push(p);
-                    }
-                }
-            });
-
-            console.log(self.permissions);
-        },
-        loadPermissions: function loadPermissions(cb) {
-
-            var self = this;
-
-            var params = {
-                paginate: 'no',
-                page: self.page
-            };
-
-            axios.get('/admin/permissions', { params: params }).then(function (response) {
-                self.options.permissions = response.data.data;
-                cb();
-            });
-        },
-        loadGroup: function loadGroup(cb) {
-
-            var self = this;
-
-            axios.get('/admin/groups/' + self.propGroupId).then(function (response) {
-                var Group = response.data.data;
-                self.name = Group.name;
-                self.permissions = Group.permissions;
-
-                self.$store.commit('setBreadcrumbs', [{ label: 'Users', to: { name: 'users.list' } }, { label: 'Groups', to: { name: 'users.groups.list' } }, { label: Group.name, name: '' }, { label: 'Edit', name: '' }]);
-
-                cb();
-            });
-        },
-        existsInPermissions: function existsInPermissions(permissionKey) {
-            var self = this;
-            var found = false;
-            _.each(self.permissions, function (p) {
-                if (p.permission === permissionKey) found = true;
-            });
-            return found;
-        }
+  props: {
+    propGroupId: {
+      required: true
     }
+  },
+  data: function data() {
+    return {
+      valid: false,
+      name: '',
+      nameRules: [function (v) {
+        return !!v || 'Name is required';
+      }],
+      permissions: [],
+      selectedPermission: {},
+      selectedPermissionValue: 0,
+      options: {
+        permissions: [],
+        permissionValues: [{
+          label: 'Allow',
+          value: 1
+        }, {
+          label: 'Deny',
+          value: -1
+        }]
+      }
+    };
+  },
+  mounted: function mounted() {
+    console.log('pages.Home.vue');
+    var self = this;
+    self.loadPermissions(function () {});
+    self.loadGroup(function () {});
+  },
+  methods: {
+    removePermission: function removePermission(i) {
+      this.permissions.splice(i, 1);
+    },
+    save: function save() {
+      var self = this;
+      var payload = {
+        name: self.name,
+        permissions: self.permissions
+      };
+      self.$store.commit('showLoader');
+      axios.put('/admin/groups/' + self.propGroupId, payload).then(function (response) {
+        self.$store.commit('showSnackbar', {
+          message: response.data.message,
+          color: 'success',
+          duration: 3000
+        });
+        self.$store.commit('hideLoader');
+        self.$eventBus.$emit('GROUP_UPDATED');
+      })["catch"](function (error) {
+        self.$store.commit('hideLoader');
+
+        if (error.response) {
+          self.$store.commit('showSnackbar', {
+            message: error.response.data.message,
+            color: 'error',
+            duration: 3000
+          });
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log('Error', error.message);
+        }
+      });
+    },
+    addSpecialPermission: function addSpecialPermission() {
+      var self = this;
+
+      _.each(self.options.permissions, function (p) {
+        if (self.selectedPermission === p.key) {
+          if (!self.existsInPermissions(self.selectedPermission)) {
+            p.value = self.selectedPermissionValue;
+            self.permissions.push(p);
+          }
+        }
+      });
+
+      console.log(self.permissions);
+    },
+    loadPermissions: function loadPermissions(cb) {
+      var self = this;
+      var params = {
+        paginate: 'no',
+        page: self.page
+      };
+      axios.get('/admin/permissions', {
+        params: params
+      }).then(function (response) {
+        self.options.permissions = response.data.data;
+        cb();
+      });
+    },
+    loadGroup: function loadGroup(cb) {
+      var self = this;
+      axios.get('/admin/groups/' + self.propGroupId).then(function (response) {
+        var Group = response.data.data;
+        self.name = Group.name;
+        self.permissions = Group.permissions;
+        self.$store.commit('setBreadcrumbs', [{
+          label: 'Users',
+          to: {
+            name: 'users.list'
+          }
+        }, {
+          label: 'Groups',
+          to: {
+            name: 'users.groups.list'
+          }
+        }, {
+          label: Group.name,
+          name: ''
+        }, {
+          label: 'Edit',
+          name: ''
+        }]);
+        cb();
+      });
+    },
+    existsInPermissions: function existsInPermissions(permissionKey) {
+      var self = this;
+      var found = false;
+
+      _.each(self.permissions, function (p) {
+        if (p.permission === permissionKey) found = true;
+      });
+
+      return found;
+    }
+  }
 });
 
 /***/ }),
@@ -71130,109 +71152,131 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    data: function data() {
-        return {
-            headers: [{ text: 'Action', value: false, align: 'left', sortable: false }, { text: 'Title', value: 'name', align: 'left', sortable: false }, { text: 'Key', value: 'key', align: 'left', sortable: false }, { text: 'Description', value: 'description', align: 'left', sortable: false }, { text: 'Date Created', value: 'created_at', align: 'left', sortable: false }],
-            items: [],
-            totalItems: 0,
-            pagination: {
-                rowsPerPage: 10
-            },
-
-            filters: {
-                title: ''
-            },
-
-            dialogs: {
-                edit: {
-                    group: {},
-                    show: false
-                },
-                add: {
-                    show: false
-                }
-            }
-        };
-    },
-    mounted: function mounted() {
-        var self = this;
-
-        self.$store.commit('setBreadcrumbs', [{ label: 'Users', to: { name: 'users.list' } }, { label: 'Permissions', name: '' }]);
-    },
-
-    watch: {
-        'pagination.page': function paginationPage() {
-            this.loadPermissions(function () {});
+  data: function data() {
+    return {
+      headers: [{
+        text: 'Action',
+        value: false,
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Title',
+        value: 'name',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Key',
+        value: 'key',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Description',
+        value: 'description',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Date Created',
+        value: 'created_at',
+        align: 'left',
+        sortable: false
+      }],
+      items: [],
+      totalItems: 0,
+      pagination: {
+        rowsPerPage: 10
+      },
+      filters: {
+        title: ''
+      },
+      dialogs: {
+        edit: {
+          group: {},
+          show: false
         },
-        'pagination.rowsPerPage': function paginationRowsPerPage() {
-            this.loadPermissions(function () {});
-        },
-        'filters.title': _.debounce(function () {
-            var self = this;
-            self.loadPermissions(function () {});
-        }, 700)
-    },
-    methods: {
-        trash: function trash(permission) {
-            var self = this;
-
-            self.$store.commit('showDialog', {
-                type: "confirm",
-                title: "Confirm Deletion",
-                message: "Are you sure you want to delete this permission?",
-                okCb: function okCb() {
-
-                    axios.delete('/admin/permissions/' + permission.id).then(function (response) {
-
-                        self.$store.commit('showSnackbar', {
-                            message: response.data.message,
-                            color: 'success',
-                            duration: 3000
-                        });
-
-                        self.loadPermissions(function () {});
-                    }).catch(function (error) {
-
-                        self.$store.commit('hideLoader');
-
-                        if (error.response) {
-                            self.$store.commit('showSnackbar', {
-                                message: error.response.data.message,
-                                color: 'error',
-                                duration: 3000
-                            });
-                        } else if (error.request) {
-                            console.log(error.request);
-                        } else {
-                            console.log('Error', error.message);
-                        }
-                    });
-                },
-                cancelCb: function cancelCb() {
-                    console.log("CANCEL");
-                }
-            });
-        },
-        loadPermissions: function loadPermissions(cb) {
-
-            var self = this;
-
-            var params = {
-                title: self.filters.title,
-                page: self.pagination.page,
-                per_page: self.pagination.rowsPerPage
-            };
-
-            axios.get('/admin/permissions', { params: params }).then(function (response) {
-                self.items = response.data.data.data;
-                self.totalItems = response.data.data.total;
-                self.pagination.totalItems = response.data.data.total;
-                (cb || Function)();
-            });
+        add: {
+          show: false
         }
+      }
+    };
+  },
+  mounted: function mounted() {
+    var self = this;
+    self.$store.commit('setBreadcrumbs', [{
+      label: 'Users',
+      to: {
+        name: 'users.list'
+      }
+    }, {
+      label: 'Permissions',
+      name: ''
+    }]);
+  },
+  watch: {
+    'pagination.page': function paginationPage() {
+      this.loadPermissions(function () {});
+    },
+    'pagination.rowsPerPage': function paginationRowsPerPage() {
+      this.loadPermissions(function () {});
+    },
+    'filters.title': _.debounce(function () {
+      var self = this;
+      self.loadPermissions(function () {});
+    }, 700)
+  },
+  methods: {
+    trash: function trash(permission) {
+      var self = this;
+      self.$store.commit('showDialog', {
+        type: "confirm",
+        title: "Confirm Deletion",
+        message: "Are you sure you want to delete this permission?",
+        okCb: function okCb() {
+          axios["delete"]('/admin/permissions/' + permission.id).then(function (response) {
+            self.$store.commit('showSnackbar', {
+              message: response.data.message,
+              color: 'success',
+              duration: 3000
+            });
+            self.loadPermissions(function () {});
+          })["catch"](function (error) {
+            self.$store.commit('hideLoader');
+
+            if (error.response) {
+              self.$store.commit('showSnackbar', {
+                message: error.response.data.message,
+                color: 'error',
+                duration: 3000
+              });
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              console.log('Error', error.message);
+            }
+          });
+        },
+        cancelCb: function cancelCb() {
+          console.log("CANCEL");
+        }
+      });
+    },
+    loadPermissions: function loadPermissions(cb) {
+      var self = this;
+      var params = {
+        title: self.filters.title,
+        page: self.pagination.page,
+        per_page: self.pagination.rowsPerPage
+      };
+      axios.get('/admin/permissions', {
+        params: params
+      }).then(function (response) {
+        self.items = response.data.data.data;
+        self.totalItems = response.data.data.total;
+        self.pagination.totalItems = response.data.data.total;
+        (cb || Function)();
+      });
     }
+  }
 });
 
 /***/ }),
@@ -71537,85 +71581,89 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    data: function data() {
-        return {
-            valid: false,
-            isLoading: false,
-            title: '',
-            titleRules: [function (v) {
-                return !!v || 'Title is required';
-            }],
-            description: '',
-            descriptionRules: [function (v) {
-                return !!v || 'Description is required';
-            }],
-            permissionKey: '',
-            permissionKeyRules: [function (v) {
-                return !!v || 'Permission Key is required';
-            }, function (v) {
-                return v && !v.match(/[^\w\.]+/g) || 'Description cannot contain special characters';
-            }]
-        };
+  data: function data() {
+    return {
+      valid: false,
+      isLoading: false,
+      title: '',
+      titleRules: [function (v) {
+        return !!v || 'Title is required';
+      }],
+      description: '',
+      descriptionRules: [function (v) {
+        return !!v || 'Description is required';
+      }],
+      permissionKey: '',
+      permissionKeyRules: [function (v) {
+        return !!v || 'Permission Key is required';
+      }, function (v) {
+        return v && !v.match(/[^\w\.]+/g) || 'Description cannot contain special characters';
+      }]
+    };
+  },
+  mounted: function mounted() {
+    this.$store.commit('setBreadcrumbs', [{
+      label: 'Users',
+      to: {
+        name: 'users.list'
+      }
+    }, {
+      label: 'Permissions',
+      to: {
+        name: 'users.permissions.list'
+      }
+    }, {
+      label: 'Create',
+      name: ''
+    }]);
+  },
+  watch: {
+    permissionKey: function permissionKey(v) {
+      if (v) this.permissionKey = v.replace(' ', '.').toLowerCase();
     },
-    mounted: function mounted() {
-        this.$store.commit('setBreadcrumbs', [{ label: 'Users', to: { name: 'users.list' } }, { label: 'Permissions', to: { name: 'users.permissions.list' } }, { label: 'Create', name: '' }]);
-    },
-
-    watch: {
-        permissionKey: function permissionKey(v) {
-            if (v) this.permissionKey = v.replace(' ', '.').toLowerCase();
-        },
-        title: function title(v) {
-            if (v) this.permissionKey = v.replace(' ', '.').toLowerCase();
-        }
-    },
-    methods: {
-        save: function save() {
-
-            var self = this;
-
-            var payload = {
-                title: self.title,
-                description: self.description,
-                key: self.permissionKey
-            };
-
-            self.isLoading = true;
-
-            axios.post('/admin/permissions', payload).then(function (response) {
-
-                self.$store.commit('showSnackbar', {
-                    message: response.data.message,
-                    color: 'success',
-                    duration: 3000
-                });
-                self.$eventBus.$emit('PERMISSION_ADDED');
-
-                // reset
-                self.$refs.permissionFormAdd.reset();
-                self.permissions = [];
-                self.isLoading = false;
-            }).catch(function (error) {
-
-                self.isLoading = false;
-                self.$store.commit('hideLoader');
-
-                if (error.response) {
-                    self.$store.commit('showSnackbar', {
-                        message: error.response.data.message,
-                        color: 'error',
-                        duration: 3000
-                    });
-                } else if (error.request) {
-                    console.log(error.request);
-                } else {
-                    console.log('Error', error.message);
-                }
-            });
-        }
+    title: function title(v) {
+      if (v) this.permissionKey = v.replace(' ', '.').toLowerCase();
     }
+  },
+  methods: {
+    save: function save() {
+      var self = this;
+      var payload = {
+        title: self.title,
+        description: self.description,
+        key: self.permissionKey
+      };
+      self.isLoading = true;
+      axios.post('/admin/permissions', payload).then(function (response) {
+        self.$store.commit('showSnackbar', {
+          message: response.data.message,
+          color: 'success',
+          duration: 3000
+        });
+        self.$eventBus.$emit('PERMISSION_ADDED'); // reset
+
+        self.$refs.permissionFormAdd.reset();
+        self.permissions = [];
+        self.isLoading = false;
+      })["catch"](function (error) {
+        self.isLoading = false;
+        self.$store.commit('hideLoader');
+
+        if (error.response) {
+          self.$store.commit('showSnackbar', {
+            message: error.response.data.message,
+            color: 'error',
+            duration: 3000
+          });
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log('Error', error.message);
+        }
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -71874,105 +71922,106 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    props: {
-        propPermissionId: {
-            required: true
-        }
-    },
-    data: function data() {
-        return {
-            valid: false,
-            isLoading: false,
-            title: '',
-            titleRules: [function (v) {
-                return !!v || 'Title is required';
-            }],
-            description: '',
-            descriptionRules: [function (v) {
-                return !!v || 'Description is required';
-            }],
-            permissionKey: '',
-            permissionKeyRules: [function (v) {
-                return !!v || 'Permission Key is required';
-            }, function (v) {
-                return !v.match(/[^\w\.]+/g) || 'Description cannot contain special characters';
-            }]
-        };
-    },
-    mounted: function mounted() {
-        this.loadPermission();
-    },
-
-    watch: {
-        permissionKey: function permissionKey(v) {
-            this.permissionKey = v.replace(' ', '.').toLowerCase();
-        },
-        title: function title(v) {
-            this.permissionKey = v.replace(' ', '.').toLowerCase();
-        }
-    },
-    methods: {
-        save: function save() {
-
-            var self = this;
-
-            var payload = {
-                title: self.title,
-                description: self.description,
-                key: self.permissionKey
-            };
-
-            self.isLoading = true;
-
-            axios.put('/admin/permissions/' + self.propPermissionId, payload).then(function (response) {
-
-                self.$store.commit('showSnackbar', {
-                    message: response.data.message,
-                    color: 'success',
-                    duration: 3000
-                });
-
-                // reset
-                self.permissions = [];
-                self.isLoading = false;
-            }).catch(function (error) {
-
-                self.isLoading = false;
-                self.$store.commit('hideLoader');
-
-                if (error.response) {
-                    self.$store.commit('showSnackbar', {
-                        message: error.response.data.message,
-                        color: 'error',
-                        duration: 3000
-                    });
-                } else if (error.request) {
-                    console.log(error.request);
-                } else {
-                    console.log('Error', error.message);
-                }
-            });
-        },
-        loadPermission: function loadPermission(cb) {
-
-            var self = this;
-
-            axios.get('/admin/permissions/' + self.propPermissionId).then(function (response) {
-
-                var Permission = response.data.data;
-
-                self.title = Permission.title;
-                self.description = Permission.description;
-                self.permissionKey = Permission.key;
-
-                self.$store.commit('setBreadcrumbs', [{ label: 'Users', to: { name: 'users.list' } }, { label: 'Permissions', to: { name: 'users.permissions.list' } }, { label: Permission.title, name: '' }, { label: 'Edit', name: '' }]);
-
-                (cb || Function)();
-            });
-        }
+  props: {
+    propPermissionId: {
+      required: true
     }
+  },
+  data: function data() {
+    return {
+      valid: false,
+      isLoading: false,
+      title: '',
+      titleRules: [function (v) {
+        return !!v || 'Title is required';
+      }],
+      description: '',
+      descriptionRules: [function (v) {
+        return !!v || 'Description is required';
+      }],
+      permissionKey: '',
+      permissionKeyRules: [function (v) {
+        return !!v || 'Permission Key is required';
+      }, function (v) {
+        return !v.match(/[^\w\.]+/g) || 'Description cannot contain special characters';
+      }]
+    };
+  },
+  mounted: function mounted() {
+    this.loadPermission();
+  },
+  watch: {
+    permissionKey: function permissionKey(v) {
+      this.permissionKey = v.replace(' ', '.').toLowerCase();
+    },
+    title: function title(v) {
+      this.permissionKey = v.replace(' ', '.').toLowerCase();
+    }
+  },
+  methods: {
+    save: function save() {
+      var self = this;
+      var payload = {
+        title: self.title,
+        description: self.description,
+        key: self.permissionKey
+      };
+      self.isLoading = true;
+      axios.put('/admin/permissions/' + self.propPermissionId, payload).then(function (response) {
+        self.$store.commit('showSnackbar', {
+          message: response.data.message,
+          color: 'success',
+          duration: 3000
+        }); // reset
+
+        self.permissions = [];
+        self.isLoading = false;
+      })["catch"](function (error) {
+        self.isLoading = false;
+        self.$store.commit('hideLoader');
+
+        if (error.response) {
+          self.$store.commit('showSnackbar', {
+            message: error.response.data.message,
+            color: 'error',
+            duration: 3000
+          });
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log('Error', error.message);
+        }
+      });
+    },
+    loadPermission: function loadPermission(cb) {
+      var self = this;
+      axios.get('/admin/permissions/' + self.propPermissionId).then(function (response) {
+        var Permission = response.data.data;
+        self.title = Permission.title;
+        self.description = Permission.description;
+        self.permissionKey = Permission.key;
+        self.$store.commit('setBreadcrumbs', [{
+          label: 'Users',
+          to: {
+            name: 'users.list'
+          }
+        }, {
+          label: 'Permissions',
+          to: {
+            name: 'users.permissions.list'
+          }
+        }, {
+          label: Permission.title,
+          name: ''
+        }, {
+          label: 'Edit',
+          name: ''
+        }]);
+        (cb || Function)();
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -72287,32 +72336,31 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    components: {
-        FileUpload: __WEBPACK_IMPORTED_MODULE_1__components_FileUpload_vue___default.a,
-        FileGroupLists: __WEBPACK_IMPORTED_MODULE_0__components_FileGroupLists_vue___default.a,
-        FileLists: __WEBPACK_IMPORTED_MODULE_2__components_FileLists_vue___default.a
-    },
-    mounted: function mounted() {
-        console.log('pages.FileManager.vue');
-
-        var self = this;
-
-        self.$store.commit('setBreadcrumbs', [{ label: 'Files', name: '' }]);
-    },
-    data: function data() {
-        return {
-            active: 'files'
-        };
-    },
-
-    watch: {
-        active: function active(v) {
-            console.log('active tab: ' + v);
-        }
-    },
-    methods: {}
+  components: {
+    FileUpload: __WEBPACK_IMPORTED_MODULE_1__components_FileUpload_vue___default.a,
+    FileGroupLists: __WEBPACK_IMPORTED_MODULE_0__components_FileGroupLists_vue___default.a,
+    FileLists: __WEBPACK_IMPORTED_MODULE_2__components_FileLists_vue___default.a
+  },
+  mounted: function mounted() {
+    console.log('pages.FileManager.vue');
+    var self = this;
+    self.$store.commit('setBreadcrumbs', [{
+      label: 'Files',
+      name: ''
+    }]);
+  },
+  data: function data() {
+    return {
+      active: 'files'
+    };
+  },
+  watch: {
+    active: function active(v) {
+      console.log('active tab: ' + v);
+    }
+  },
+  methods: {}
 });
 
 /***/ }),
@@ -72461,131 +72509,145 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 
 
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    components: {
-        FileGroupAdd: __WEBPACK_IMPORTED_MODULE_0__FileGroupAdd_vue___default.a,
-        FileGroupEdit: __WEBPACK_IMPORTED_MODULE_1__FileGroupEdit_vue___default.a
-    },
-    data: function data() {
-        return {
-            headers: [{ text: 'Action', value: false, align: 'left', sortable: false }, { text: 'Group Name', value: 'name', align: 'left', sortable: false }, { text: 'Description', value: 'description', align: 'left', sortable: false }, { text: 'Total Files', value: 'file_count', align: 'left', sortable: false }, { text: 'Date Created', value: 'created_at', align: 'left', sortable: false }],
-            items: [],
-            totalItems: 0,
-            pagination: {
-                rowsPerPage: 10
-            },
-
-            filters: {
-                name: ''
-            },
-
-            dialogs: {
-                edit: {
-                    fileGroup: {},
-                    show: false
-                },
-                add: {
-                    show: false
-                }
-            }
-        };
-    },
-    mounted: function mounted() {
-        console.log('pages.files.components.FileGroupLists.vue');
-
-        var self = this;
-
-        self.$eventBus.$on(['FILE_GROUP_ADDED', 'FILE_GROUP_UPDATED', 'FILE_GROUP_DELETED'], function () {
-            self.loadFileGroups(function () {});
-        });
-    },
-
-    watch: {
-        'filters.name': _.debounce(function (v) {
-            this.loadFileGroups(function () {});
-        }, 500),
-        'pagination.page': function paginationPage() {
-            this.loadFileGroups(function () {});
+  components: {
+    FileGroupAdd: __WEBPACK_IMPORTED_MODULE_0__FileGroupAdd_vue___default.a,
+    FileGroupEdit: __WEBPACK_IMPORTED_MODULE_1__FileGroupEdit_vue___default.a
+  },
+  data: function data() {
+    return {
+      headers: [{
+        text: 'Action',
+        value: false,
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Group Name',
+        value: 'name',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Description',
+        value: 'description',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Total Files',
+        value: 'file_count',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Date Created',
+        value: 'created_at',
+        align: 'left',
+        sortable: false
+      }],
+      items: [],
+      totalItems: 0,
+      pagination: {
+        rowsPerPage: 10
+      },
+      filters: {
+        name: ''
+      },
+      dialogs: {
+        edit: {
+          fileGroup: {},
+          show: false
         },
-        'pagination.rowsPerPage': function paginationRowsPerPage() {
-            this.loadFileGroups(function () {});
+        add: {
+          show: false
         }
+      }
+    };
+  },
+  mounted: function mounted() {
+    console.log('pages.files.components.FileGroupLists.vue');
+    var self = this;
+    self.$eventBus.$on(['FILE_GROUP_ADDED', 'FILE_GROUP_UPDATED', 'FILE_GROUP_DELETED'], function () {
+      self.loadFileGroups(function () {});
+    });
+  },
+  watch: {
+    'filters.name': _.debounce(function (v) {
+      this.loadFileGroups(function () {});
+    }, 500),
+    'pagination.page': function paginationPage() {
+      this.loadFileGroups(function () {});
     },
-    methods: {
-        trash: function trash(group) {
-            var self = this;
-
-            self.$store.commit('showDialog', {
-                type: "confirm",
-                title: "Confirm Deletion",
-                message: "Are you sure you want to delete this file group?",
-                okCb: function okCb() {
-
-                    axios.delete('/admin/file-groups/' + group.id).then(function (response) {
-
-                        self.$store.commit('showSnackbar', {
-                            message: response.data.message,
-                            color: 'success',
-                            duration: 3000
-                        });
-
-                        self.$eventBus.$emit('FILE_GROUP_DELETED');
-                    }).catch(function (error) {
-                        if (error.response) {
-                            self.$store.commit('showSnackbar', {
-                                message: error.response.data.message,
-                                color: 'error',
-                                duration: 3000
-                            });
-                        } else if (error.request) {
-                            console.log(error.request);
-                        } else {
-                            console.log('Error', error.message);
-                        }
-                    });
-                },
-                cancelCb: function cancelCb() {
-                    console.log("CANCEL");
-                }
-            });
-        },
-        showDialog: function showDialog(dialog, data) {
-
-            var self = this;
-
-            switch (dialog) {
-                case 'file_group_edit':
-                    self.dialogs.edit.fileGroup = data;
-                    setTimeout(function () {
-                        self.dialogs.edit.show = true;
-                    }, 500);
-                    break;
-                case 'file_group_add':
-                    setTimeout(function () {
-                        self.dialogs.add.show = true;
-                    }, 500);
-                    break;
-            }
-        },
-        loadFileGroups: function loadFileGroups(cb) {
-
-            var self = this;
-
-            var params = {
-                name: self.filters.name,
-                page: self.pagination.page,
-                per_page: self.pagination.rowsPerPage
-            };
-
-            axios.get('/admin/file-groups', { params: params }).then(function (response) {
-                self.items = response.data.data.data;
-                self.totalItems = response.data.data.total;
-                self.pagination.totalItems = response.data.data.total;
-                (cb || Function)();
-            });
-        }
+    'pagination.rowsPerPage': function paginationRowsPerPage() {
+      this.loadFileGroups(function () {});
     }
+  },
+  methods: {
+    trash: function trash(group) {
+      var self = this;
+      self.$store.commit('showDialog', {
+        type: "confirm",
+        title: "Confirm Deletion",
+        message: "Are you sure you want to delete this file group?",
+        okCb: function okCb() {
+          axios["delete"]('/admin/file-groups/' + group.id).then(function (response) {
+            self.$store.commit('showSnackbar', {
+              message: response.data.message,
+              color: 'success',
+              duration: 3000
+            });
+            self.$eventBus.$emit('FILE_GROUP_DELETED');
+          })["catch"](function (error) {
+            if (error.response) {
+              self.$store.commit('showSnackbar', {
+                message: error.response.data.message,
+                color: 'error',
+                duration: 3000
+              });
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              console.log('Error', error.message);
+            }
+          });
+        },
+        cancelCb: function cancelCb() {
+          console.log("CANCEL");
+        }
+      });
+    },
+    showDialog: function showDialog(dialog, data) {
+      var self = this;
+
+      switch (dialog) {
+        case 'file_group_edit':
+          self.dialogs.edit.fileGroup = data;
+          setTimeout(function () {
+            self.dialogs.edit.show = true;
+          }, 500);
+          break;
+
+        case 'file_group_add':
+          setTimeout(function () {
+            self.dialogs.add.show = true;
+          }, 500);
+          break;
+      }
+    },
+    loadFileGroups: function loadFileGroups(cb) {
+      var self = this;
+      var params = {
+        name: self.filters.name,
+        page: self.pagination.page,
+        per_page: self.pagination.rowsPerPage
+      };
+      axios.get('/admin/file-groups', {
+        params: params
+      }).then(function (response) {
+        self.items = response.data.data.data;
+        self.totalItems = response.data.data.total;
+        self.pagination.totalItems = response.data.data.total;
+        (cb || Function)();
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -72666,68 +72728,60 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    data: function data() {
-        return {
-            valid: false,
-            isLoading: false,
-            name: '',
-            nameRules: [function (v) {
-                return !!v || 'Name is required';
-            }],
-            description: '',
-            descriptionRules: [function (v) {
-                return !!v || 'Description is required';
-            }]
-        };
-    },
-    mounted: function mounted() {
-        console.log('pages.files.components.FileGroupAdd.vue');
+  data: function data() {
+    return {
+      valid: false,
+      isLoading: false,
+      name: '',
+      nameRules: [function (v) {
+        return !!v || 'Name is required';
+      }],
+      description: '',
+      descriptionRules: [function (v) {
+        return !!v || 'Description is required';
+      }]
+    };
+  },
+  mounted: function mounted() {
+    console.log('pages.files.components.FileGroupAdd.vue');
+    var self = this;
+  },
+  methods: {
+    save: function save() {
+      var self = this;
+      var payload = {
+        name: self.name,
+        description: self.description
+      };
+      self.isLoading = true;
+      axios.post('/admin/file-groups', payload).then(function (response) {
+        self.$store.commit('showSnackbar', {
+          message: response.data.message,
+          color: 'success',
+          duration: 3000
+        });
+        self.isLoading = false;
+        self.$eventBus.$emit('FILE_GROUP_ADDED'); // reset
 
-        var self = this;
-    },
+        self.$refs.fileGroupFormAdd.reset();
+      })["catch"](function (error) {
+        self.isLoading = false;
 
-    methods: {
-        save: function save() {
-            var self = this;
-
-            var payload = {
-                name: self.name,
-                description: self.description
-            };
-
-            self.isLoading = true;
-
-            axios.post('/admin/file-groups', payload).then(function (response) {
-
-                self.$store.commit('showSnackbar', {
-                    message: response.data.message,
-                    color: 'success',
-                    duration: 3000
-                });
-
-                self.isLoading = false;
-                self.$eventBus.$emit('FILE_GROUP_ADDED');
-
-                // reset
-                self.$refs.fileGroupFormAdd.reset();
-            }).catch(function (error) {
-                self.isLoading = false;
-                if (error.response) {
-                    self.$store.commit('showSnackbar', {
-                        message: error.response.data.message,
-                        color: 'error',
-                        duration: 3000
-                    });
-                } else if (error.request) {
-                    console.log(error.request);
-                } else {
-                    console.log('Error', error.message);
-                }
-            });
+        if (error.response) {
+          self.$store.commit('showSnackbar', {
+            message: error.response.data.message,
+            color: 'error',
+            duration: 3000
+          });
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log('Error', error.message);
         }
+      });
     }
+  }
 });
 
 /***/ }),
@@ -72938,86 +72992,77 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    props: {
-        propFileGroupId: {
-            required: true
-        }
-    },
-    data: function data() {
-        return {
-            valid: false,
-            isLoading: false,
-            name: '',
-            nameRules: [function (v) {
-                return !!v || 'Name is required';
-            }],
-            description: '',
-            descriptionRules: [function (v) {
-                return !!v || 'Description is required';
-            }]
-        };
-    },
-    mounted: function mounted() {
-        console.log('pages.files.components.FileGroupEdit.vue');
-
-        var self = this;
-    },
-
-    watch: {
-        propFileGroupId: function propFileGroupId(v) {
-            if (v) this.loadFileGroup(function () {});
-        }
-    },
-    methods: {
-        save: function save() {
-            var self = this;
-
-            var payload = {
-                name: self.name,
-                description: self.description
-            };
-
-            self.isLoading = true;
-
-            axios.put('/admin/file-groups/' + self.propFileGroupId, payload).then(function (response) {
-
-                self.$store.commit('showSnackbar', {
-                    message: response.data.message,
-                    color: 'success',
-                    duration: 3000
-                });
-
-                self.isLoading = false;
-                self.$eventBus.$emit('FILE_GROUP_UPDATED');
-            }).catch(function (error) {
-                self.isLoading = false;
-                if (error.response) {
-                    self.$store.commit('showSnackbar', {
-                        message: error.response.data.message,
-                        color: 'error',
-                        duration: 3000
-                    });
-                } else if (error.request) {
-                    console.log(error.request);
-                } else {
-                    console.log('Error', error.message);
-                }
-            });
-        },
-        loadFileGroup: function loadFileGroup(cb) {
-
-            var self = this;
-
-            axios.get('/admin/file-groups/' + self.propFileGroupId).then(function (response) {
-                var Group = response.data.data;
-                self.name = Group.name;
-                self.description = Group.description;
-                cb();
-            });
-        }
+  props: {
+    propFileGroupId: {
+      required: true
     }
+  },
+  data: function data() {
+    return {
+      valid: false,
+      isLoading: false,
+      name: '',
+      nameRules: [function (v) {
+        return !!v || 'Name is required';
+      }],
+      description: '',
+      descriptionRules: [function (v) {
+        return !!v || 'Description is required';
+      }]
+    };
+  },
+  mounted: function mounted() {
+    console.log('pages.files.components.FileGroupEdit.vue');
+    var self = this;
+  },
+  watch: {
+    propFileGroupId: function propFileGroupId(v) {
+      if (v) this.loadFileGroup(function () {});
+    }
+  },
+  methods: {
+    save: function save() {
+      var self = this;
+      var payload = {
+        name: self.name,
+        description: self.description
+      };
+      self.isLoading = true;
+      axios.put('/admin/file-groups/' + self.propFileGroupId, payload).then(function (response) {
+        self.$store.commit('showSnackbar', {
+          message: response.data.message,
+          color: 'success',
+          duration: 3000
+        });
+        self.isLoading = false;
+        self.$eventBus.$emit('FILE_GROUP_UPDATED');
+      })["catch"](function (error) {
+        self.isLoading = false;
+
+        if (error.response) {
+          self.$store.commit('showSnackbar', {
+            message: error.response.data.message,
+            color: 'error',
+            duration: 3000
+          });
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log('Error', error.message);
+        }
+      });
+    },
+    loadFileGroup: function loadFileGroup(cb) {
+      var self = this;
+      axios.get('/admin/file-groups/' + self.propFileGroupId).then(function (response) {
+        var Group = response.data.data;
+        self.name = Group.name;
+        self.description = Group.description;
+        cb();
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -73599,108 +73644,95 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    data: function data() {
-        return {
-            dropzone: null,
-            fileGroups: [],
-            uploadTo: '',
-            addedFiles: []
-        };
+  data: function data() {
+    return {
+      dropzone: null,
+      fileGroups: [],
+      uploadTo: '',
+      addedFiles: []
+    };
+  },
+  mounted: function mounted() {
+    console.log('pages.files.components.FileUpload.vue');
+    var self = this;
+    self.loadFileGroups(function () {});
+    self.initDropzone();
+    self.$eventBus.$on(['FILE_GROUP_ADDED'], function () {
+      self.loadFileGroups(function () {});
+    });
+  },
+  methods: {
+    clear: function clear() {
+      var self = this;
+
+      _.each(self.addedFiles, function (f) {
+        self.dropzone.removeFile(f);
+      });
+
+      self.addedFiles = [];
     },
-    mounted: function mounted() {
-        console.log('pages.files.components.FileUpload.vue');
-
-        var self = this;
-
-        self.loadFileGroups(function () {});
-        self.initDropzone();
-
-        self.$eventBus.$on(['FILE_GROUP_ADDED'], function () {
-            self.loadFileGroups(function () {});
-        });
+    upload: function upload() {
+      var self = this;
+      self.dropzone.processQueue();
     },
-
-    methods: {
-        clear: function clear() {
-            var self = this;
-
-            _.each(self.addedFiles, function (f) {
-                self.dropzone.removeFile(f);
-            });
-
-            self.addedFiles = [];
+    initDropzone: function initDropzone() {
+      var self = this;
+      Dropzone.autoDiscover = false;
+      self.dropzone = new Dropzone("#fileupload", {
+        url: '/admin/files',
+        paramName: "file",
+        // The name that will be used to transfer the file
+        maxFilesize: 50,
+        // 50MB
+        uploadMultiple: true,
+        //acceptedFiles: 'image/*',
+        headers: {
+          'X-CSRF-TOKEN': _token
         },
-        upload: function upload() {
-
-            var self = this;
-
-            self.dropzone.processQueue();
+        autoProcessQueue: true,
+        init: function init() {// initial hook
         },
-        initDropzone: function initDropzone() {
-
-            var self = this;
-
-            Dropzone.autoDiscover = false;
-
-            self.dropzone = new Dropzone("#fileupload", {
-                url: '/admin/files',
-                paramName: "file", // The name that will be used to transfer the file
-                maxFilesize: 50, // 50MB
-                uploadMultiple: true,
-                //acceptedFiles: 'image/*',
-                headers: { 'X-CSRF-TOKEN': _token },
-                autoProcessQueue: true,
-                init: function init() {
-                    // initial hook
-                },
-                success: function success(file, response) {
-                    // success hook
-                }
-            });
-
-            self.dropzone.on("addedfile", function (file) {
-                if (!self.uploadTo) {
-                    self.$store.commit('showSnackbar', {
-                        message: "Please choose file group to upload the file(s)",
-                        color: 'error',
-                        duration: 3000
-                    });
-                    self.dropzone.removeFile(file);
-                } else {
-                    self.addedFiles.push(file);
-                }
-            });
-
-            self.dropzone.on('sending', function (file, xhr, formData) {
-                formData.append('file_group_id', self.uploadTo);
-            });
-
-            self.dropzone.on("complete", function (file) {
-                self.$store.commit('showSnackbar', {
-                    message: "File(s) uploaded successfully.",
-                    color: 'success',
-                    duration: 3000
-                });
-
-                self.$eventBus.$emit('FILE_UPLOADED');
-            });
-        },
-        loadFileGroups: function loadFileGroups(cb) {
-
-            var self = this;
-
-            var params = {
-                paginate: 'no'
-            };
-
-            axios.get('/admin/file-groups', { params: params }).then(function (response) {
-                self.fileGroups = response.data.data;
-                cb();
-            });
+        success: function success(file, response) {// success hook
         }
+      });
+      self.dropzone.on("addedfile", function (file) {
+        if (!self.uploadTo) {
+          self.$store.commit('showSnackbar', {
+            message: "Please choose file group to upload the file(s)",
+            color: 'error',
+            duration: 3000
+          });
+          self.dropzone.removeFile(file);
+        } else {
+          self.addedFiles.push(file);
+        }
+      });
+      self.dropzone.on('sending', function (file, xhr, formData) {
+        formData.append('file_group_id', self.uploadTo);
+      });
+      self.dropzone.on("complete", function (file) {
+        self.$store.commit('showSnackbar', {
+          message: "File(s) uploaded successfully.",
+          color: 'success',
+          duration: 3000
+        });
+        self.$eventBus.$emit('FILE_UPLOADED');
+      });
+    },
+    loadFileGroups: function loadFileGroups(cb) {
+      var self = this;
+      var params = {
+        paginate: 'no'
+      };
+      axios.get('/admin/file-groups', {
+        params: params
+      }).then(function (response) {
+        self.fileGroups = response.data.data;
+        cb();
+      });
     }
+  }
 });
 
 /***/ }),
@@ -73997,165 +74029,177 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    components: {},
-    data: function data() {
-        return {
-            headers: [{ text: 'Action', value: false, align: 'left', sortable: false }, { text: 'Thumb', value: 'thumb', align: 'left', sortable: false }, { text: 'Name', value: 'name', align: 'left', sortable: false }, { text: 'Size', value: 'size', align: 'left', sortable: false }, { text: 'Found In', value: 'group', align: 'left', sortable: false }, { text: 'Date Created', value: 'created_at', align: 'left', sortable: false }],
-            items: [],
-            totalItems: 0,
-            pagination: {
-                rowsPerPage: 10
-            },
-
-            filters: {
-                name: '',
-                selectedGroupIds: '',
-                fileGroupId: [],
-                fileGroupsHolder: []
-            },
-
-            dialogs: {
-                view: {
-                    file: {},
-                    show: false
-                }
-            }
-        };
-    },
-    mounted: function mounted() {
-        console.log('pages.files.components.FileLists.vue');
-
-        var self = this;
-
-        self.$eventBus.$on(['FILE_DELETED', 'FILE_UPLOADED'], function () {
-            self.loadFiles(function () {});
-        });
-    },
-
-    watch: {
-        'filters.fileGroupId': _.debounce(function (v) {
-
-            var selected = [];
-
-            _.each(v, function (v, k) {
-                if (v) selected.push(k);
-            });
-
-            this.filters.selectedGroupIds = selected.join(',');
-        }, 500),
-        'filters.selectedGroupIds': function filtersSelectedGroupIds(v) {
-            this.loadFiles(function () {});
-        },
-
-        'filters.name': _.debounce(function (v) {
-            this.loadFiles(function () {});
-        }, 500),
-        'pagination.page': function paginationPage() {
-            this.loadFiles(function () {});
-        },
-        'pagination.rowsPerPage': function paginationRowsPerPage() {
-            this.loadFiles(function () {});
+  components: {},
+  data: function data() {
+    return {
+      headers: [{
+        text: 'Action',
+        value: false,
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Thumb',
+        value: 'thumb',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Name',
+        value: 'name',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Size',
+        value: 'size',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Found In',
+        value: 'group',
+        align: 'left',
+        sortable: false
+      }, {
+        text: 'Date Created',
+        value: 'created_at',
+        align: 'left',
+        sortable: false
+      }],
+      items: [],
+      totalItems: 0,
+      pagination: {
+        rowsPerPage: 10
+      },
+      filters: {
+        name: '',
+        selectedGroupIds: '',
+        fileGroupId: [],
+        fileGroupsHolder: []
+      },
+      dialogs: {
+        view: {
+          file: {},
+          show: false
         }
+      }
+    };
+  },
+  mounted: function mounted() {
+    console.log('pages.files.components.FileLists.vue');
+    var self = this;
+    self.$eventBus.$on(['FILE_DELETED', 'FILE_UPLOADED'], function () {
+      self.loadFiles(function () {});
+    });
+  },
+  watch: {
+    'filters.fileGroupId': _.debounce(function (v) {
+      var selected = [];
+
+      _.each(v, function (v, k) {
+        if (v) selected.push(k);
+      });
+
+      this.filters.selectedGroupIds = selected.join(',');
+    }, 500),
+    'filters.selectedGroupIds': function filtersSelectedGroupIds(v) {
+      this.loadFiles(function () {});
     },
-    methods: {
-        getFullUrl: function getFullUrl(file, width, action) {
-
-            var w = width || 4000;
-            var act = action || 'resize';
-
-            return LSK_APP.APP_URL + '/files/' + file.id + '/preview?w=' + w + '&action=' + act;
-        },
-        downloadFile: function downloadFile(file) {
-            window.open(LSK_APP.APP_URL + '/files/' + file.id + '/download?file_token=' + file.file_token);
-        },
-        showDialog: function showDialog(dialog, data) {
-
-            var self = this;
-
-            switch (dialog) {
-                case 'file_show':
-                    self.dialogs.view.file = data;
-                    setTimeout(function () {
-                        self.dialogs.view.show = true;
-                    }, 500);
-                    break;
-            }
-        },
-        trash: function trash(file) {
-            var self = this;
-
-            self.$store.commit('showDialog', {
-                type: "confirm",
-                title: "Confirm Deletion",
-                message: "Are you sure you want to delete this file?",
-                okCb: function okCb() {
-
-                    axios.delete('/admin/files/' + file.id).then(function (response) {
-
-                        self.$store.commit('showSnackbar', {
-                            message: response.data.message,
-                            color: 'success',
-                            duration: 3000
-                        });
-
-                        self.$eventBus.$emit('FILE_DELETED');
-
-                        // maybe the action took place from view file
-                        // lets close it.
-                        self.dialogs.view.show = false;
-                    }).catch(function (error) {
-                        if (error.response) {
-                            self.$store.commit('showSnackbar', {
-                                message: error.response.data.message,
-                                color: 'error',
-                                duration: 3000
-                            });
-                        } else if (error.request) {
-                            console.log(error.request);
-                        } else {
-                            console.log('Error', error.message);
-                        }
-                    });
-                },
-                cancelCb: function cancelCb() {
-                    console.log("CANCEL");
-                }
-            });
-        },
-        loadFileGroups: function loadFileGroups(cb) {
-
-            var self = this;
-
-            var params = {
-                paginate: 'no'
-            };
-
-            axios.get('/admin/file-groups', { params: params }).then(function (response) {
-                self.filters.fileGroupsHolder = response.data.data;
-                cb();
-            });
-        },
-        loadFiles: function loadFiles(cb) {
-
-            var self = this;
-
-            var params = {
-                name: self.filters.name,
-                file_group_id: self.filters.selectedGroupIds,
-                page: self.pagination.page,
-                per_page: self.pagination.rowsPerPage
-            };
-
-            axios.get('/admin/files', { params: params }).then(function (response) {
-                self.items = response.data.data.data;
-                self.totalItems = response.data.data.total;
-                self.pagination.totalItems = response.data.data.total;
-                (cb || Function)();
-            });
-        }
+    'filters.name': _.debounce(function (v) {
+      this.loadFiles(function () {});
+    }, 500),
+    'pagination.page': function paginationPage() {
+      this.loadFiles(function () {});
+    },
+    'pagination.rowsPerPage': function paginationRowsPerPage() {
+      this.loadFiles(function () {});
     }
+  },
+  methods: {
+    getFullUrl: function getFullUrl(file, width, action) {
+      var w = width || 4000;
+      var act = action || 'resize';
+      return LSK_APP.APP_URL + "/files/" + file.id + "/preview?w=" + w + "&action=" + act;
+    },
+    downloadFile: function downloadFile(file) {
+      window.open(LSK_APP.APP_URL + '/files/' + file.id + '/download?file_token=' + file.file_token);
+    },
+    showDialog: function showDialog(dialog, data) {
+      var self = this;
+
+      switch (dialog) {
+        case 'file_show':
+          self.dialogs.view.file = data;
+          setTimeout(function () {
+            self.dialogs.view.show = true;
+          }, 500);
+          break;
+      }
+    },
+    trash: function trash(file) {
+      var self = this;
+      self.$store.commit('showDialog', {
+        type: "confirm",
+        title: "Confirm Deletion",
+        message: "Are you sure you want to delete this file?",
+        okCb: function okCb() {
+          axios["delete"]('/admin/files/' + file.id).then(function (response) {
+            self.$store.commit('showSnackbar', {
+              message: response.data.message,
+              color: 'success',
+              duration: 3000
+            });
+            self.$eventBus.$emit('FILE_DELETED'); // maybe the action took place from view file
+            // lets close it.
+
+            self.dialogs.view.show = false;
+          })["catch"](function (error) {
+            if (error.response) {
+              self.$store.commit('showSnackbar', {
+                message: error.response.data.message,
+                color: 'error',
+                duration: 3000
+              });
+            } else if (error.request) {
+              console.log(error.request);
+            } else {
+              console.log('Error', error.message);
+            }
+          });
+        },
+        cancelCb: function cancelCb() {
+          console.log("CANCEL");
+        }
+      });
+    },
+    loadFileGroups: function loadFileGroups(cb) {
+      var self = this;
+      var params = {
+        paginate: 'no'
+      };
+      axios.get('/admin/file-groups', {
+        params: params
+      }).then(function (response) {
+        self.filters.fileGroupsHolder = response.data.data;
+        cb();
+      });
+    },
+    loadFiles: function loadFiles(cb) {
+      var self = this;
+      var params = {
+        name: self.filters.name,
+        file_group_id: self.filters.selectedGroupIds,
+        page: self.pagination.page,
+        per_page: self.pagination.rowsPerPage
+      };
+      axios.get('/admin/files', {
+        params: params
+      }).then(function (response) {
+        self.items = response.data.data.data;
+        self.totalItems = response.data.data.total;
+        self.pagination.totalItems = response.data.data.total;
+        (cb || Function)();
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -74644,14 +74688,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-
 /* harmony default export */ __webpack_exports__["default"] = ({
-    mounted: function mounted() {
-
-        var self = this;
-
-        self.$store.commit('setBreadcrumbs', [{ label: 'Settings', name: '' }]);
-    }
+  mounted: function mounted() {
+    var self = this;
+    self.$store.commit('setBreadcrumbs', [{
+      label: 'Settings',
+      name: ''
+    }]);
+  }
 });
 
 /***/ }),
@@ -74701,14 +74745,11 @@ if (false) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue__);
 
-
 var EventBus = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a();
-
 /* harmony default export */ __webpack_exports__["a"] = ({
-    install: function install(Vue, options) {
-
-        Vue.prototype.$eventBus = EventBus;
-    }
+  install: function install(Vue, options) {
+    Vue.prototype.$eventBus = EventBus;
+  }
 });
 
 /***/ }),
@@ -74717,20 +74758,19 @@ var EventBus = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a();
 
 "use strict";
 /* harmony default export */ __webpack_exports__["a"] = ({
-    install: function install(Vue, options) {
-
-        Vue.prototype.$appFormatters = {
-            formatDate: function formatDate(dateString, format) {
-                return moment(dateString).format(format ? format : 'MMMM DD, YYYY');
-            },
-            formatByteToMB: function formatByteToMB(sizeInBytes) {
-                return (sizeInBytes / (1024 * 1024)).toFixed(2);
-            },
-            formatMbToBytes: function formatMbToBytes(mb) {
-                return (mb * 1048576).toFixed(2);
-            }
-        };
-    }
+  install: function install(Vue, options) {
+    Vue.prototype.$appFormatters = {
+      formatDate: function formatDate(dateString, format) {
+        return moment(dateString).format(format ? format : 'MMMM DD, YYYY');
+      },
+      formatByteToMB: function formatByteToMB(sizeInBytes) {
+        return (sizeInBytes / (1024 * 1024)).toFixed(2);
+      },
+      formatMbToBytes: function formatMbToBytes(mb) {
+        return (mb * 1048576).toFixed(2);
+      }
+    };
+  }
 });
 
 /***/ }),
@@ -74738,56 +74778,51 @@ var EventBus = new __WEBPACK_IMPORTED_MODULE_0_vue___default.a();
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var AxiosAjaxDetect = function () {
-            function AxiosAjaxDetect() {
-                        _classCallCheck(this, AxiosAjaxDetect);
-            }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-            _createClass(AxiosAjaxDetect, [{
-                        key: "init",
-                        value: function init(startCb, endCb) {
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-                                    var count = 0;
+var AxiosAjaxDetect = /*#__PURE__*/function () {
+  function AxiosAjaxDetect() {
+    _classCallCheck(this, AxiosAjaxDetect);
+  }
 
-                                    // Add a request interceptor
-                                    window.axios.interceptors.request.use(function (config) {
-                                                count++;
+  _createClass(AxiosAjaxDetect, [{
+    key: "init",
+    value: function init(startCb, endCb) {
+      var count = 0; // Add a request interceptor
 
-                                                if (count === 1) startCb();
+      window.axios.interceptors.request.use(function (config) {
+        count++;
+        if (count === 1) startCb();
+        return config;
+      }, function (error) {
+        return Promise.reject(error);
+      }); // Add a response interceptor
 
-                                                return config;
-                                    }, function (error) {
-                                                return Promise.reject(error);
-                                    });
+      window.axios.interceptors.response.use(function (response) {
+        count--;
 
-                                    // Add a response interceptor
-                                    window.axios.interceptors.response.use(function (response) {
+        if (count === 0) {
+          endCb();
+        }
 
-                                                count--;
+        return response;
+      }, function (error) {
+        count--;
 
-                                                if (count === 0) {
-                                                            endCb();
-                                                }
+        if (count === 0) {
+          endCb();
+        }
 
-                                                return response;
-                                    }, function (error) {
+        return Promise.reject(error);
+      });
+    }
+  }]);
 
-                                                count--;
-
-                                                if (count === 0) {
-                                                            endCb();
-                                                }
-
-                                                return Promise.reject(error);
-                                    });
-                        }
-            }]);
-
-            return AxiosAjaxDetect;
+  return AxiosAjaxDetect;
 }();
 
 /* harmony default export */ __webpack_exports__["a"] = (new AxiosAjaxDetect());

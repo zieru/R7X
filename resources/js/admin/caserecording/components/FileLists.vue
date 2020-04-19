@@ -13,6 +13,7 @@
                     <v-btn-toggle mandatory rounded light v-model="filter_status">
                         <v-btn small value="" :loading="loading">All</v-btn>
                         <v-btn small value="new" :loading="loading">New</v-btn>
+                        <v-btn small value="uploaded" :loading="loading">Uploaded</v-btn>
                         <v-btn small value="onprogress" :loading="loading">On Progress</v-btn>
                         <v-btn small value="closed" :loading="loading">Closed</v-btn>
                     </v-btn-toggle>
@@ -107,6 +108,7 @@
                 tableloading:true,
                 headers: [
                     { text: 'Judul',align: 'start', value: 'judul',sortable: true,filterable:true },
+                    { text: 'Status',align: 'start', value: 'ket',sortable: true,filterable:true },
                     { text: 'MSISDN', value: 'msisdn_menghubungi',sortable: false,filterable:true },
                     { text: 'MSISDN', value: 'msisdn_bermasalah',  sortable: true,filterable:true },
                 ],
@@ -144,6 +146,8 @@
 
             filter_status:{
                 handler () {
+                    const self = this;
+                    self.loadFiles(()=>{});
                 }
             },
             pagination: {
@@ -267,39 +271,31 @@
             loadFiles(cb) {
                 const self = this;
                 self.loading = true;
+
+                let filter_status = null;
+                if (self.filter_status) filter_status = self.filter_status;
+
                 let targetIndex = '';
-                    if(self.headers.findIndex(item => item.value === self.pagination.sortBy[0] < 0)){
-                        targetIndex = '';
-                    }else{
-                        targetIndex = self.headers.findIndex(item => item.value === self.pagination.sortBy[0]);
-                    }
+                (Math.sign(self.headers.findIndex(item => item.value === self.pagination.sortBy[0]) <= 0)) ? targetIndex = '' : targetIndex = self.headers.findIndex(item => item.value === self.pagination.sortBy[0])
+
                 const direction = self.pagination.sortDesc[0] ? 'desc' : 'asc';
                 let params = {
                     "search[value]": self.filters.name,
-                    file_group_id: self.filters.selectedGroupIds,
+                    status: filter_status,
                     draw: self.pagination.page,
                     length: self.pagination.itemsPerPage,
                     start: (((self.pagination.page/self.pagination.itemsPerPage)*self.pagination.itemsPerPage)-1)*self.pagination.itemsPerPage,
                     'order[0][dir]': direction,
                     'order[0][column]' :  targetIndex
                 };
-                function search(nameKey, myArray){
-                    for (var i=0; i < myArray.length; i++) {
-                        if (myArray[i].name === nameKey) {
-                            return myArray[i];
-                        }
-                    }
-                }
 
-
-                /*Object.keys(self.pagination.sortBy).find(key => self.pagination.sortBy[value] === value)*/
                 $.each(self.headers, function(key, value) {
                     params['columns['+key+'][data]'] = value.value;
                     params['columns['+key+'][searchable]'] = value.filterable;
                     params['columns['+key+'][orderable]'] = value.sortable;
                 });
 
-                (this.pagination);
+
 
 
                 axios.get('/api/admin/caserecording',{params: params})
@@ -319,7 +315,7 @@
                         });
                     };
                         self.loading = false;
-                    self.tableloading = false;
+                        self.tableloading = false;
                 })
             }
         }
