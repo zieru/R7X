@@ -16,9 +16,9 @@ class CreateRecordingLogsTable extends Migration
         Schema::create('recording_loglaporan', function (Blueprint $table) {
             $table->bigIncrements('id_log_laporan');
             $table->dateTime('waktu');
-            $table->integer('id_agent');
+            $table->unsignedinteger('id_agent')->nullable();
             $table->string('ket','32')->nullable(false);
-            $table->bigInteger('id_laporan');
+            $table->unsignedbigInteger('id_laporan')->nullable();
             $table->text('rec_url');
             $table->longText('isi');
             $table->timestamps();

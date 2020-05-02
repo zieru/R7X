@@ -21,16 +21,16 @@ class CreateRecordingsTable extends Migration
             $table->longText('description');
             $table->dateTime('tgl_kejadian');
             $table->dateTime('tgl_kejadian_end')->nullable();
-            $table->integer('id_agent');
+            $table->unsignedinteger('id_agent')->nullable();
             $table->dateTime('waktu');
             $table->string('ket');
             $table->string('id_co')->nullable();
             $table->dateTime('lastresponse_date')->nullable();
             $table->string('lastresponse_user')->nullable();
-            $table->integer('lastresponse_user_id')->nullable();
+            $table->unsignedinteger('lastresponse_user_id')->nullable();
             $table->integer('priority');
             $table->integer('has_notify')->nullable();
-            $table->integer('pic')->nullable();
+            $table->unsignedinteger('pic')->nullable();
             $table->timestamps();
             $table->foreign('pic')
                 ->references('id')->on('users')
