@@ -14,6 +14,7 @@ let mix = require('laravel-mix');
 mix.copyDirectory('resources/img', 'public/img')
     .js('resources/js/admin/admin.js', 'public/js')
     .sass('resources/sass/admin.scss', 'public/css')
+    .copyDirectory('resources/fonts', 'public/fonts')
     .sass('resources/sass/front.scss', 'public/css')
     .extract(['vue','vue-router','moment','axios','lodash','dropzone']);
 

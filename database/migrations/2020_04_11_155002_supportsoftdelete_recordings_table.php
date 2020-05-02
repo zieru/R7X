@@ -16,6 +16,7 @@ class SupportsoftdeleteRecordingsTable extends Migration
         //
         Schema::table('recording_tbllaporan', function (Blueprint $table) {
             $table->softDeletes();
+
         });
 
     }
@@ -30,6 +31,6 @@ class SupportsoftdeleteRecordingsTable extends Migration
         Schema::table('recording_tbllaporan', function (Blueprint $table) {
             $table->dropColumn('deleted_at');
         });
-        //
+        //a
     }
 }

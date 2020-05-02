@@ -21,9 +21,21 @@ const router = new Router({
             component: require('./recordingbrowser/Home'),
         },
         {
-            name: 'caserecording.list',
             path: '/caserecording',
-            component: require('./caserecording/Home'),
+            component: require('./caserecording/CaseRecording'),
+            children:[
+                {
+                    path:'/',
+                    name: 'caserecording.list',
+                    component: require('./caserecording/Home')
+                },
+                {
+                    path:'view/:id',
+                    name:'caserecording.view',
+                    component: require('./caserecording/View'),
+                    props: (route) => ({propCaseId: route.params.id}),
+                },
+            ]
         },
 
         {

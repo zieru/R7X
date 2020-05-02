@@ -6,6 +6,9 @@ export default {
             formatDate: function(dateString,format) {
                 return moment(dateString).format(format ? format : 'MMMM DD, YYYY');
             },
+            formatDatetimeago: function(dateString,format) {
+                return moment(dateString).locale('id').startOf('minute').fromNow();
+            },
             formatByteToMB (sizeInBytes) {
                 return (sizeInBytes / (1024*1024)).toFixed(2);
             },

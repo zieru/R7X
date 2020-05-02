@@ -2,17 +2,18 @@
 
 namespace App;
 
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class CaseRecording extends Model
+class recording_tbllaporan extends Model
 {
+    //
     use SoftDeletes;
 
     protected $table = 'recording_tbllaporan';
-    protected $primaryKey = 'id';
+    protected $primaryKey = 'id_laporan';
     protected $fillable = [
+        'isi_laporan',
         'judul',
         'tipe_layanan',
         'msisdn_menghubungi',
@@ -23,10 +24,17 @@ class CaseRecording extends Model
         'id_agent',
         'waktu',
         'id_co',
-        'last_response_date',
-        'last_response_user',
-        'last_response_userid',
+        'lastresponse_date',
+        'lastresponse_user',
+        'lastresponse_userid',
         'priority',
-        'pic'
+        'pic',
+        'updated_at'
     ];
+    public function User(){
+        return $this->belongsTo('App\User','id_agent');
+    }
+    public function RecordingLogLaporans(){
+        return $this->hasMany('App\recording_tbllaporan','id_laporan');
+    }
 }

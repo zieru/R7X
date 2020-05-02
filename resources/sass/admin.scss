@@ -1,1 +1,16 @@
 @import "base";
+tbody tr:nth-of-type(odd) {
+
+}
+thead.v-data-table-header > tr > th {
+  /*border-bottom: 1px solid rgba(0,0,0,.87) !important;*/
+}
+[v-cloak] {
+  display: none;
+}
+
+thead.v-data-table-header > tr > th > span {
+  font-weight: bolder !important;
+  text-align: center !important;
+  color: #000;
+}

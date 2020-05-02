@@ -31,6 +31,7 @@ class CreateRecordingLogsTable extends Migration
         });
     }
 
+
     /**
      * Reverse the migrations.
      *

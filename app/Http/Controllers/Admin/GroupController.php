@@ -82,7 +82,6 @@ class GroupController extends AdminController
             'name' => 'required',
             'permissions' => 'array',
         ]);
-
         if($validate->fails()) return $this->sendResponseBadRequest($validate->errors()->first());
 
         $updated = $this->groupRepository->update($id,$request->all());

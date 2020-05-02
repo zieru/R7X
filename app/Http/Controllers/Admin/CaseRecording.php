@@ -22,16 +22,6 @@ class CaseRecording extends AdminController
 
     public function index(Request $request){
 
-        if(request()->has('status')){
-            $x= datatables()->of(CaseRecordingModel::where('ket', '=',$request->get('status'))) ;
-        }else{
-            $x= datatables()->of(CaseRecordingModel::all()) ;
-        }
-
-        $model = CaseRecordingModel::all();
-//        $x = datatables()->eloquent(CaseRecordingModel::query());
-
-        return $x->toJson();
     }
 
     public function InsertNewCase($request){

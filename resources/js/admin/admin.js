@@ -16,11 +16,14 @@ import 'vuetify/dist/vuetify.min.css';
 import Vue from 'vue';
 import Vuetify from 'vuetify';
 import VueProgressBar from 'vue-progressbar'
+import CKEditor from 'ckeditor4-vue';
+
 
 // this is the vuetify theming options
 // you can change colors here based on your needs
 // and please dont forget to recompile scripts
 Vue.use(Vuetify);
+Vue.use( CKEditor );
 // this is the progress bar settings, you
 // can change colors here to fit on your needs or match
 // your theming above
@@ -46,6 +49,7 @@ import store from '../common/Store';
 import eventBus from '../common/Event';
 import formatters from '../common/Formatters';
 import AxiosAjaxDetct from '../common/AxiosAjaxDetect';
+import './sharedcomponent';
 // As a plugin
 /*import VueMask from 'v-mask'
 Vue.use(VueMask);
@@ -168,9 +172,15 @@ const admin = new Vue({
             }
         },
         clickLogout(logoutUrl,afterLogoutRedirectUrl) {
-            axios.post(logoutUrl).then((r)=>{
-                window.location.href = afterLogoutRedirectUrl;
+            axios.post(logoutUrl).then(function(response) {
+                    window.location.href = afterLogoutRedirectUrl;
+            }).catch(function(error) {
+                    alert(error.response.status+':'+ error.response.statusText + ' Please Reload Your Browser');
             });
+            /*axios.post(logoutUrl).then((r)=>{
+                window.location.href = afterLogoutRedirectUrl;
+            })*/
+            ;
         },
         dialogOk() {
             store.commit('dialogOk');

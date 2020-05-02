@@ -114,6 +114,7 @@ class Group extends Model
         $userCurrentPermissions = $this->permissions;
         $updateOnly = false;
 
+
         // maybe a permission ID
         if(is_int($permission))
         {
@@ -238,7 +239,6 @@ class Group extends Model
         {
             if($p['key'] == $permissionKey && $p['value'] == Permission::PERMISSION_ALLOW) $has = true;
         }
-
         return $has;
     }
 }

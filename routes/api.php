@@ -21,8 +21,10 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     Route::post('/caserecording/createnew', 'CaseRecording@createnew');
     Route::get('/caserecording/createnew', 'CaseRecording@createnew');
 });*/
-Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function() {
+Route::prefix('admin')->namespace('API')->middleware(['auth'])->group(function() {
     Route::post('/caserecording/createnew', 'CaseRecording@Store');
     Route::get('/caserecording', 'CaseRecording@index');
+    Route::get('/caserecording/{caserecording}/log', 'CaseRecording@log');
+    Route::get('/caserecording/{caserecording}/show', 'CaseRecording@show');
 });
 

@@ -1,6 +1,6 @@
 <template>
     <div class="page_wrap_vue pa-3">
-        <!--<v-fab-transition>
+        <v-fab-transition>
             <v-btn
                     color="primary"
                     fab
@@ -13,7 +13,7 @@
             >
                 <v-icon>mdi-plus</v-icon>
             </v-btn>
-        </v-fab-transition>-->
+        </v-fab-transition>
         <!-- add newcase -->
         <v-dialog v-model="dialogs.add.show" hide-overlay persistent fullscreen scrollable transition="dialog-bottom-transition">
             <v-card>
@@ -29,6 +29,7 @@
                 <NewCaseDialog ref="NewCase"></NewCaseDialog>
             </v-card>
         </v-dialog>
+        
         <file-lists></file-lists>
     </div>
 

@@ -1,14 +1,12 @@
 <template>
-    <div class="component-wrap">
-
-        <!-- filers -->
-        <v-card color="primary" class="white--text" raised>
-            <!--<v-card-title>Case Recording</v-card-title>-->
+    <div>
+        <v-card v-cloak color="primary" class="white--text" raised>
+            <v-card-title>Case Recording</v-card-title>
             <div class="d-flex flex-column">
                 <div class="flex-grow-1 pa-2">
-                    <v-text-field rounded light solo clearable append-icon="search" :loading="loading" label="Search..." v-model="filters.name"></v-text-field>
+                    <v-text-field rounded light solo clearable prepend-inner-icon="search" hint="Enter Keyword" :loading="loading" label="Search..." v-model="filters.name"></v-text-field>
                 </div>
-                <div class="flex-grow-1 px-3">
+                <div class="flex-grow-1 pa-3">
                     Show Only:
                     <v-btn-toggle mandatory rounded light v-model="filter_status">
                         <v-btn small value="" :loading="loading">All</v-btn>
@@ -20,11 +18,6 @@
                     <v-btn-toggle light class="float-right">
                         <v-btn :loading="loading" @click="loadFiles()" small><v-icon>mdi-refresh</v-icon></v-btn>
                     </v-btn-toggle>
-                </div>
-                <div class="flex-grow-1 pa-2">
-                    <span v-for="(group,i) in filters.fileGroupsHolder" :key="i">
-                        <v-checkbox v-bind:label="group.name" v-model="filters.fileGroupId[group.id]"></v-checkbox>
-                    </span>
                 </div>
             </div>
         </v-card>
@@ -42,6 +35,9 @@
         <!-- groups table -->
 
         <v-data-table
+                v-cloak
+                fixed-header
+                height="480px"
                 v-bind:headers="headers"
                 :options.sync="pagination"
                 :search="filters.name"
@@ -51,43 +47,31 @@
                 class="elevation-1 mytable"
                 :footer-props="{
                       showFirstLastPage: true,
-                'items-per-page-options': [10, 30, 50,100]
+                'items-per-page-options': [30, 50,100,500,1000]
               }"
             >
+            <template v-slot:body="{items}" v-cloak>
+                <tbody>
+                <tr v-for="item in items" :key="item.id_laporan">
+                    <td>
+                        <v-btn
+                                small
+                                transition="slide-y-transition"
+                                @click="$router.push({name:'caserecording.view',params:{id: item.id_laporan}})"
+                        >View
+                        </v-btn>
+                    </td>
+                    <td>{{ item.judul }}</td>
+                    <td>{{ item.tipe_layanan }}</td>
+                    <td>{{ item.ket }}</td>
+                    <td>{{ item.msisdn_bermasalah }} / {{ item.msisdn_menghubungi }}</td>
+                    <td><v-icon>mdi-account-circle</v-icon> {{ item.id_co || 'n/a' }}</td>
+                    <td><v-icon>mdi-clock</v-icon> {{ $appFormatters.formatDatetimeago(item.created_at) }}</td>
+                </tr>
+                </tbody>
+            </template>
         </v-data-table>
         <!-- /groups table -->
-
-        <!-- view file dialog -->
-        <v-dialog v-model="dialogs.view.show" fullscreen :laze="false" transition="dialog-bottom-transition" :overlay=false>
-            <v-card>
-                <v-toolbar class="primary">
-                    <v-btn icon @click.native="dialogs.view.show = false" dark>
-                        <v-icon>close</v-icon>
-                    </v-btn>
-                    <v-toolbar-title class="white--text">{{dialogs.view.file.name}}</v-toolbar-title>
-                    <v-spacer></v-spacer>
-                    <v-toolbar-items>
-                        <v-btn dark text @click.native="downloadFile(dialogs.view.file)">
-                            Download
-                            <v-icon right dark>file_download</v-icon></v-btn>
-                    </v-toolbar-items>
-                    <v-toolbar-items>
-                        <v-btn dark text @click.native="trash(dialogs.view.file)">
-                            Delete
-                            <v-icon right dark>delete</v-icon></v-btn>
-                    </v-toolbar-items>
-                </v-toolbar>
-                <v-card-text>
-                    <div class="file_view_popup">
-                        <div class="file_view_popup_link">
-                            <v-text-field text disabled :value="getFullUrl(dialogs.view.file)"></v-text-field>
-                        </div>
-                        <img :src="getFullUrl(dialogs.view.file)"/>
-                    </div>
-                </v-card-text>
-            </v-card>
-        </v-dialog>
-
     </div>
 </template>
 
@@ -107,22 +91,24 @@
                 loading:true,
                 tableloading:true,
                 headers: [
+                    { text: 'Action',align: 'start', value: 'id',sortable: false,filterable:false },
                     { text: 'Judul',align: 'start', value: 'judul',sortable: true,filterable:true },
+                    { text: 'Site',align: 'start', value: 'tipe_layanan',sortable: true,filterable:true },
                     { text: 'Status',align: 'start', value: 'ket',sortable: true,filterable:true },
-                    { text: 'MSISDN', value: 'msisdn_menghubungi',sortable: false,filterable:true },
-                    { text: 'MSISDN', value: 'msisdn_bermasalah',  sortable: true,filterable:true },
+                    { text: 'MSISDN', value: 'msisdn_menghubungi',sortable: true,filterable:true },
+                    { text: 'Agent', value: 'id_co',sortable: false,filterable:true },
+                    { text: 'Last Date', value: 'updated_at',sortable: true,filterable:true }
+
                 ],
                 items: [],
                 totalItems: 0,
                 pagination: {
-                    rowsPerPage: 10
+                    sortBy: ["updated_at"],
+                    sortDesc: [true],
                 },
 
                 filters: {
                     name: '',
-                    selectedGroupIds: '',
-                    fileGroupId: [],
-                    fileGroupsHolder: []
                 },
 
                 dialogs: {
@@ -134,7 +120,6 @@
             }
         },
         mounted() {
-            console.log('pages.files.components.FileLists.vue');
 
             const self = this;
 
@@ -156,118 +141,15 @@
                 },
                 deep: true,
             },
-
-            'filters.fileGroupId':_.debounce(function(v) {
-
-                let selected = [];
-
-                _.each(v,(v,k)=>{
-                    if(v) selected.push(k);
-                });
-
-                this.filters.selectedGroupIds = selected.join(',');
-            },500),
-            'search':_.debounce(function(){
-                const self = this;
-                self.loadFiles(()=>{});
-            },700),
-            'filters.selectedGroupIds'(v) {
-                this.loadFiles(()=>{});
-            },
             'filters.name':_.debounce(function(v) {
                 this.loadFiles(()=>{});
             },500),
-            'pagination.page':function(){
-                this.loadFiles(()=>{});
-            },
-            'pagination.rowsPerPage':function(){
-                this.loadFiles(()=>{});
-            },
             items(){
                 this.loading = false
                 this.tableloading = false;
             }
         },
         methods: {
-            getFullUrl(file, width, action) {
-
-                let w = width || 4000;
-                let act = action || 'resize';
-
-                return LSK_APP.APP_URL +`/files/`+file.id+`/preview?w=`+w+`&action=`+act;
-            },
-            downloadFile(file) {
-                window.open(LSK_APP.APP_URL + '/files/'+file.id+'/download?file_token='+file.file_token);
-            },
-            showDialog(dialog, data) {
-
-                const self = this;
-
-                switch (dialog){
-                    case 'file_show':
-                        self.dialogs.view.file = data;
-                        setTimeout(()=>{
-                            self.dialogs.view.show = true;
-                        },500);
-                        break;
-                }
-            },
-            trash(file) {
-                const self = this;
-
-                self.$store.commit('showDialog',{
-                    type: "confirm",
-                    title: "Confirm Deletion",
-                    message: "Are you sure you want to delete this file?",
-                    okCb: ()=>{
-
-                        axios.delete('/admin/files/' + file.id).then(function(response) {
-
-                            self.$store.commit('showSnackbar',{
-                                message: response.data.message,
-                                color: 'success',
-                                duration: 3000
-                            });
-
-                            self.$eventBus.$emit('FILE_DELETED');
-
-                            // maybe the action took place from view file
-                            // lets close it.
-                            self.dialogs.view.show = false;
-
-                        }).catch(function (error) {
-                            if (error.response) {
-                                self.$store.commit('showSnackbar',{
-                                    message: error.response.data.message,
-                                    color: 'error',
-                                    duration: 3000
-                                });
-                            } else if (error.request) {
-                                console.log(error.request);
-
-                            } else {
-                                console.log('Error', error.message);
-                            }
-                        });
-                    },
-                    cancelCb: ()=>{
-                        console.log("CANCEL");
-                    }
-                });
-            },
-            loadFileGroups(cb) {
-
-                const self = this;
-
-                let params = {
-                    paginate: 'no'
-                };
-
-                axios.get('/admin/file-groups',{params: params}).then(function(response) {
-                    self.filters.fileGroupsHolder = response.data.data;
-                    cb();
-                });
-            },
             loadFiles(cb) {
                 const self = this;
                 self.loading = true;
@@ -323,9 +205,7 @@
 </script>
 
 <style scoped>
-    .mytable th {
-        font-weight:bolder;
-    }
+
     .file_view_popup {
         min-width: 500px;
         text-align: center;
