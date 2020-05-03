@@ -30,3 +30,16 @@ Route::prefix('admin')->namespace('API')->middleware(['auth'])->group(function()
     route::apiResource('filestorage','Files');
 });
 
+Route::group(['prefix' => 'v1'], function () {
+    Route::post('login', 'UsersController@login');
+    Route::post('register', 'UsersController@register');
+    Route::post('refreshtoken', 'UsersController@refreshToken');
+
+    //Route::get('logout', 'UsersController@logout')->middleware('auth:api');
+
+    Route::get('/unauthorized', 'UsersController@unauthorized');
+    Route::group(['middleware' => ['CheckClientCredentials','auth:api']], function() {
+        Route::post('logout', 'UsersController@logout');
+        Route::post('details', 'UsersController@details');
+    });
+});
