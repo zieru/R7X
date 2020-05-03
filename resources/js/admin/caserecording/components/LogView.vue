@@ -110,11 +110,7 @@
                     <Editor>
 
                     </Editor>
-                    <v-textarea
-                            solo
-                            name="input-7-4"
-                            label="Solo textarea"
-                    ></v-textarea>
+
                 </v-expansion-panel-content>
             </v-expansion-panel>
         </v-expansion-panels>

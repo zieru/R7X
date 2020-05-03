@@ -26,5 +26,7 @@ Route::prefix('admin')->namespace('API')->middleware(['auth'])->group(function()
     Route::get('/caserecording', 'CaseRecording@index');
     Route::get('/caserecording/{caserecording}/log', 'CaseRecording@log');
     Route::get('/caserecording/{caserecording}/show', 'CaseRecording@show');
+
+    route::apiResource('filestorage','Files');
 });
 

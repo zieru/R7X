@@ -41,6 +41,7 @@ class FileController extends AdminController
     {
         $results = $this->fileRepository->index($request->all());
 
+        //var_dump($this->fileRepository->index($request->all()));
         return $this->sendResponseOk($results);
     }
 

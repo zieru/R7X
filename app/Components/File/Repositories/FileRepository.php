@@ -53,6 +53,7 @@ class FileRepository extends BaseRepository
      */
     public function index($params)
     {
+
         return $this->get($params,['user','group'],function($q) use ($params)
         {
             $groupIds = explode(',',Arr::get($params,'file_group_id',''));

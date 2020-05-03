@@ -1,16 +1,68 @@
 <template>
     <div>
-        <ckeditor :config="editorConfig" v-model="editorData"></ckeditor>
+        <v-dialog v-model="dialog" width="600px">
+            <template v-slot:activator="{ on }">
+                <v-btn color="primary" dark v-on="on">Open Dialog</v-btn>
+            </template>
+            <v-card>
+                <v-toolbar dark color="primary" dense>
+                    <v-btn icon dark @click="dialog = false">
+                        <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                    <v-toolbar-title>Media Manager</v-toolbar-title>
+                </v-toolbar>
+                <Files :managefilegrouptab="false"></Files>
+            </v-card>
+
+        </v-dialog>
+
+        <v-btn @click="mediamanageropen()" small color="primary" id="ckeditormedia" outlined><v-icon>cloud-upload</v-icon> Media Manager</v-btn>
+        <ckeditor ref="editor" @input="onEditorInput" @ready="onEditorReady" :config="editorConfig" v-model="editorData"></ckeditor>
+
     </div>
 </template>
 
 <script>
     export default {
-        props: ['userdata'],
         name: "UserProfileTitleCard",
+        methods:{
+            onEditorInput (value) {
+                console.log(this.editor )
+            },
+            mediamanageropen(){
+                this.editor = this.$refs.editor;
+                let oEditor = this.editor;
+                var mediamanager = new Mediamanager({
+                    loadItemsUrl: '/api/admin/filestorage',
+                    uploadUrl: 'https://lisa.infomedia.co.id/digitallearning/backend/mediamanager/do_upload'
+                });
+                mediamanager.open();
+
+                mediamanager.options.insertType = 'string';
+                mediamanager.options.insert = function (data) {
+                    var newElement = CKEDITOR.dom.element.createFromHtml( data, oEditor.document );
+
+                    console.log(data);
+                    oEditor.insertElement( newElement );
+                }
+            },
+            onEditorReady (editor) {
+                this.editor = editor
+                let oEditor = this.editor;
+
+                var editor = oEditor;
+                editor.on( 'key', function( evt ) {
+                    // getData() returns CKEditor's HTML content.
+                    console.log( 'Total bytes: ' + evt.editor.getData().length );
+                });
+            }
+        },
+        props:{
+            editorData: String,
+        },
         data() {
             return {
-                editorData: '<p>Content of the editor.</p>',
+                dialog:false,
                 editorConfig: {
                     toolbar: [
                         {name: 'clipboard', items: ['Undo', 'Redo']},

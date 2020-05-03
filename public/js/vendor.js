@@ -1,4 +1,4 @@
-webpackJsonp([0],[
+webpackJsonp([1],[
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1854,7 +1854,7 @@ webpackJsonp([0],[
             try {
                 oldLocale = globalLocale._abbr;
                 var aliasedRequire = require;
-                __webpack_require__(152)("./" + name);
+                __webpack_require__(159)("./" + name);
                 getSetGlobalLocale(oldLocale);
             } catch (e) {}
         }
@@ -4610,15 +4610,13 @@ webpackJsonp([0],[
 /***/ }),
 /* 1 */,
 /* 2 */,
-/* 3 */,
-/* 4 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var bind = __webpack_require__(139);
-var isBuffer = __webpack_require__(156);
+var bind = __webpack_require__(141);
 
 /*global toString:true*/
 
@@ -4634,6 +4632,27 @@ var toString = Object.prototype.toString;
  */
 function isArray(val) {
   return toString.call(val) === '[object Array]';
+}
+
+/**
+ * Determine if a value is undefined
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if the value is undefined, otherwise false
+ */
+function isUndefined(val) {
+  return typeof val === 'undefined';
+}
+
+/**
+ * Determine if a value is a Buffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Buffer, otherwise false
+ */
+function isBuffer(val) {
+  return val !== null && !isUndefined(val) && val.constructor !== null && !isUndefined(val.constructor)
+    && typeof val.constructor.isBuffer === 'function' && val.constructor.isBuffer(val);
 }
 
 /**
@@ -4690,16 +4709,6 @@ function isString(val) {
  */
 function isNumber(val) {
   return typeof val === 'number';
-}
-
-/**
- * Determine if a value is undefined
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if the value is undefined, otherwise false
- */
-function isUndefined(val) {
-  return typeof val === 'undefined';
 }
 
 /**
@@ -4794,9 +4803,13 @@ function trim(str) {
  *
  * react-native:
  *  navigator.product -> 'ReactNative'
+ * nativescript
+ *  navigator.product -> 'NativeScript' or 'NS'
  */
 function isStandardBrowserEnv() {
-  if (typeof navigator !== 'undefined' && navigator.product === 'ReactNative') {
+  if (typeof navigator !== 'undefined' && (navigator.product === 'ReactNative' ||
+                                           navigator.product === 'NativeScript' ||
+                                           navigator.product === 'NS')) {
     return false;
   }
   return (
@@ -4878,6 +4891,32 @@ function merge(/* obj1, obj2, obj3, ... */) {
 }
 
 /**
+ * Function equal to merge with the difference being that no reference
+ * to original objects is kept.
+ *
+ * @see merge
+ * @param {Object} obj1 Object to merge
+ * @returns {Object} Result of all merge properties
+ */
+function deepMerge(/* obj1, obj2, obj3, ... */) {
+  var result = {};
+  function assignValue(val, key) {
+    if (typeof result[key] === 'object' && typeof val === 'object') {
+      result[key] = deepMerge(result[key], val);
+    } else if (typeof val === 'object') {
+      result[key] = deepMerge({}, val);
+    } else {
+      result[key] = val;
+    }
+  }
+
+  for (var i = 0, l = arguments.length; i < l; i++) {
+    forEach(arguments[i], assignValue);
+  }
+  return result;
+}
+
+/**
  * Extends object a by mutably adding to it the properties of object b.
  *
  * @param {Object} a The object to be extended
@@ -4915,19 +4954,21 @@ module.exports = {
   isStandardBrowserEnv: isStandardBrowserEnv,
   forEach: forEach,
   merge: merge,
+  deepMerge: deepMerge,
   extend: extend,
   trim: trim
 };
 
 
 /***/ }),
+/* 4 */,
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 if (false) {
   module.exports = require('./vue.common.prod.js')
 } else {
-  module.exports = __webpack_require__(172)
+  module.exports = __webpack_require__(177)
 }
 
 
@@ -4987,111 +5028,9 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(process) {
-
-var utils = __webpack_require__(4);
-var normalizeHeaderName = __webpack_require__(158);
-
-var DEFAULT_CONTENT_TYPE = {
-  'Content-Type': 'application/x-www-form-urlencoded'
-};
-
-function setContentTypeIfUnset(headers, value) {
-  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
-    headers['Content-Type'] = value;
-  }
-}
-
-function getDefaultAdapter() {
-  var adapter;
-  if (typeof XMLHttpRequest !== 'undefined') {
-    // For browsers use XHR adapter
-    adapter = __webpack_require__(141);
-  } else if (typeof process !== 'undefined') {
-    // For node use HTTP adapter
-    adapter = __webpack_require__(141);
-  }
-  return adapter;
-}
-
-var defaults = {
-  adapter: getDefaultAdapter(),
-
-  transformRequest: [function transformRequest(data, headers) {
-    normalizeHeaderName(headers, 'Content-Type');
-    if (utils.isFormData(data) ||
-      utils.isArrayBuffer(data) ||
-      utils.isBuffer(data) ||
-      utils.isStream(data) ||
-      utils.isFile(data) ||
-      utils.isBlob(data)
-    ) {
-      return data;
-    }
-    if (utils.isArrayBufferView(data)) {
-      return data.buffer;
-    }
-    if (utils.isURLSearchParams(data)) {
-      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
-      return data.toString();
-    }
-    if (utils.isObject(data)) {
-      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
-      return JSON.stringify(data);
-    }
-    return data;
-  }],
-
-  transformResponse: [function transformResponse(data) {
-    /*eslint no-param-reassign:0*/
-    if (typeof data === 'string') {
-      try {
-        data = JSON.parse(data);
-      } catch (e) { /* Ignore */ }
-    }
-    return data;
-  }],
-
-  /**
-   * A timeout in milliseconds to abort a request. If set to 0 (default) a
-   * timeout is not created.
-   */
-  timeout: 0,
-
-  xsrfCookieName: 'XSRF-TOKEN',
-  xsrfHeaderName: 'X-XSRF-TOKEN',
-
-  maxContentLength: -1,
-
-  validateStatus: function validateStatus(status) {
-    return status >= 200 && status < 300;
-  }
-};
-
-defaults.headers = {
-  common: {
-    'Accept': 'application/json, text/plain, */*'
-  }
-};
-
-utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
-  defaults.headers[method] = {};
-});
-
-utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
-  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
-});
-
-module.exports = defaults;
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(140)))
-
-/***/ }),
-/* 9 */
+/* 8 */,
+/* 9 */,
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -22211,7 +22150,7 @@ module.exports = defaults;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6), __webpack_require__(7)(module)))
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -22288,7 +22227,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -22427,7 +22366,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -22490,7 +22429,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -22553,7 +22492,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -22679,7 +22618,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -22742,7 +22681,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -22850,7 +22789,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -22913,7 +22852,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -23022,7 +22961,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -23158,7 +23097,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -23252,7 +23191,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -23314,7 +23253,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -23437,7 +23376,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -23560,7 +23499,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -23672,7 +23611,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -23827,7 +23766,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -23919,7 +23858,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -24095,7 +24034,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -24162,7 +24101,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -24246,7 +24185,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -24310,7 +24249,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -24390,7 +24329,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -24470,7 +24409,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -24550,7 +24489,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -24653,7 +24592,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -24757,7 +24696,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -24828,7 +24767,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -24899,7 +24838,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -24966,7 +24905,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -25037,7 +24976,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -25108,7 +25047,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -25174,7 +25113,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -25245,7 +25184,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -25320,7 +25259,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -25416,7 +25355,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -25512,7 +25451,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -25608,7 +25547,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -25692,7 +25631,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -25762,7 +25701,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -25872,7 +25811,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -25985,7 +25924,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -26049,7 +25988,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -26136,7 +26075,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -26214,7 +26153,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -26296,7 +26235,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -26375,7 +26314,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -26456,7 +26395,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -26536,7 +26475,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -26617,7 +26556,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -26744,7 +26683,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -26872,7 +26811,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -26973,7 +26912,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -27101,7 +27040,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -27259,7 +27198,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -27373,7 +27312,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -27472,7 +27411,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -27558,7 +27497,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 67 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -27694,7 +27633,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 68 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -27767,7 +27706,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -27840,7 +27779,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 70 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -27936,7 +27875,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 71 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -28022,7 +27961,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 72 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -28115,7 +28054,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 73 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -28206,7 +28145,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 74 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -28320,7 +28259,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 75 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -28450,7 +28389,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 76 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -28535,7 +28474,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 77 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -28658,7 +28597,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 78 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -28749,7 +28688,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 79 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -28889,7 +28828,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 80 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -28963,7 +28902,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 81 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -29085,7 +29024,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 82 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -29186,7 +29125,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 83 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -29302,7 +29241,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 84 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -29370,7 +29309,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 85 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -29464,7 +29403,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 86 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -29549,7 +29488,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 87 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -29657,7 +29596,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 88 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -29821,7 +29760,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 89 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -29907,7 +29846,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 90 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -29993,7 +29932,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 91 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -30057,7 +29996,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 92 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -30154,7 +30093,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 93 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -30220,7 +30159,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 94 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -30347,7 +30286,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 95 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -30438,7 +30377,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 96 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -30529,7 +30468,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 97 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -30593,7 +30532,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 98 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -30721,7 +30660,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 99 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -30851,7 +30790,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 100 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -30920,7 +30859,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 101 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -30985,7 +30924,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 102 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -31064,7 +31003,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 103 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -31250,7 +31189,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 104 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -31352,7 +31291,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 105 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -31416,7 +31355,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 106 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -31491,7 +31430,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 107 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -31651,7 +31590,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 108 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -31828,7 +31767,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 109 */
+/* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -31900,7 +31839,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 110 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -32015,7 +31954,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 111 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -32130,7 +32069,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 112 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -32222,7 +32161,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 113 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -32295,7 +32234,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 114 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -32358,7 +32297,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 115 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -32491,7 +32430,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 116 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -32584,7 +32523,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 117 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -32655,7 +32594,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 118 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -32775,7 +32714,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 119 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -32846,7 +32785,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 120 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -32912,7 +32851,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 121 */
+/* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -33038,7 +32977,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 122 */
+/* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -33136,7 +33075,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 123 */
+/* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -33231,7 +33170,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 124 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -33293,7 +33232,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 125 */
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -33355,7 +33294,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 126 */
+/* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js language configuration
@@ -33478,7 +33417,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 127 */
+/* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -33636,7 +33575,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 128 */
+/* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -33738,7 +33677,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 129 */
+/* 130 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -33800,7 +33739,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 130 */
+/* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -33862,7 +33801,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 131 */
+/* 132 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -33945,7 +33884,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 132 */
+/* 133 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -34017,7 +33956,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 133 */
+/* 134 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -34081,7 +34020,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 134 */
+/* 135 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -34195,7 +34134,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 135 */
+/* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -34302,7 +34241,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 136 */
+/* 137 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -34409,7 +34348,7 @@ module.exports = defaults;
 
 
 /***/ }),
-/* 137 */
+/* 138 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38247,13 +38186,14 @@ function __guardMethod__(obj, methodName, transform) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)(module)))
 
 /***/ }),
-/* 138 */
+/* 139 */,
+/* 140 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(155);
+module.exports = __webpack_require__(161);
 
 /***/ }),
-/* 139 */
+/* 141 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38271,7 +38211,202 @@ module.exports = function bind(fn, thisArg) {
 
 
 /***/ }),
-/* 140 */
+/* 142 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(3);
+
+function encode(val) {
+  return encodeURIComponent(val).
+    replace(/%40/gi, '@').
+    replace(/%3A/gi, ':').
+    replace(/%24/g, '$').
+    replace(/%2C/gi, ',').
+    replace(/%20/g, '+').
+    replace(/%5B/gi, '[').
+    replace(/%5D/gi, ']');
+}
+
+/**
+ * Build a URL by appending params to the end
+ *
+ * @param {string} url The base of the url (e.g., http://www.google.com)
+ * @param {object} [params] The params to be appended
+ * @returns {string} The formatted url
+ */
+module.exports = function buildURL(url, params, paramsSerializer) {
+  /*eslint no-param-reassign:0*/
+  if (!params) {
+    return url;
+  }
+
+  var serializedParams;
+  if (paramsSerializer) {
+    serializedParams = paramsSerializer(params);
+  } else if (utils.isURLSearchParams(params)) {
+    serializedParams = params.toString();
+  } else {
+    var parts = [];
+
+    utils.forEach(params, function serialize(val, key) {
+      if (val === null || typeof val === 'undefined') {
+        return;
+      }
+
+      if (utils.isArray(val)) {
+        key = key + '[]';
+      } else {
+        val = [val];
+      }
+
+      utils.forEach(val, function parseValue(v) {
+        if (utils.isDate(v)) {
+          v = v.toISOString();
+        } else if (utils.isObject(v)) {
+          v = JSON.stringify(v);
+        }
+        parts.push(encode(key) + '=' + encode(v));
+      });
+    });
+
+    serializedParams = parts.join('&');
+  }
+
+  if (serializedParams) {
+    var hashmarkIndex = url.indexOf('#');
+    if (hashmarkIndex !== -1) {
+      url = url.slice(0, hashmarkIndex);
+    }
+
+    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
+  }
+
+  return url;
+};
+
+
+/***/ }),
+/* 143 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = function isCancel(value) {
+  return !!(value && value.__CANCEL__);
+};
+
+
+/***/ }),
+/* 144 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+var utils = __webpack_require__(3);
+var normalizeHeaderName = __webpack_require__(166);
+
+var DEFAULT_CONTENT_TYPE = {
+  'Content-Type': 'application/x-www-form-urlencoded'
+};
+
+function setContentTypeIfUnset(headers, value) {
+  if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
+    headers['Content-Type'] = value;
+  }
+}
+
+function getDefaultAdapter() {
+  var adapter;
+  if (typeof XMLHttpRequest !== 'undefined') {
+    // For browsers use XHR adapter
+    adapter = __webpack_require__(146);
+  } else if (typeof process !== 'undefined' && Object.prototype.toString.call(process) === '[object process]') {
+    // For node use HTTP adapter
+    adapter = __webpack_require__(146);
+  }
+  return adapter;
+}
+
+var defaults = {
+  adapter: getDefaultAdapter(),
+
+  transformRequest: [function transformRequest(data, headers) {
+    normalizeHeaderName(headers, 'Accept');
+    normalizeHeaderName(headers, 'Content-Type');
+    if (utils.isFormData(data) ||
+      utils.isArrayBuffer(data) ||
+      utils.isBuffer(data) ||
+      utils.isStream(data) ||
+      utils.isFile(data) ||
+      utils.isBlob(data)
+    ) {
+      return data;
+    }
+    if (utils.isArrayBufferView(data)) {
+      return data.buffer;
+    }
+    if (utils.isURLSearchParams(data)) {
+      setContentTypeIfUnset(headers, 'application/x-www-form-urlencoded;charset=utf-8');
+      return data.toString();
+    }
+    if (utils.isObject(data)) {
+      setContentTypeIfUnset(headers, 'application/json;charset=utf-8');
+      return JSON.stringify(data);
+    }
+    return data;
+  }],
+
+  transformResponse: [function transformResponse(data) {
+    /*eslint no-param-reassign:0*/
+    if (typeof data === 'string') {
+      try {
+        data = JSON.parse(data);
+      } catch (e) { /* Ignore */ }
+    }
+    return data;
+  }],
+
+  /**
+   * A timeout in milliseconds to abort a request. If set to 0 (default) a
+   * timeout is not created.
+   */
+  timeout: 0,
+
+  xsrfCookieName: 'XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN',
+
+  maxContentLength: -1,
+
+  validateStatus: function validateStatus(status) {
+    return status >= 200 && status < 300;
+  }
+};
+
+defaults.headers = {
+  common: {
+    'Accept': 'application/json, text/plain, */*'
+  }
+};
+
+utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
+  defaults.headers[method] = {};
+});
+
+utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  defaults.headers[method] = utils.merge(DEFAULT_CONTENT_TYPE);
+});
+
+module.exports = defaults;
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(145)))
+
+/***/ }),
+/* 145 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -38461,18 +38596,19 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 141 */
+/* 146 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(4);
-var settle = __webpack_require__(159);
-var buildURL = __webpack_require__(161);
-var parseHeaders = __webpack_require__(162);
-var isURLSameOrigin = __webpack_require__(163);
-var createError = __webpack_require__(142);
+var utils = __webpack_require__(3);
+var settle = __webpack_require__(167);
+var buildURL = __webpack_require__(142);
+var buildFullPath = __webpack_require__(169);
+var parseHeaders = __webpack_require__(172);
+var isURLSameOrigin = __webpack_require__(173);
+var createError = __webpack_require__(147);
 
 module.exports = function xhrAdapter(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -38492,7 +38628,8 @@ module.exports = function xhrAdapter(config) {
       requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
     }
 
-    request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
+    var fullPath = buildFullPath(config.baseURL, config.url);
+    request.open(config.method.toUpperCase(), buildURL(fullPath, config.params, config.paramsSerializer), true);
 
     // Set the request timeout in MS
     request.timeout = config.timeout;
@@ -38529,6 +38666,18 @@ module.exports = function xhrAdapter(config) {
       request = null;
     };
 
+    // Handle browser request cancellation (as opposed to a manual cancellation)
+    request.onabort = function handleAbort() {
+      if (!request) {
+        return;
+      }
+
+      reject(createError('Request aborted', config, 'ECONNABORTED', request));
+
+      // Clean up request
+      request = null;
+    };
+
     // Handle low level network errors
     request.onerror = function handleError() {
       // Real errors are hidden from us by the browser
@@ -38541,7 +38690,11 @@ module.exports = function xhrAdapter(config) {
 
     // Handle timeout
     request.ontimeout = function handleTimeout() {
-      reject(createError('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED',
+      var timeoutErrorMessage = 'timeout of ' + config.timeout + 'ms exceeded';
+      if (config.timeoutErrorMessage) {
+        timeoutErrorMessage = config.timeoutErrorMessage;
+      }
+      reject(createError(timeoutErrorMessage, config, 'ECONNABORTED',
         request));
 
       // Clean up request
@@ -38552,12 +38705,12 @@ module.exports = function xhrAdapter(config) {
     // This is only done if running in a standard browser environment.
     // Specifically not if we're in a web worker, or react-native.
     if (utils.isStandardBrowserEnv()) {
-      var cookies = __webpack_require__(164);
+      var cookies = __webpack_require__(174);
 
       // Add xsrf header
-      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
-          cookies.read(config.xsrfCookieName) :
-          undefined;
+      var xsrfValue = (config.withCredentials || isURLSameOrigin(fullPath)) && config.xsrfCookieName ?
+        cookies.read(config.xsrfCookieName) :
+        undefined;
 
       if (xsrfValue) {
         requestHeaders[config.xsrfHeaderName] = xsrfValue;
@@ -38578,8 +38731,8 @@ module.exports = function xhrAdapter(config) {
     }
 
     // Add withCredentials to request if needed
-    if (config.withCredentials) {
-      request.withCredentials = true;
+    if (!utils.isUndefined(config.withCredentials)) {
+      request.withCredentials = !!config.withCredentials;
     }
 
     // Add responseType to request if needed
@@ -38630,13 +38783,13 @@ module.exports = function xhrAdapter(config) {
 
 
 /***/ }),
-/* 142 */
+/* 147 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var enhanceError = __webpack_require__(160);
+var enhanceError = __webpack_require__(168);
 
 /**
  * Create an Error with the specified message, config, error code, request and response.
@@ -38655,19 +38808,87 @@ module.exports = function createError(message, config, code, request, response) 
 
 
 /***/ }),
-/* 143 */
+/* 148 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-module.exports = function isCancel(value) {
-  return !!(value && value.__CANCEL__);
+var utils = __webpack_require__(3);
+
+/**
+ * Config-specific merge-function which creates a new config-object
+ * by merging two configuration objects together.
+ *
+ * @param {Object} config1
+ * @param {Object} config2
+ * @returns {Object} New object resulting from merging config2 to config1
+ */
+module.exports = function mergeConfig(config1, config2) {
+  // eslint-disable-next-line no-param-reassign
+  config2 = config2 || {};
+  var config = {};
+
+  var valueFromConfig2Keys = ['url', 'method', 'params', 'data'];
+  var mergeDeepPropertiesKeys = ['headers', 'auth', 'proxy'];
+  var defaultToConfig2Keys = [
+    'baseURL', 'url', 'transformRequest', 'transformResponse', 'paramsSerializer',
+    'timeout', 'withCredentials', 'adapter', 'responseType', 'xsrfCookieName',
+    'xsrfHeaderName', 'onUploadProgress', 'onDownloadProgress',
+    'maxContentLength', 'validateStatus', 'maxRedirects', 'httpAgent',
+    'httpsAgent', 'cancelToken', 'socketPath'
+  ];
+
+  utils.forEach(valueFromConfig2Keys, function valueFromConfig2(prop) {
+    if (typeof config2[prop] !== 'undefined') {
+      config[prop] = config2[prop];
+    }
+  });
+
+  utils.forEach(mergeDeepPropertiesKeys, function mergeDeepProperties(prop) {
+    if (utils.isObject(config2[prop])) {
+      config[prop] = utils.deepMerge(config1[prop], config2[prop]);
+    } else if (typeof config2[prop] !== 'undefined') {
+      config[prop] = config2[prop];
+    } else if (utils.isObject(config1[prop])) {
+      config[prop] = utils.deepMerge(config1[prop]);
+    } else if (typeof config1[prop] !== 'undefined') {
+      config[prop] = config1[prop];
+    }
+  });
+
+  utils.forEach(defaultToConfig2Keys, function defaultToConfig2(prop) {
+    if (typeof config2[prop] !== 'undefined') {
+      config[prop] = config2[prop];
+    } else if (typeof config1[prop] !== 'undefined') {
+      config[prop] = config1[prop];
+    }
+  });
+
+  var axiosKeys = valueFromConfig2Keys
+    .concat(mergeDeepPropertiesKeys)
+    .concat(defaultToConfig2Keys);
+
+  var otherKeys = Object
+    .keys(config2)
+    .filter(function filterAxiosKeys(key) {
+      return axiosKeys.indexOf(key) === -1;
+    });
+
+  utils.forEach(otherKeys, function otherKeysDefaultToConfig2(prop) {
+    if (typeof config2[prop] !== 'undefined') {
+      config[prop] = config2[prop];
+    } else if (typeof config1[prop] !== 'undefined') {
+      config[prop] = config1[prop];
+    }
+  });
+
+  return config;
 };
 
 
 /***/ }),
-/* 144 */
+/* 149 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38693,8 +38914,8 @@ module.exports = Cancel;
 
 
 /***/ }),
-/* 145 */,
-/* 146 */
+/* 150 */,
+/* 151 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -41620,269 +41841,271 @@ if (inBrowser && window.Vue) {
 
 
 /***/ }),
-/* 147 */,
-/* 148 */,
-/* 149 */,
-/* 150 */,
-/* 151 */,
-/* 152 */
+/* 152 */,
+/* 153 */,
+/* 154 */,
+/* 155 */,
+/* 156 */,
+/* 157 */,
+/* 158 */,
+/* 159 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
-	"./af": 10,
-	"./af.js": 10,
-	"./ar": 11,
-	"./ar-dz": 12,
-	"./ar-dz.js": 12,
-	"./ar-kw": 13,
-	"./ar-kw.js": 13,
-	"./ar-ly": 14,
-	"./ar-ly.js": 14,
-	"./ar-ma": 15,
-	"./ar-ma.js": 15,
-	"./ar-sa": 16,
-	"./ar-sa.js": 16,
-	"./ar-tn": 17,
-	"./ar-tn.js": 17,
-	"./ar.js": 11,
-	"./az": 18,
-	"./az.js": 18,
-	"./be": 19,
-	"./be.js": 19,
-	"./bg": 20,
-	"./bg.js": 20,
-	"./bm": 21,
-	"./bm.js": 21,
-	"./bn": 22,
-	"./bn.js": 22,
-	"./bo": 23,
-	"./bo.js": 23,
-	"./br": 24,
-	"./br.js": 24,
-	"./bs": 25,
-	"./bs.js": 25,
-	"./ca": 26,
-	"./ca.js": 26,
-	"./cs": 27,
-	"./cs.js": 27,
-	"./cv": 28,
-	"./cv.js": 28,
-	"./cy": 29,
-	"./cy.js": 29,
-	"./da": 30,
-	"./da.js": 30,
-	"./de": 31,
-	"./de-at": 32,
-	"./de-at.js": 32,
-	"./de-ch": 33,
-	"./de-ch.js": 33,
-	"./de.js": 31,
-	"./dv": 34,
-	"./dv.js": 34,
-	"./el": 35,
-	"./el.js": 35,
-	"./en-SG": 36,
-	"./en-SG.js": 36,
-	"./en-au": 37,
-	"./en-au.js": 37,
-	"./en-ca": 38,
-	"./en-ca.js": 38,
-	"./en-gb": 39,
-	"./en-gb.js": 39,
-	"./en-ie": 40,
-	"./en-ie.js": 40,
-	"./en-il": 41,
-	"./en-il.js": 41,
-	"./en-nz": 42,
-	"./en-nz.js": 42,
-	"./eo": 43,
-	"./eo.js": 43,
-	"./es": 44,
-	"./es-do": 45,
-	"./es-do.js": 45,
-	"./es-us": 46,
-	"./es-us.js": 46,
-	"./es.js": 44,
-	"./et": 47,
-	"./et.js": 47,
-	"./eu": 48,
-	"./eu.js": 48,
-	"./fa": 49,
-	"./fa.js": 49,
-	"./fi": 50,
-	"./fi.js": 50,
-	"./fo": 51,
-	"./fo.js": 51,
-	"./fr": 52,
-	"./fr-ca": 53,
-	"./fr-ca.js": 53,
-	"./fr-ch": 54,
-	"./fr-ch.js": 54,
-	"./fr.js": 52,
-	"./fy": 55,
-	"./fy.js": 55,
-	"./ga": 56,
-	"./ga.js": 56,
-	"./gd": 57,
-	"./gd.js": 57,
-	"./gl": 58,
-	"./gl.js": 58,
-	"./gom-latn": 59,
-	"./gom-latn.js": 59,
-	"./gu": 60,
-	"./gu.js": 60,
-	"./he": 61,
-	"./he.js": 61,
-	"./hi": 62,
-	"./hi.js": 62,
-	"./hr": 63,
-	"./hr.js": 63,
-	"./hu": 64,
-	"./hu.js": 64,
-	"./hy-am": 65,
-	"./hy-am.js": 65,
-	"./id": 66,
-	"./id.js": 66,
-	"./is": 67,
-	"./is.js": 67,
-	"./it": 68,
-	"./it-ch": 69,
-	"./it-ch.js": 69,
-	"./it.js": 68,
-	"./ja": 70,
-	"./ja.js": 70,
-	"./jv": 71,
-	"./jv.js": 71,
-	"./ka": 72,
-	"./ka.js": 72,
-	"./kk": 73,
-	"./kk.js": 73,
-	"./km": 74,
-	"./km.js": 74,
-	"./kn": 75,
-	"./kn.js": 75,
-	"./ko": 76,
-	"./ko.js": 76,
-	"./ku": 77,
-	"./ku.js": 77,
-	"./ky": 78,
-	"./ky.js": 78,
-	"./lb": 79,
-	"./lb.js": 79,
-	"./lo": 80,
-	"./lo.js": 80,
-	"./lt": 81,
-	"./lt.js": 81,
-	"./lv": 82,
-	"./lv.js": 82,
-	"./me": 83,
-	"./me.js": 83,
-	"./mi": 84,
-	"./mi.js": 84,
-	"./mk": 85,
-	"./mk.js": 85,
-	"./ml": 86,
-	"./ml.js": 86,
-	"./mn": 87,
-	"./mn.js": 87,
-	"./mr": 88,
-	"./mr.js": 88,
-	"./ms": 89,
-	"./ms-my": 90,
-	"./ms-my.js": 90,
-	"./ms.js": 89,
-	"./mt": 91,
-	"./mt.js": 91,
-	"./my": 92,
-	"./my.js": 92,
-	"./nb": 93,
-	"./nb.js": 93,
-	"./ne": 94,
-	"./ne.js": 94,
-	"./nl": 95,
-	"./nl-be": 96,
-	"./nl-be.js": 96,
-	"./nl.js": 95,
-	"./nn": 97,
-	"./nn.js": 97,
-	"./pa-in": 98,
-	"./pa-in.js": 98,
-	"./pl": 99,
-	"./pl.js": 99,
-	"./pt": 100,
-	"./pt-br": 101,
-	"./pt-br.js": 101,
-	"./pt.js": 100,
-	"./ro": 102,
-	"./ro.js": 102,
-	"./ru": 103,
-	"./ru.js": 103,
-	"./sd": 104,
-	"./sd.js": 104,
-	"./se": 105,
-	"./se.js": 105,
-	"./si": 106,
-	"./si.js": 106,
-	"./sk": 107,
-	"./sk.js": 107,
-	"./sl": 108,
-	"./sl.js": 108,
-	"./sq": 109,
-	"./sq.js": 109,
-	"./sr": 110,
-	"./sr-cyrl": 111,
-	"./sr-cyrl.js": 111,
-	"./sr.js": 110,
-	"./ss": 112,
-	"./ss.js": 112,
-	"./sv": 113,
-	"./sv.js": 113,
-	"./sw": 114,
-	"./sw.js": 114,
-	"./ta": 115,
-	"./ta.js": 115,
-	"./te": 116,
-	"./te.js": 116,
-	"./tet": 117,
-	"./tet.js": 117,
-	"./tg": 118,
-	"./tg.js": 118,
-	"./th": 119,
-	"./th.js": 119,
-	"./tl-ph": 120,
-	"./tl-ph.js": 120,
-	"./tlh": 121,
-	"./tlh.js": 121,
-	"./tr": 122,
-	"./tr.js": 122,
-	"./tzl": 123,
-	"./tzl.js": 123,
-	"./tzm": 124,
-	"./tzm-latn": 125,
-	"./tzm-latn.js": 125,
-	"./tzm.js": 124,
-	"./ug-cn": 126,
-	"./ug-cn.js": 126,
-	"./uk": 127,
-	"./uk.js": 127,
-	"./ur": 128,
-	"./ur.js": 128,
-	"./uz": 129,
-	"./uz-latn": 130,
-	"./uz-latn.js": 130,
-	"./uz.js": 129,
-	"./vi": 131,
-	"./vi.js": 131,
-	"./x-pseudo": 132,
-	"./x-pseudo.js": 132,
-	"./yo": 133,
-	"./yo.js": 133,
-	"./zh-cn": 134,
-	"./zh-cn.js": 134,
-	"./zh-hk": 135,
-	"./zh-hk.js": 135,
-	"./zh-tw": 136,
-	"./zh-tw.js": 136
+	"./af": 11,
+	"./af.js": 11,
+	"./ar": 12,
+	"./ar-dz": 13,
+	"./ar-dz.js": 13,
+	"./ar-kw": 14,
+	"./ar-kw.js": 14,
+	"./ar-ly": 15,
+	"./ar-ly.js": 15,
+	"./ar-ma": 16,
+	"./ar-ma.js": 16,
+	"./ar-sa": 17,
+	"./ar-sa.js": 17,
+	"./ar-tn": 18,
+	"./ar-tn.js": 18,
+	"./ar.js": 12,
+	"./az": 19,
+	"./az.js": 19,
+	"./be": 20,
+	"./be.js": 20,
+	"./bg": 21,
+	"./bg.js": 21,
+	"./bm": 22,
+	"./bm.js": 22,
+	"./bn": 23,
+	"./bn.js": 23,
+	"./bo": 24,
+	"./bo.js": 24,
+	"./br": 25,
+	"./br.js": 25,
+	"./bs": 26,
+	"./bs.js": 26,
+	"./ca": 27,
+	"./ca.js": 27,
+	"./cs": 28,
+	"./cs.js": 28,
+	"./cv": 29,
+	"./cv.js": 29,
+	"./cy": 30,
+	"./cy.js": 30,
+	"./da": 31,
+	"./da.js": 31,
+	"./de": 32,
+	"./de-at": 33,
+	"./de-at.js": 33,
+	"./de-ch": 34,
+	"./de-ch.js": 34,
+	"./de.js": 32,
+	"./dv": 35,
+	"./dv.js": 35,
+	"./el": 36,
+	"./el.js": 36,
+	"./en-SG": 37,
+	"./en-SG.js": 37,
+	"./en-au": 38,
+	"./en-au.js": 38,
+	"./en-ca": 39,
+	"./en-ca.js": 39,
+	"./en-gb": 40,
+	"./en-gb.js": 40,
+	"./en-ie": 41,
+	"./en-ie.js": 41,
+	"./en-il": 42,
+	"./en-il.js": 42,
+	"./en-nz": 43,
+	"./en-nz.js": 43,
+	"./eo": 44,
+	"./eo.js": 44,
+	"./es": 45,
+	"./es-do": 46,
+	"./es-do.js": 46,
+	"./es-us": 47,
+	"./es-us.js": 47,
+	"./es.js": 45,
+	"./et": 48,
+	"./et.js": 48,
+	"./eu": 49,
+	"./eu.js": 49,
+	"./fa": 50,
+	"./fa.js": 50,
+	"./fi": 51,
+	"./fi.js": 51,
+	"./fo": 52,
+	"./fo.js": 52,
+	"./fr": 53,
+	"./fr-ca": 54,
+	"./fr-ca.js": 54,
+	"./fr-ch": 55,
+	"./fr-ch.js": 55,
+	"./fr.js": 53,
+	"./fy": 56,
+	"./fy.js": 56,
+	"./ga": 57,
+	"./ga.js": 57,
+	"./gd": 58,
+	"./gd.js": 58,
+	"./gl": 59,
+	"./gl.js": 59,
+	"./gom-latn": 60,
+	"./gom-latn.js": 60,
+	"./gu": 61,
+	"./gu.js": 61,
+	"./he": 62,
+	"./he.js": 62,
+	"./hi": 63,
+	"./hi.js": 63,
+	"./hr": 64,
+	"./hr.js": 64,
+	"./hu": 65,
+	"./hu.js": 65,
+	"./hy-am": 66,
+	"./hy-am.js": 66,
+	"./id": 67,
+	"./id.js": 67,
+	"./is": 68,
+	"./is.js": 68,
+	"./it": 69,
+	"./it-ch": 70,
+	"./it-ch.js": 70,
+	"./it.js": 69,
+	"./ja": 71,
+	"./ja.js": 71,
+	"./jv": 72,
+	"./jv.js": 72,
+	"./ka": 73,
+	"./ka.js": 73,
+	"./kk": 74,
+	"./kk.js": 74,
+	"./km": 75,
+	"./km.js": 75,
+	"./kn": 76,
+	"./kn.js": 76,
+	"./ko": 77,
+	"./ko.js": 77,
+	"./ku": 78,
+	"./ku.js": 78,
+	"./ky": 79,
+	"./ky.js": 79,
+	"./lb": 80,
+	"./lb.js": 80,
+	"./lo": 81,
+	"./lo.js": 81,
+	"./lt": 82,
+	"./lt.js": 82,
+	"./lv": 83,
+	"./lv.js": 83,
+	"./me": 84,
+	"./me.js": 84,
+	"./mi": 85,
+	"./mi.js": 85,
+	"./mk": 86,
+	"./mk.js": 86,
+	"./ml": 87,
+	"./ml.js": 87,
+	"./mn": 88,
+	"./mn.js": 88,
+	"./mr": 89,
+	"./mr.js": 89,
+	"./ms": 90,
+	"./ms-my": 91,
+	"./ms-my.js": 91,
+	"./ms.js": 90,
+	"./mt": 92,
+	"./mt.js": 92,
+	"./my": 93,
+	"./my.js": 93,
+	"./nb": 94,
+	"./nb.js": 94,
+	"./ne": 95,
+	"./ne.js": 95,
+	"./nl": 96,
+	"./nl-be": 97,
+	"./nl-be.js": 97,
+	"./nl.js": 96,
+	"./nn": 98,
+	"./nn.js": 98,
+	"./pa-in": 99,
+	"./pa-in.js": 99,
+	"./pl": 100,
+	"./pl.js": 100,
+	"./pt": 101,
+	"./pt-br": 102,
+	"./pt-br.js": 102,
+	"./pt.js": 101,
+	"./ro": 103,
+	"./ro.js": 103,
+	"./ru": 104,
+	"./ru.js": 104,
+	"./sd": 105,
+	"./sd.js": 105,
+	"./se": 106,
+	"./se.js": 106,
+	"./si": 107,
+	"./si.js": 107,
+	"./sk": 108,
+	"./sk.js": 108,
+	"./sl": 109,
+	"./sl.js": 109,
+	"./sq": 110,
+	"./sq.js": 110,
+	"./sr": 111,
+	"./sr-cyrl": 112,
+	"./sr-cyrl.js": 112,
+	"./sr.js": 111,
+	"./ss": 113,
+	"./ss.js": 113,
+	"./sv": 114,
+	"./sv.js": 114,
+	"./sw": 115,
+	"./sw.js": 115,
+	"./ta": 116,
+	"./ta.js": 116,
+	"./te": 117,
+	"./te.js": 117,
+	"./tet": 118,
+	"./tet.js": 118,
+	"./tg": 119,
+	"./tg.js": 119,
+	"./th": 120,
+	"./th.js": 120,
+	"./tl-ph": 121,
+	"./tl-ph.js": 121,
+	"./tlh": 122,
+	"./tlh.js": 122,
+	"./tr": 123,
+	"./tr.js": 123,
+	"./tzl": 124,
+	"./tzl.js": 124,
+	"./tzm": 125,
+	"./tzm-latn": 126,
+	"./tzm-latn.js": 126,
+	"./tzm.js": 125,
+	"./ug-cn": 127,
+	"./ug-cn.js": 127,
+	"./uk": 128,
+	"./uk.js": 128,
+	"./ur": 129,
+	"./ur.js": 129,
+	"./uz": 130,
+	"./uz-latn": 131,
+	"./uz-latn.js": 131,
+	"./uz.js": 130,
+	"./vi": 132,
+	"./vi.js": 132,
+	"./x-pseudo": 133,
+	"./x-pseudo.js": 133,
+	"./yo": 134,
+	"./yo.js": 134,
+	"./zh-cn": 135,
+	"./zh-cn.js": 135,
+	"./zh-hk": 136,
+	"./zh-hk.js": 136,
+	"./zh-tw": 137,
+	"./zh-tw.js": 137
 };
 function webpackContext(req) {
 	return __webpack_require__(webpackContextResolve(req));
@@ -41898,21 +42121,21 @@ webpackContext.keys = function webpackContextKeys() {
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = 152;
+webpackContext.id = 159;
 
 /***/ }),
-/* 153 */,
-/* 154 */,
-/* 155 */
+/* 160 */,
+/* 161 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(4);
-var bind = __webpack_require__(139);
-var Axios = __webpack_require__(157);
-var defaults = __webpack_require__(8);
+var utils = __webpack_require__(3);
+var bind = __webpack_require__(141);
+var Axios = __webpack_require__(162);
+var mergeConfig = __webpack_require__(148);
+var defaults = __webpack_require__(144);
 
 /**
  * Create an instance of Axios
@@ -41941,19 +42164,19 @@ axios.Axios = Axios;
 
 // Factory for creating new instances
 axios.create = function create(instanceConfig) {
-  return createInstance(utils.merge(defaults, instanceConfig));
+  return createInstance(mergeConfig(axios.defaults, instanceConfig));
 };
 
 // Expose Cancel & CancelToken
-axios.Cancel = __webpack_require__(144);
-axios.CancelToken = __webpack_require__(170);
+axios.Cancel = __webpack_require__(149);
+axios.CancelToken = __webpack_require__(175);
 axios.isCancel = __webpack_require__(143);
 
 // Expose all/spread
 axios.all = function all(promises) {
   return Promise.all(promises);
 };
-axios.spread = __webpack_require__(171);
+axios.spread = __webpack_require__(176);
 
 module.exports = axios;
 
@@ -41962,33 +42185,17 @@ module.exports.default = axios;
 
 
 /***/ }),
-/* 156 */
-/***/ (function(module, exports) {
-
-/*!
- * Determine if an object is a Buffer
- *
- * @author   Feross Aboukhadijeh <https://feross.org>
- * @license  MIT
- */
-
-module.exports = function isBuffer (obj) {
-  return obj != null && obj.constructor != null &&
-    typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
-}
-
-
-/***/ }),
-/* 157 */
+/* 162 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var defaults = __webpack_require__(8);
-var utils = __webpack_require__(4);
-var InterceptorManager = __webpack_require__(165);
-var dispatchRequest = __webpack_require__(166);
+var utils = __webpack_require__(3);
+var buildURL = __webpack_require__(142);
+var InterceptorManager = __webpack_require__(163);
+var dispatchRequest = __webpack_require__(164);
+var mergeConfig = __webpack_require__(148);
 
 /**
  * Create a new instance of Axios
@@ -42012,13 +42219,22 @@ Axios.prototype.request = function request(config) {
   /*eslint no-param-reassign:0*/
   // Allow for axios('example/url'[, config]) a la fetch API
   if (typeof config === 'string') {
-    config = utils.merge({
-      url: arguments[0]
-    }, arguments[1]);
+    config = arguments[1] || {};
+    config.url = arguments[0];
+  } else {
+    config = config || {};
   }
 
-  config = utils.merge(defaults, {method: 'get'}, this.defaults, config);
-  config.method = config.method.toLowerCase();
+  config = mergeConfig(this.defaults, config);
+
+  // Set config.method
+  if (config.method) {
+    config.method = config.method.toLowerCase();
+  } else if (this.defaults.method) {
+    config.method = this.defaults.method.toLowerCase();
+  } else {
+    config.method = 'get';
+  }
 
   // Hook up interceptors middleware
   var chain = [dispatchRequest, undefined];
@@ -42037,6 +42253,11 @@ Axios.prototype.request = function request(config) {
   }
 
   return promise;
+};
+
+Axios.prototype.getUri = function getUri(config) {
+  config = mergeConfig(this.defaults, config);
+  return buildURL(config.url, config.params, config.paramsSerializer).replace(/^\?/, '');
 };
 
 // Provide aliases for supported request methods
@@ -42065,13 +42286,185 @@ module.exports = Axios;
 
 
 /***/ }),
-/* 158 */
+/* 163 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(4);
+var utils = __webpack_require__(3);
+
+function InterceptorManager() {
+  this.handlers = [];
+}
+
+/**
+ * Add a new interceptor to the stack
+ *
+ * @param {Function} fulfilled The function to handle `then` for a `Promise`
+ * @param {Function} rejected The function to handle `reject` for a `Promise`
+ *
+ * @return {Number} An ID used to remove interceptor later
+ */
+InterceptorManager.prototype.use = function use(fulfilled, rejected) {
+  this.handlers.push({
+    fulfilled: fulfilled,
+    rejected: rejected
+  });
+  return this.handlers.length - 1;
+};
+
+/**
+ * Remove an interceptor from the stack
+ *
+ * @param {Number} id The ID that was returned by `use`
+ */
+InterceptorManager.prototype.eject = function eject(id) {
+  if (this.handlers[id]) {
+    this.handlers[id] = null;
+  }
+};
+
+/**
+ * Iterate over all the registered interceptors
+ *
+ * This method is particularly useful for skipping over any
+ * interceptors that may have become `null` calling `eject`.
+ *
+ * @param {Function} fn The function to call for each interceptor
+ */
+InterceptorManager.prototype.forEach = function forEach(fn) {
+  utils.forEach(this.handlers, function forEachHandler(h) {
+    if (h !== null) {
+      fn(h);
+    }
+  });
+};
+
+module.exports = InterceptorManager;
+
+
+/***/ }),
+/* 164 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(3);
+var transformData = __webpack_require__(165);
+var isCancel = __webpack_require__(143);
+var defaults = __webpack_require__(144);
+
+/**
+ * Throws a `Cancel` if cancellation has been requested.
+ */
+function throwIfCancellationRequested(config) {
+  if (config.cancelToken) {
+    config.cancelToken.throwIfRequested();
+  }
+}
+
+/**
+ * Dispatch a request to the server using the configured adapter.
+ *
+ * @param {object} config The config that is to be used for the request
+ * @returns {Promise} The Promise to be fulfilled
+ */
+module.exports = function dispatchRequest(config) {
+  throwIfCancellationRequested(config);
+
+  // Ensure headers exist
+  config.headers = config.headers || {};
+
+  // Transform request data
+  config.data = transformData(
+    config.data,
+    config.headers,
+    config.transformRequest
+  );
+
+  // Flatten headers
+  config.headers = utils.merge(
+    config.headers.common || {},
+    config.headers[config.method] || {},
+    config.headers
+  );
+
+  utils.forEach(
+    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
+    function cleanHeaderConfig(method) {
+      delete config.headers[method];
+    }
+  );
+
+  var adapter = config.adapter || defaults.adapter;
+
+  return adapter(config).then(function onAdapterResolution(response) {
+    throwIfCancellationRequested(config);
+
+    // Transform response data
+    response.data = transformData(
+      response.data,
+      response.headers,
+      config.transformResponse
+    );
+
+    return response;
+  }, function onAdapterRejection(reason) {
+    if (!isCancel(reason)) {
+      throwIfCancellationRequested(config);
+
+      // Transform response data
+      if (reason && reason.response) {
+        reason.response.data = transformData(
+          reason.response.data,
+          reason.response.headers,
+          config.transformResponse
+        );
+      }
+    }
+
+    return Promise.reject(reason);
+  });
+};
+
+
+/***/ }),
+/* 165 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(3);
+
+/**
+ * Transform the data for a request or a response
+ *
+ * @param {Object|String} data The data to be transformed
+ * @param {Array} headers The headers for the request or response
+ * @param {Array|Function} fns A single function or Array of functions
+ * @returns {*} The resulting transformed data
+ */
+module.exports = function transformData(data, headers, fns) {
+  /*eslint no-param-reassign:0*/
+  utils.forEach(fns, function transform(fn) {
+    data = fn(data, headers);
+  });
+
+  return data;
+};
+
+
+/***/ }),
+/* 166 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(3);
 
 module.exports = function normalizeHeaderName(headers, normalizedName) {
   utils.forEach(headers, function processHeader(value, name) {
@@ -42084,13 +42477,13 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 
 
 /***/ }),
-/* 159 */
+/* 167 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var createError = __webpack_require__(142);
+var createError = __webpack_require__(147);
 
 /**
  * Resolve or reject a Promise based on response status.
@@ -42101,8 +42494,7 @@ var createError = __webpack_require__(142);
  */
 module.exports = function settle(resolve, reject, response) {
   var validateStatus = response.config.validateStatus;
-  // Note: status is not exposed by XDomainRequest
-  if (!response.status || !validateStatus || validateStatus(response.status)) {
+  if (!validateStatus || validateStatus(response.status)) {
     resolve(response);
   } else {
     reject(createError(
@@ -42117,7 +42509,7 @@ module.exports = function settle(resolve, reject, response) {
 
 
 /***/ }),
-/* 160 */
+/* 168 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42138,93 +42530,110 @@ module.exports = function enhanceError(error, config, code, request, response) {
   if (code) {
     error.code = code;
   }
+
   error.request = request;
   error.response = response;
+  error.isAxiosError = true;
+
+  error.toJSON = function() {
+    return {
+      // Standard
+      message: this.message,
+      name: this.name,
+      // Microsoft
+      description: this.description,
+      number: this.number,
+      // Mozilla
+      fileName: this.fileName,
+      lineNumber: this.lineNumber,
+      columnNumber: this.columnNumber,
+      stack: this.stack,
+      // Axios
+      config: this.config,
+      code: this.code
+    };
+  };
   return error;
 };
 
 
 /***/ }),
-/* 161 */
+/* 169 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(4);
-
-function encode(val) {
-  return encodeURIComponent(val).
-    replace(/%40/gi, '@').
-    replace(/%3A/gi, ':').
-    replace(/%24/g, '$').
-    replace(/%2C/gi, ',').
-    replace(/%20/g, '+').
-    replace(/%5B/gi, '[').
-    replace(/%5D/gi, ']');
-}
+var isAbsoluteURL = __webpack_require__(170);
+var combineURLs = __webpack_require__(171);
 
 /**
- * Build a URL by appending params to the end
+ * Creates a new URL by combining the baseURL with the requestedURL,
+ * only when the requestedURL is not already an absolute URL.
+ * If the requestURL is absolute, this function returns the requestedURL untouched.
  *
- * @param {string} url The base of the url (e.g., http://www.google.com)
- * @param {object} [params] The params to be appended
- * @returns {string} The formatted url
+ * @param {string} baseURL The base URL
+ * @param {string} requestedURL Absolute or relative URL to combine
+ * @returns {string} The combined full path
  */
-module.exports = function buildURL(url, params, paramsSerializer) {
-  /*eslint no-param-reassign:0*/
-  if (!params) {
-    return url;
+module.exports = function buildFullPath(baseURL, requestedURL) {
+  if (baseURL && !isAbsoluteURL(requestedURL)) {
+    return combineURLs(baseURL, requestedURL);
   }
-
-  var serializedParams;
-  if (paramsSerializer) {
-    serializedParams = paramsSerializer(params);
-  } else if (utils.isURLSearchParams(params)) {
-    serializedParams = params.toString();
-  } else {
-    var parts = [];
-
-    utils.forEach(params, function serialize(val, key) {
-      if (val === null || typeof val === 'undefined') {
-        return;
-      }
-
-      if (utils.isArray(val)) {
-        key = key + '[]';
-      } else {
-        val = [val];
-      }
-
-      utils.forEach(val, function parseValue(v) {
-        if (utils.isDate(v)) {
-          v = v.toISOString();
-        } else if (utils.isObject(v)) {
-          v = JSON.stringify(v);
-        }
-        parts.push(encode(key) + '=' + encode(v));
-      });
-    });
-
-    serializedParams = parts.join('&');
-  }
-
-  if (serializedParams) {
-    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
-  }
-
-  return url;
+  return requestedURL;
 };
 
 
 /***/ }),
-/* 162 */
+/* 170 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(4);
+/**
+ * Determines whether the specified URL is absolute
+ *
+ * @param {string} url The URL to test
+ * @returns {boolean} True if the specified URL is absolute, otherwise false
+ */
+module.exports = function isAbsoluteURL(url) {
+  // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
+  // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
+  // by any combination of letters, digits, plus, period, or hyphen.
+  return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
+};
+
+
+/***/ }),
+/* 171 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * Creates a new URL by combining the specified URLs
+ *
+ * @param {string} baseURL The base URL
+ * @param {string} relativeURL The relative URL
+ * @returns {string} The combined URL
+ */
+module.exports = function combineURLs(baseURL, relativeURL) {
+  return relativeURL
+    ? baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '')
+    : baseURL;
+};
+
+
+/***/ }),
+/* 172 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(3);
 
 // Headers whose duplicates are ignored by node
 // c.f. https://nodejs.org/api/http.html#http_message_headers
@@ -42278,369 +42687,148 @@ module.exports = function parseHeaders(headers) {
 
 
 /***/ }),
-/* 163 */
+/* 173 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(4);
+var utils = __webpack_require__(3);
 
 module.exports = (
   utils.isStandardBrowserEnv() ?
 
   // Standard browser envs have full support of the APIs needed to test
   // whether the request URL is of the same origin as current location.
-  (function standardBrowserEnv() {
-    var msie = /(msie|trident)/i.test(navigator.userAgent);
-    var urlParsingNode = document.createElement('a');
-    var originURL;
+    (function standardBrowserEnv() {
+      var msie = /(msie|trident)/i.test(navigator.userAgent);
+      var urlParsingNode = document.createElement('a');
+      var originURL;
 
-    /**
+      /**
     * Parse a URL to discover it's components
     *
     * @param {String} url The URL to be parsed
     * @returns {Object}
     */
-    function resolveURL(url) {
-      var href = url;
+      function resolveURL(url) {
+        var href = url;
 
-      if (msie) {
+        if (msie) {
         // IE needs attribute set twice to normalize properties
+          urlParsingNode.setAttribute('href', href);
+          href = urlParsingNode.href;
+        }
+
         urlParsingNode.setAttribute('href', href);
-        href = urlParsingNode.href;
+
+        // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
+        return {
+          href: urlParsingNode.href,
+          protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
+          host: urlParsingNode.host,
+          search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
+          hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
+          hostname: urlParsingNode.hostname,
+          port: urlParsingNode.port,
+          pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
+            urlParsingNode.pathname :
+            '/' + urlParsingNode.pathname
+        };
       }
 
-      urlParsingNode.setAttribute('href', href);
+      originURL = resolveURL(window.location.href);
 
-      // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
-      return {
-        href: urlParsingNode.href,
-        protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
-        host: urlParsingNode.host,
-        search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
-        hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
-        hostname: urlParsingNode.hostname,
-        port: urlParsingNode.port,
-        pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
-                  urlParsingNode.pathname :
-                  '/' + urlParsingNode.pathname
-      };
-    }
-
-    originURL = resolveURL(window.location.href);
-
-    /**
+      /**
     * Determine if a URL shares the same origin as the current location
     *
     * @param {String} requestURL The URL to test
     * @returns {boolean} True if URL shares the same origin, otherwise false
     */
-    return function isURLSameOrigin(requestURL) {
-      var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
-      return (parsed.protocol === originURL.protocol &&
+      return function isURLSameOrigin(requestURL) {
+        var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
+        return (parsed.protocol === originURL.protocol &&
             parsed.host === originURL.host);
-    };
-  })() :
+      };
+    })() :
 
   // Non standard browser envs (web workers, react-native) lack needed support.
-  (function nonStandardBrowserEnv() {
-    return function isURLSameOrigin() {
-      return true;
-    };
-  })()
+    (function nonStandardBrowserEnv() {
+      return function isURLSameOrigin() {
+        return true;
+      };
+    })()
 );
 
 
 /***/ }),
-/* 164 */
+/* 174 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(4);
+var utils = __webpack_require__(3);
 
 module.exports = (
   utils.isStandardBrowserEnv() ?
 
   // Standard browser envs support document.cookie
-  (function standardBrowserEnv() {
-    return {
-      write: function write(name, value, expires, path, domain, secure) {
-        var cookie = [];
-        cookie.push(name + '=' + encodeURIComponent(value));
+    (function standardBrowserEnv() {
+      return {
+        write: function write(name, value, expires, path, domain, secure) {
+          var cookie = [];
+          cookie.push(name + '=' + encodeURIComponent(value));
 
-        if (utils.isNumber(expires)) {
-          cookie.push('expires=' + new Date(expires).toGMTString());
+          if (utils.isNumber(expires)) {
+            cookie.push('expires=' + new Date(expires).toGMTString());
+          }
+
+          if (utils.isString(path)) {
+            cookie.push('path=' + path);
+          }
+
+          if (utils.isString(domain)) {
+            cookie.push('domain=' + domain);
+          }
+
+          if (secure === true) {
+            cookie.push('secure');
+          }
+
+          document.cookie = cookie.join('; ');
+        },
+
+        read: function read(name) {
+          var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
+          return (match ? decodeURIComponent(match[3]) : null);
+        },
+
+        remove: function remove(name) {
+          this.write(name, '', Date.now() - 86400000);
         }
-
-        if (utils.isString(path)) {
-          cookie.push('path=' + path);
-        }
-
-        if (utils.isString(domain)) {
-          cookie.push('domain=' + domain);
-        }
-
-        if (secure === true) {
-          cookie.push('secure');
-        }
-
-        document.cookie = cookie.join('; ');
-      },
-
-      read: function read(name) {
-        var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
-        return (match ? decodeURIComponent(match[3]) : null);
-      },
-
-      remove: function remove(name) {
-        this.write(name, '', Date.now() - 86400000);
-      }
-    };
-  })() :
+      };
+    })() :
 
   // Non standard browser env (web workers, react-native) lack needed support.
-  (function nonStandardBrowserEnv() {
-    return {
-      write: function write() {},
-      read: function read() { return null; },
-      remove: function remove() {}
-    };
-  })()
+    (function nonStandardBrowserEnv() {
+      return {
+        write: function write() {},
+        read: function read() { return null; },
+        remove: function remove() {}
+      };
+    })()
 );
 
 
 /***/ }),
-/* 165 */
+/* 175 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(4);
-
-function InterceptorManager() {
-  this.handlers = [];
-}
-
-/**
- * Add a new interceptor to the stack
- *
- * @param {Function} fulfilled The function to handle `then` for a `Promise`
- * @param {Function} rejected The function to handle `reject` for a `Promise`
- *
- * @return {Number} An ID used to remove interceptor later
- */
-InterceptorManager.prototype.use = function use(fulfilled, rejected) {
-  this.handlers.push({
-    fulfilled: fulfilled,
-    rejected: rejected
-  });
-  return this.handlers.length - 1;
-};
-
-/**
- * Remove an interceptor from the stack
- *
- * @param {Number} id The ID that was returned by `use`
- */
-InterceptorManager.prototype.eject = function eject(id) {
-  if (this.handlers[id]) {
-    this.handlers[id] = null;
-  }
-};
-
-/**
- * Iterate over all the registered interceptors
- *
- * This method is particularly useful for skipping over any
- * interceptors that may have become `null` calling `eject`.
- *
- * @param {Function} fn The function to call for each interceptor
- */
-InterceptorManager.prototype.forEach = function forEach(fn) {
-  utils.forEach(this.handlers, function forEachHandler(h) {
-    if (h !== null) {
-      fn(h);
-    }
-  });
-};
-
-module.exports = InterceptorManager;
-
-
-/***/ }),
-/* 166 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var utils = __webpack_require__(4);
-var transformData = __webpack_require__(167);
-var isCancel = __webpack_require__(143);
-var defaults = __webpack_require__(8);
-var isAbsoluteURL = __webpack_require__(168);
-var combineURLs = __webpack_require__(169);
-
-/**
- * Throws a `Cancel` if cancellation has been requested.
- */
-function throwIfCancellationRequested(config) {
-  if (config.cancelToken) {
-    config.cancelToken.throwIfRequested();
-  }
-}
-
-/**
- * Dispatch a request to the server using the configured adapter.
- *
- * @param {object} config The config that is to be used for the request
- * @returns {Promise} The Promise to be fulfilled
- */
-module.exports = function dispatchRequest(config) {
-  throwIfCancellationRequested(config);
-
-  // Support baseURL config
-  if (config.baseURL && !isAbsoluteURL(config.url)) {
-    config.url = combineURLs(config.baseURL, config.url);
-  }
-
-  // Ensure headers exist
-  config.headers = config.headers || {};
-
-  // Transform request data
-  config.data = transformData(
-    config.data,
-    config.headers,
-    config.transformRequest
-  );
-
-  // Flatten headers
-  config.headers = utils.merge(
-    config.headers.common || {},
-    config.headers[config.method] || {},
-    config.headers || {}
-  );
-
-  utils.forEach(
-    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
-    function cleanHeaderConfig(method) {
-      delete config.headers[method];
-    }
-  );
-
-  var adapter = config.adapter || defaults.adapter;
-
-  return adapter(config).then(function onAdapterResolution(response) {
-    throwIfCancellationRequested(config);
-
-    // Transform response data
-    response.data = transformData(
-      response.data,
-      response.headers,
-      config.transformResponse
-    );
-
-    return response;
-  }, function onAdapterRejection(reason) {
-    if (!isCancel(reason)) {
-      throwIfCancellationRequested(config);
-
-      // Transform response data
-      if (reason && reason.response) {
-        reason.response.data = transformData(
-          reason.response.data,
-          reason.response.headers,
-          config.transformResponse
-        );
-      }
-    }
-
-    return Promise.reject(reason);
-  });
-};
-
-
-/***/ }),
-/* 167 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var utils = __webpack_require__(4);
-
-/**
- * Transform the data for a request or a response
- *
- * @param {Object|String} data The data to be transformed
- * @param {Array} headers The headers for the request or response
- * @param {Array|Function} fns A single function or Array of functions
- * @returns {*} The resulting transformed data
- */
-module.exports = function transformData(data, headers, fns) {
-  /*eslint no-param-reassign:0*/
-  utils.forEach(fns, function transform(fn) {
-    data = fn(data, headers);
-  });
-
-  return data;
-};
-
-
-/***/ }),
-/* 168 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * Determines whether the specified URL is absolute
- *
- * @param {string} url The URL to test
- * @returns {boolean} True if the specified URL is absolute, otherwise false
- */
-module.exports = function isAbsoluteURL(url) {
-  // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
-  // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
-  // by any combination of letters, digits, plus, period, or hyphen.
-  return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
-};
-
-
-/***/ }),
-/* 169 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * Creates a new URL by combining the specified URLs
- *
- * @param {string} baseURL The base URL
- * @param {string} relativeURL The relative URL
- * @returns {string} The combined URL
- */
-module.exports = function combineURLs(baseURL, relativeURL) {
-  return relativeURL
-    ? baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '')
-    : baseURL;
-};
-
-
-/***/ }),
-/* 170 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var Cancel = __webpack_require__(144);
+var Cancel = __webpack_require__(149);
 
 /**
  * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -42698,7 +42886,7 @@ module.exports = CancelToken;
 
 
 /***/ }),
-/* 171 */
+/* 176 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42732,7 +42920,7 @@ module.exports = function spread(callback) {
 
 
 /***/ }),
-/* 172 */
+/* 177 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -54696,10 +54884,10 @@ Vue.compile = compileToFunctions;
 
 module.exports = Vue;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6), __webpack_require__(173).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6), __webpack_require__(178).setImmediate))
 
 /***/ }),
-/* 173 */
+/* 178 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
@@ -54755,7 +54943,7 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(174);
+__webpack_require__(179);
 // On some exotic environments, it's not clear which object `setimmediate` was
 // able to install onto.  Search each possibility in the same order as the
 // `setimmediate` library.
@@ -54769,7 +54957,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ }),
-/* 174 */
+/* 179 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -54959,14 +55147,9 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6), __webpack_require__(140)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6), __webpack_require__(145)))
 
 /***/ }),
-/* 175 */,
-/* 176 */,
-/* 177 */,
-/* 178 */,
-/* 179 */,
 /* 180 */,
 /* 181 */,
 /* 182 */,
@@ -55114,16 +55297,34 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 /* 324 */,
 /* 325 */,
 /* 326 */,
-/* 327 */
+/* 327 */,
+/* 328 */,
+/* 329 */,
+/* 330 */,
+/* 331 */,
+/* 332 */,
+/* 333 */,
+/* 334 */,
+/* 335 */,
+/* 336 */,
+/* 337 */,
+/* 338 */,
+/* 339 */,
+/* 340 */,
+/* 341 */,
+/* 342 */,
+/* 343 */,
+/* 344 */,
+/* 345 */
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(5);
-__webpack_require__(146);
+__webpack_require__(151);
 __webpack_require__(0);
-__webpack_require__(138);
-__webpack_require__(9);
-module.exports = __webpack_require__(137);
+__webpack_require__(140);
+__webpack_require__(10);
+module.exports = __webpack_require__(138);
 
 
 /***/ })
-],[327]);
+],[345]);

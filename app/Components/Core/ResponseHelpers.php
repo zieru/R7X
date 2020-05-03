@@ -22,11 +22,12 @@ Trait ResponseHelpers
      */
     public function sendResponse($data = null, $message = '', $statusCode = 200,$headers = [])
     {
+
+
         $d = [
             'message' => $message,
             'data' => $data
         ];
-
         return response($d,$statusCode,$headers);
     }
 
@@ -40,6 +41,7 @@ Trait ResponseHelpers
      */
     public function sendResponseOk($data = [],string $message = "Resource found.", array $headers = [])
     {
+
         return $this->sendResponse($data,$message,200,$headers);
     }
 

@@ -8,6 +8,7 @@ import colors from "vuetify/lib/util/colors";
 
 // vendor
 require('../bootstrap');
+
 window.Vue = require('vue');
 
 // 3rd party
@@ -17,6 +18,10 @@ import Vue from 'vue';
 import Vuetify from 'vuetify';
 import VueProgressBar from 'vue-progressbar'
 import CKEditor from 'ckeditor4-vue';
+import JQuery from 'jquery'
+
+window.$ = JQuery
+
 
 
 // this is the vuetify theming options

@@ -29,12 +29,30 @@
                 <tbody>
                 <tr v-for="item in items" :key="item.id">
                     <td>
-                        <v-btn @click="showDialog('file_show',item)" icon small>
-                            <v-icon class="blue--text">mdi-magnify</v-icon>
-                        </v-btn>
-                        <v-btn @click="trash(props.item)" icon small>
-                            <v-icon class="red--text">mdi-delete</v-icon>
-                        </v-btn>
+                        <v-tooltip top>
+                            <template v-slot:activator="{ on }" transition="scroll-y-transition">
+                                <v-btn @click="showDialog('file_show',item)" icon small v-on="on">
+                                    <v-icon class="green--text">mdi-plus</v-icon>
+                                </v-btn>
+                            </template>
+                            <span>Insert to post</span>
+                        </v-tooltip>
+                        <v-tooltip top>
+                            <template v-slot:activator="{ on }" transition="fade-transition">
+                                <v-btn @click="showDialog('file_show',item)" icon small v-on="on">
+                                    <v-icon class="blue--text">mdi-magnify</v-icon>
+                                </v-btn>
+                            </template>
+                            <span>Preview</span>
+                        </v-tooltip>
+                        <v-tooltip top>
+                            <template v-slot:activator="{ on }" transition="scroll-y-transition">
+                                <v-btn @click="trash(props.item)" icon small v-on="on">
+                                    <v-icon class="red--text">mdi-delete</v-icon>
+                                </v-btn>
+                            </template>
+                            Delete
+                        </v-tooltip>
                     </td>
                     <td>
                         <v-avatar
@@ -156,6 +174,12 @@
             },
         },
         methods: {
+            insertToEditor(file, width, action){
+                let fileurl =  LSK_APP.APP_URL +`/files/`+file.id+`/preview?w=`+w+`&action=`+act;
+                let insert = '<img src="'+fileurl+'"/>';
+
+                return insert;
+            },
             getFullUrl(file, width, action) {
 
                 let w = width || 4000;

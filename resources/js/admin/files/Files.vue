@@ -5,7 +5,7 @@
             <v-tab  key="files" href="#files" ripple>
                 Files
             </v-tab>
-            <v-tab key="manage-groups" href="#manage-groups" ripple>
+            <v-tab v-if="managefilegroup != false" key="manage-groups" href="#manage-groups" ripple>
                 Manage File Groups
             </v-tab>
             <v-tab key="upload" href="#upload" ripple>
@@ -19,7 +19,7 @@
                     </v-card-text>
                 </v-card>
             </v-tab-item>
-            <v-tab-item value="manage-groups">
+            <v-tab-item v-if="managefilegroup != false" value="manage-groups">
                 <v-card flat>
                     <v-card-text>
                         <file-group-lists></file-group-lists>
@@ -47,6 +47,12 @@
             FileGroupLists,
             FileLists
         },
+        props:{
+            managefilegrouptab: {
+                type:Boolean,
+                default:true
+            }
+        },
         mounted() {
             console.log('pages.FileManager.vue');
 
@@ -58,11 +64,13 @@
         },
         data() {
             return {
+                managefilegroup: this.managefilegrouptab,
                 active: 'files'
             }
         },
         watch: {
             active(v) {
+                console.log(this.managefilegroup);
                 console.log('active tab: ' + v);
             }
         },
