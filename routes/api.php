@@ -32,6 +32,8 @@ Route::prefix('admin')->namespace('API')->middleware(['auth'])->group(function()
 
 Route::group(['prefix' => 'v1'], function () {
     Route::post('login', 'UsersController@login');
+    Route::get('login/google', 'UsersController@redirectToProvider');
+    Route::get('login/google/callback', 'UsersController@handleProviderCallback');
     Route::post('register', 'UsersController@register');
     Route::post('refreshtoken', 'UsersController@refreshToken');
 
@@ -40,6 +42,6 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/unauthorized', 'UsersController@unauthorized');
     Route::group(['middleware' => ['CheckClientCredentials','auth:api']], function() {
         Route::post('logout', 'UsersController@logout');
-        Route::post('details', 'UsersController@details');
+        Route::get('details', 'UsersController@details');
     });
 });
