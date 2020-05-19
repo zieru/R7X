@@ -40,6 +40,6 @@ Route::group(['prefix' => 'v1'], function () {
     Route::get('/unauthorized', 'UsersController@unauthorized');
     Route::group(['middleware' => ['CheckClientCredentials','auth:api']], function() {
         Route::post('logout', 'UsersController@logout');
-        Route::post('details', 'UsersController@details');
+        Route::get('details', 'UsersController@details');
     });
 });

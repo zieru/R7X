@@ -16,7 +16,10 @@ class UsersController extends Controller
     public function login() {
         if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
             $oClient = OClient::where('password_client', 1)->first();
-            return $this->getTokenAndRefreshToken($oClient, request('email'), request('password'));
+            
+            $x = (array) $this->getTokenAndRefreshToken($oClient, request('email'), request('password'));
+            $x['original']['status'] = 'ok';
+            return response()->json($x['original'],200); 
         }
         else {
             return response()->json(['error'=>'Unauthorised'], 401);
@@ -49,7 +52,7 @@ class UsersController extends Controller
         $http = new Client;
 
         try {
-            $response = $http->request('POST', 'http://localhost:8001/oauth/token', [
+            $response = $http->request('POST', 'http://r7s.test/oauth/token', [
                 'form_params' => [
                     'grant_type' => 'refresh_token',
                     'refresh_token' => $refresh_token,
@@ -75,7 +78,7 @@ class UsersController extends Controller
             'password' => $password,
             'scope' => '*',
         ]));*/
-        $response = $http->request('POST', 'http://localhost:8001/oauth/token', [
+        $response = $http->request('POST', 'http://r7s.test/oauth/token', [
             'form_params' => [
                 'grant_type' => 'password',
                 'client_id' => $oClient->id,
@@ -92,6 +95,25 @@ class UsersController extends Controller
 
     public function details() {
         $user = Auth::user();
+        $permission = $user->getCombinedPermissions();
+
+        $user['permission']  = $permission;
+        $user['role']  = array('id'=> 'admin', 'name'=> "管理员", 'describe'=> "拥有所有权限",'status' => 1, 'creatorId'=> "system", 
+            "permissionList"=> array('dashboard'),
+            'permissions' => 
+            array(array(
+            'roleId'=>'admin',
+      'permissionId'=> 'dashboard',
+      'permissionName'=> '仪表盘',
+      'actions'=> '[{"action":"add","defaultCheck":false,"describe":"新增"},{"action":"query","defaultCheck":false,"describe":"查询"},{"action":"get","defaultCheck":false,"describe":"详情"},{"action":"update","defaultCheck":false,"describe":"修改"},{"action":"delete","defaultCheck":false,"describe":"删除"}]',
+      'actionList'=> null,
+      'dataAccess'=> null 
+        )
+    ));
+
+        $user['roleId']  = "admin";
+        $user['avatar'] = 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png';
+
         return response()->json($user, $this->successStatus);
     }
 
