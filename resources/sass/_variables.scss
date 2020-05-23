@@ -1,9 +1,34 @@
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins";
+@import "~bootstrap/scss/reboot";
+@import "~bootstrap/scss/buttons";
+@import "~bootstrap/scss/forms";
+@import "~bootstrap/scss/card";
+@import "~bootstrap/scss/alert";
+@import "~bootstrap/scss/type";
+@import "~bootstrap/scss/code";
+@import "~bootstrap/scss/bootstrap-grid";
+$theme-colors: (
+        "primary": $cyan,
+        "danger": #ff4136
+);
+@function theme-color($key: "primary") {
+  @return map-get($theme-colors, $key);
+}
+
+@function color($key: "blue") {
+  @return map-get($colors, $key);
+}
 // Brands
-/*$brand-primary: #3097D1;
-$brand-info: #8eb4cb;
+$brand-primary: $cyan;
+$brand-info: $cyan;
 $brand-success: #2ab27b;
 $brand-warning: #cbb956;
-$brand-danger: #bf5329;*/
+$brand-danger: #bf5329;
+$enable-rounded:  true;
+$enable-gradients:  true;
+$enable-shadows:  true;
 
 // loader vars
 $loader-bg-transparency: 0.7;

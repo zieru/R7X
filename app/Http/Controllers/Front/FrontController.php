@@ -14,4 +14,5 @@ use App\Http\Controllers\Controller;
 abstract class FrontController extends Controller
 {
 
+
 }

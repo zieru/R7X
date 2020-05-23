@@ -31,9 +31,9 @@ Route::prefix('admin')->namespace('API')->middleware(['auth'])->group(function()
 });
 
 Route::group(['prefix' => 'v1'], function () {
-    Route::post('login', 'UsersController@login');
-    Route::get('login/google', 'UsersController@redirectToProvider');
-    Route::get('login/google/callback', 'UsersController@handleProviderCallback');
+    Route::post('login', 'UsersController@login')->name('api.v1.login');
+    Route::get('login/google', 'UsersController@redirectToProvider')->name('api.v1.login.google');
+    Route::get('login/google/callback', 'UsersController@handleProviderCallback')->name('api.v1.login.google.callback');
     Route::post('register', 'UsersController@register');
     Route::post('refreshtoken', 'UsersController@refreshToken');
 

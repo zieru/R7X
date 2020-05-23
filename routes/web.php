@@ -11,7 +11,12 @@
 |
 */
 
-Route::get('/','Front\\HomeController@index')->name('front.home');
+Route::get('/','Front\HomeController@index')->name('front.home');
+Route::prefix('oauth')->group(function(){
+    Route::get('/','Front\\HomeController@oauthlogin')->name('front.oauthlogin');
+    Route::get('/provider/google','UsersController@redirectToProvider')->name('front.oauthlogin.provider.google');
+});
+
 /*Route::get('/', function () {
     return redirect('login');
 });*/
