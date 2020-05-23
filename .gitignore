@@ -22,3 +22,4 @@ yarn-error.log
 /public/3.js
 /public/css/*.css
 /public/js/*.js
+/public/fonts/vendor/bootstrap-sass/bootstrap/
