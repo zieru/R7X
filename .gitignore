@@ -16,6 +16,9 @@ yarn-error.log
 /public/0.js
 /public/1.js
 /public/2.js
+/public/*.js
 /public/*.worker.js
 /public/*.worker.js
 /public/3.js
+/public/css/*.css
+/public/js/*.js
