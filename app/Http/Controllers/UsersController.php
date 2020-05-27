@@ -214,15 +214,25 @@ class UsersController extends Controller
         $user['role']  = array('id'=> 'admin', 'name'=> "管理员", 'describe'=> "拥有所有权限",'status' => 1, 'creatorId'=> "system",
             "permissionList"=> array('dashboard'),
             'permissions' =>
-            array(array(
-            'roleId'=>'admin',
-      'permissionId'=> 'dashboard',
-      'permissionName'=> '仪表盘',
-      'actions'=> '[{"action":"add","defaultCheck":false,"describe":"新增"},{"action":"query","defaultCheck":false,"describe":"查询"},{"action":"get","defaultCheck":false,"describe":"详情"},{"action":"update","defaultCheck":false,"describe":"修改"},{"action":"delete","defaultCheck":false,"describe":"删除"}]',
-      'actionList'=> null,
-      'dataAccess'=> null
-        )
-    ));
+            array(
+                array(
+                    'roleId'=>'admin',
+                    'permissionId'=> 'dashboard',
+                    'permissionName'=> '仪表盘',
+                    'actions'=> '[{"action":"add","defaultCheck":false,"describe":"新增"},{"action":"query","defaultCheck":false,"describe":"查询"},{"action":"get","defaultCheck":false,"describe":"详情"},{"action":"update","defaultCheck":false,"describe":"修改"},{"action":"delete","defaultCheck":false,"describe":"删除"}]',
+                    'actionList'=> null,
+                    'dataAccess'=> null
+                ),
+                array(
+                    'roleId'=>'admin',
+                    'permissionId'=> 'user',
+                    'permissionName'=> '仪表盘',
+                    'actions'=> '[{"action":"add","defaultCheck":false,"describe":"新增"},{"action":"query","defaultCheck":false,"describe":"查询"},{"action":"get","defaultCheck":false,"describe":"详情"},{"action":"update","defaultCheck":false,"describe":"修改"},{"action":"delete","defaultCheck":false,"describe":"删除"}]',
+                    'actionList'=> null,
+                    'dataAccess'=> null
+                )
+            )
+        );
 
         $user['roleId']  = "admin";
         $user['avatar'] = 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png';
