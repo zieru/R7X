@@ -13,15 +13,17 @@ class CreateLinkedSocialAccountsTable extends Migration
      */
     public function up()
     {
-        Schema::create('linked_social_accounts', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('provider_id');
-            $table->string('provider_name');
-            $table->unsignedInteger('user_id');
-            $table->timestamps();
+        if (!Schema::hasTable('linked_social_accounts')) {
+            Schema::create('linked_social_accounts', function (Blueprint $table) {
+                $table->increments('id');
+                $table->string('provider_id');
+                $table->string('provider_name');
+                $table->unsignedInteger('user_id');
+                $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users');
-        });
+                //$table->foreign('user_id')->references('id')->on('users');
+            });
+        };
     }
 
     /**
