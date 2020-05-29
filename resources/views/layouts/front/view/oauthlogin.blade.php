@@ -58,10 +58,10 @@
                 <form method="POST" action="{{ route('api.v1.login')  }}">
                     <input type="hidden" name="redirect" value="{{ Request::fullUrl()}}"/>
                     <div class="form-group">
-                        <input name="email" value="nazirul777@gmail.com" class="form-control" placeholder="Email or login" type="text">
+                        <input name="email" value="" class="form-control" placeholder="Email or login" type="text">
                     </div> <!-- form-group// -->
                     <div class="form-group">
-                        <input class="form-control" name="password" placeholder="******" type="password" value="zierong7">
+                        <input class="form-control" name="password" placeholder="******" type="password" value="">
                     </div> <!-- form-group// -->
                     <div class="row">
                         <div class="col-md-12">
