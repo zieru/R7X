@@ -12,7 +12,6 @@
 */
 
 Route::get('/','Front\HomeController@index')->name('front.home');
-Route::get('importExportView', 'MyController@importExportView');
 Route::post('import', 'BillingCollectionController@create')->name('front.BillingImport');
 Route::resource('bilco','BillingCollectionController');
 Route::prefix('oauth')->group(function(){

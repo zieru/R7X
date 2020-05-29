@@ -9,6 +9,7 @@ use Rap2hpoutre\FastExcel\FastExcel;
 
 class BillingCollectionController extends Controller
 {
+    public $successStatus = 200;
     /**
      * Display a listing of the resource.
      *
@@ -20,18 +21,43 @@ class BillingCollectionController extends Controller
 /*
         (SUM(`bill_amount_3`) - sum(`bucket_3`)) / `bill_amount_3`  as '60hCOLP'
                                     (SUM(`bill_amount_3`) - sum(`bucket_3`)) / `bill_amount_3`  as '90hCOLP'*/
+
+    }
+    public function dashboardApi(){
         $bilco = BillingCollection::groupBy('bill_cycle')
-                                    ->selectRaw('
+            ->selectRaw('
+            area,
                                     bill_cycle,
+                                    poc,
                                     sum(bill_amount_2) as 60h, 
                                     sum(bill_amount_3) as 90h,
                                     sum(`bill_amount_2`) - sum(`bucket_2`) as \'60hCOL\',
-                                    SUM(`bill_amount_3`) - sum(`bucket_3`) as \'90hCOL\'
-                                    
+                                    SUM(`bill_amount_3`) - sum(`bucket_3`) as \'90hCOL\',
+                                    (SUM(`bill_amount_2`) - sum(`bucket_2`)) / SUM(`bill_amount_2`) as \'60hCOLPERCENT\',
+                                    (SUM(`bill_amount_3`) - sum(`bucket_3`)) / SUM(`bill_amount_3`) as \'90hCOLPERCENT\'
                                     ')
-                                    ->get();
-        return response()->json($bilco);
+            ->get();
+        $result = json_decode((string) $bilco, true);
+        return response()->json($result, $this->successStatus);
     }
+    public function dashboardApiPOC(){
+        $bilco = BillingCollection::groupBy('bill_cycle', 'poc')
+            ->selectRaw('
+                                    area,
+                                    bill_cycle,
+                                    poc,
+                                    sum(bill_amount_2) as 60h, 
+                                    sum(bill_amount_3) as 90h,
+                                    sum(`bill_amount_2`) - sum(`bucket_2`) as \'60hCOL\',
+                                    SUM(`bill_amount_3`) - sum(`bucket_3`) as \'90hCOL\',
+                                    (SUM(`bill_amount_2`) - sum(`bucket_2`)) / SUM(`bill_amount_2`) as \'60hCOLPERCENT\',
+                                    (SUM(`bill_amount_3`) - sum(`bucket_3`)) / SUM(`bill_amount_3`) as \'90hCOLPERCENT\'
+                                    ')
+            ->get();
+        $result = json_decode((string) $bilco, true);
+        return response()->json($result, $this->successStatus);
+    }
+
     function csvToArray($filename = '', $delimiter = ',')
     {
         if (!file_exists($filename) || !is_readable($filename))
@@ -85,8 +111,8 @@ class BillingCollectionController extends Controller
                         'import_batch' => $importer->id,
                         'periode'     => $row[0],
                         'account_number'    => $row[1],
-                        'msisdn' => $row[2],
-                        'area' => $row[3],
+                        'msisdn' =>  substr($row[2], 0, -3) . '***',
+                    'area' => $row[3],
                         'regional' => $row[4],
                         'poc' => $row[5],
                         'bill_cycle' => $row[6],
