@@ -29,7 +29,7 @@ class HomeController extends FrontController
         Cookie::queue('redirect',$request->get('redirect'));
         if(Session::has('token_data')){
             $tokendata = \Session::get('token_data');
-
+            var_dump($tokendata);
             if(request()->has('redirect')){
                 $param = '?access_token='.$tokendata['access_token'].'&refresh_token='.$tokendata['refresh_token'];
                 return redirect(request()->get('redirect').$param);

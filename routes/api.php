@@ -33,6 +33,8 @@ Route::prefix('admin')->namespace('API')->middleware(['auth'])->group(function()
 Route::group(['prefix' => 'v1'], function () {
     Route::any('billCo/dashboard/poc', 'BillingCollectionController@dashboardApiPOC')->name('api.v1.bilco.dashboard.poc');
     Route::any('billCo/dashboard', 'BillingCollectionController@dashboardApi')->name('api.v1.bilco.dashboard');
+    Route::any('billCo/dashboard/area', 'BillingCollectionController@dashboardApiArea')->name('api.v1.bilco.dashboard.area');
+    Route::any('billCo/dashboard/compare', 'BillingCollectionController@dashboardApiCompare')->name('api.v1.bilco.dashboard.compare');
     Route::middleware(['auth'])->group(function() {
 
     });

@@ -14,6 +14,7 @@
 Route::get('/','Front\HomeController@index')->name('front.home');
 Route::post('import', 'BillingCollectionController@create')->name('front.BillingImport');
 Route::resource('bilco','BillingCollectionController');
+Route::any('billCo/compact/poc', 'BillingCollectionController@compactPOC');
 Route::prefix('oauth')->group(function(){
     Route::get('/','Front\\HomeController@oauthlogin')->name('front.oauthlogin');
     Route::get('/provider/google','UsersController@redirectToProvider')->name('front.oauthlogin.provider.google');

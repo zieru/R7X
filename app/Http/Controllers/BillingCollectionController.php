@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\BillingCollection;
+use App\BillingCollectionPoc;
 use App\Importer;
+use DB;
 use Illuminate\Http\Request;
 use Rap2hpoutre\FastExcel\FastExcel;
 
@@ -23,23 +25,169 @@ class BillingCollectionController extends Controller
                                     (SUM(`bill_amount_3`) - sum(`bucket_3`)) / `bill_amount_3`  as '90hCOLP'*/
 
     }
-    public function dashboardApi(){
-        $bilco = BillingCollection::groupBy('bill_cycle')
+
+    public function compactPOC(){
+        $periode = "2020-04-30";
+        //DB::enableQueryLog() ;
+        $d90h = BillingCollection::groupBy('bill_cycle','poc')
             ->selectRaw('
+            periode,
             area,
-                                    bill_cycle,
-                                    poc,
-                                    sum(bill_amount_2) as 60h, 
-                                    sum(bill_amount_3) as 90h,
-                                    sum(`bill_amount_2`) - sum(`bucket_2`) as \'60hCOL\',
-                                    SUM(`bill_amount_3`) - sum(`bucket_3`) as \'90hCOL\',
-                                    (SUM(`bill_amount_2`) - sum(`bucket_2`)) / SUM(`bill_amount_2`) as \'60hCOLPERCENT\',
-                                    (SUM(`bill_amount_3`) - sum(`bucket_3`)) / SUM(`bill_amount_3`) as \'90hCOLPERCENT\'
+            regional,
+            poc,
+            bill_cycle,
+    sum( bill_amount_1 ) AS bill_amount_1,
+	sum( bill_amount_2 ) AS bill_amount_2,
+	sum( bill_amount_3 ) AS bill_amount_3,
+	sum( bill_amount_4 ) AS bill_amount_4,
+	sum( bill_amount_5 ) AS bill_amount_5,
+	sum( bill_amount_6 ) AS bill_amount_6,
+	sum( bill_amount_7 ) AS bill_amount_7,
+	sum( bill_amount_8 ) AS bill_amount_8,
+	sum( bill_amount_9 ) AS bill_amount_9,
+	sum( bill_amount_10 ) AS bill_amount_10,
+	sum( bill_amount_11 ) AS bill_amount_11,
+	sum( bill_amount_12 ) AS bill_amount_12,
+	sum( bucket_1 ) AS bucket_1,
+	sum( bucket_2 ) AS bucket_2,
+	sum( bucket_3 ) AS bucket_3,
+	sum( bucket_4 ) AS bucket_4,
+	sum( bucket_5 ) AS bucket_5,
+	sum( bucket_6 ) AS bucket_6,
+	sum( bucket_7 ) AS bucket_7,
+	sum( bucket_8 ) AS bucket_8,
+	sum( bucket_9 ) AS bucket_9,
+	sum( bucket_10 ) AS bucket_10,
+	sum( bucket_11 ) AS bucket_11,
+	sum( bucket_12 ) AS bucket_12,
+	sum( bucket_13 ) AS bucket_13,
+	sum( total_bucket_per_msisdn ) AS total_bucket_per_msisdn
                                     ')
-            ->get();
-        $result = json_decode((string) $bilco, true);
-        return response()->json($result, $this->successStatus);
+            ->where('periode','=',$periode)
+            ->orderBy('periode')
+            ->orderBy('poc');
+        //echo 'x';
+        //var_dump($d90h);
+        //dd(DB::getQueryLog());
+        foreach ($d90h->get()->toArray() as $d){
+            BillingCollectionPoc::create($d);
+        }
     }
+
+    public function dashboardApi(){
+        $d60h = BillingCollectionPOC::groupBy('periode','poc')
+            ->selectRaw('periode,
+                                poc as regional,
+                                    sum(bill_amount_2) as billing , 
+                                    sum(`bucket_2`) as osbalance,
+                                    sum(`bill_amount_2`) - sum(`bucket_2`) as collection,
+                                    "60h" as kpi,
+                                    (SUM(`bill_amount_2`) - sum(`bucket_2`)) / SUM(`bill_amount_2`) as performansi
+                                    ')
+            ->orderBy('periode')
+            ->orderBy('poc')
+            ->having('billing','>',0);
+        $d90h = BillingCollection::groupBy('periode','poc')
+            ->selectRaw('periode,
+                                poc as regional,
+                                    sum(bill_amount_3) as billing , 
+                                    sum(`bucket_3`) as osbalance,
+                                    sum(`bill_amount_3`) - sum(`bucket_3`) as collection,
+                                    "90h" as kpi,
+                                    (SUM(`bill_amount_3`) - sum(`bucket_3`)) / SUM(`bill_amount_3`) as performansi
+                                    ')
+            ->orderBy('periode')
+            ->orderBy('poc')
+            ->having('billing','>',0)
+            ->union($d60h);
+
+        $bilco = datatables()->of($d90h);
+        //$result = json_decode((string) $bilco, true);
+        $result = $bilco;
+        //return response()->json($result, $this->successStatus);
+        return $bilco->toJson();
+    }
+    public function dashboardApiArea(){
+        $d60h = BillingCollectionPOC::groupBy('periode','area')
+            ->selectRaw('periode,
+                            area,
+                                    sum(bill_amount_2) as billing, 
+                                    sum(`bucket_2`) as osbalance,
+                                    sum(`bill_amount_2`) - sum(`bucket_2`) as collection,
+                                    "60h" as kpi,
+                                    (SUM(`bill_amount_2`) - sum(`bucket_2`)) / SUM(`bill_amount_2`) as performansi
+                                    ')
+            ->orderBy('periode')
+            ->orderBy('area')
+            ->having('billing','>',0);
+        $d90h = BillingCollection::groupBy('periode','area')
+            ->selectRaw('periode,
+                                area,
+                                    sum(bill_amount_3) as billing , 
+                                    sum(`bucket_3`) as osbalance,
+                                    sum(`bill_amount_3`) - sum(`bucket_3`) as collection,
+                                    "90h" as kpi,
+                                    (SUM(`bill_amount_3`) - sum(`bucket_3`)) / SUM(`bill_amount_3`) as performansi
+                                    ')
+            ->orderBy('periode')
+            ->orderBy('area')
+            ->having('billing','>',0)
+            ->union($d60h);
+
+        $bilco = datatables()->of($d90h);
+        //$result = json_decode((string) $bilco, true);
+        $result = $bilco;
+        //return response()->json($result, $this->successStatus);
+        return $bilco->toJson();
+    }
+    public function dashboardApiCompare(Request $request){
+        $d60h = BillingCollectionPOC::groupBy('bc.area')
+            ->selectRaw('
+bc.area as regional,
+bc.area,
+NULL as subarea,
+(Sum( bc.bill_amount_2 ) -  Sum( bc.bucket_2 )) / sum(bc.bill_amount_2) AS billing_1,
+(Sum( bc2.bill_amount_2 ) -  Sum( bc2.bucket_2 )) / sum(bc2.bill_amount_2) AS billing_1_1,
+(Sum( bc.bill_amount_3 ) -  Sum( bc.bucket_3 )) / sum(bc.bill_amount_3) AS billing_2,
+(Sum( bc2.bill_amount_3 ) -  Sum( bc2.bucket_3 )) / sum(bc2.bill_amount_2) AS billing_2_1,
+(( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 )) - (( Sum( bc2.bill_amount_2 ) - Sum( bc2.bucket_2 ) ) / sum( bc2.bill_amount_2 )) AS selisih1,
+(( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 )) - (( Sum( bc2.bill_amount_3 ) - Sum( bc2.bucket_3 ) ) / sum( bc2.bill_amount_3 )) AS selisih2 
+')
+            ->from('billing_collections_poc','bc')
+            ->LEFTJOIN('billing_collections as bc2',function($q) /*use(null)*/
+            {
+                $q->on('bc2.poc', '=', 'bc.poc')
+                    ->on('bc2.bill_cycle', '=', 'bc.bill_cycle')
+                    ->where('bc2.periode','=','2020-05-26');
+            })
+            ->orderBy('area')
+            ->where('bc.periode','=' ,'2020-04-30');
+        $d90h = BillingCollectionPoc::groupBy('bc.regional')
+            ->selectRaw('
+bc.regional as regional,
+NULL as area,
+bc.area as subarea,
+(Sum( bc.bill_amount_2 ) -  Sum( bc.bucket_2 )) / sum(bc.bill_amount_2) AS billing_1,
+(Sum( bc2.bill_amount_2 ) -  Sum( bc2.bucket_2 )) / sum(bc2.bill_amount_2) AS billing_1_1,
+(Sum( bc.bill_amount_3 ) -  Sum( bc.bucket_3 )) / sum(bc.bill_amount_3) AS billing_2,
+(Sum( bc2.bill_amount_3 ) -  Sum( bc2.bucket_3 )) / sum(bc2.bill_amount_2) AS billing_2_1,
+(( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 )) - (( Sum( bc2.bill_amount_2 ) - Sum( bc2.bucket_2 ) ) / sum( bc2.bill_amount_2 )) AS selisih1,
+(( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 )) - (( Sum( bc2.bill_amount_3 ) - Sum( bc2.bucket_3 ) ) / sum( bc2.bill_amount_3 )) AS selisih2 
+')
+            ->from('billing_collections_poc','bc')
+            ->LEFTJOIN('billing_collections as bc2',function($q) /*use(null)*/
+            {
+                $q->on('bc2.poc', '=', 'bc.poc')
+                    ->on('bc2.bill_cycle', '=', 'bc.bill_cycle')
+                    ->where('bc2.periode','=','2020-05-26');
+            })
+            ->orderBy('bc.area')
+            ->where('bc.periode','=' ,'2020-04-30')
+            ->union($d60h);
+        $bilco = datatables()->of($d90h);
+        return $bilco->toJson();
+    }
+
     public function dashboardApiPOC(){
         $bilco = BillingCollection::groupBy('bill_cycle', 'poc')
             ->selectRaw('
