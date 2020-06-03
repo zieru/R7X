@@ -12,7 +12,7 @@
 */
 
 Route::get('/','Front\HomeController@index')->name('front.home');
-Route::post('import', 'BillingCollectionController@create')->name('front.BillingImport');
+Route::any('import', 'BillingCollectionController@create')->name('front.BillingImport');
 Route::resource('bilco','BillingCollectionController');
 Route::any('billCo/compact/poc', 'BillingCollectionController@compactPOC');
 Route::prefix('oauth')->group(function(){

@@ -8,6 +8,11 @@ use App\Importer;
 use DB;
 use Illuminate\Http\Request;
 use Rap2hpoutre\FastExcel\FastExcel;
+use Goodby\CSV\Import\Standard\Lexer;
+use Goodby\CSV\Import\Standard\Interpreter;
+use Goodby\CSV\Import\Standard\LexerConfig;
+use test\Mockery\Fixtures\MethodWithVoidReturnType;
+
 
 class BillingCollectionController extends Controller
 {
@@ -29,7 +34,7 @@ class BillingCollectionController extends Controller
     public function compactPOC(){
         $periode = "2020-04-30";
         //DB::enableQueryLog() ;
-        $d90h = BillingCollection::groupBy('bill_cycle','poc')
+        $d90h = BillingCollectionPoc::groupBy('bill_cycle','poc')
             ->selectRaw('
             periode,
             area,
@@ -87,7 +92,7 @@ class BillingCollectionController extends Controller
             ->orderBy('periode')
             ->orderBy('poc')
             ->having('billing','>',0);
-        $d90h = BillingCollection::groupBy('periode','poc')
+        $d90h = BillingCollectionPoc::groupBy('periode','poc')
             ->selectRaw('periode,
                                 poc as regional,
                                     sum(bill_amount_3) as billing , 
@@ -120,7 +125,7 @@ class BillingCollectionController extends Controller
             ->orderBy('periode')
             ->orderBy('area')
             ->having('billing','>',0);
-        $d90h = BillingCollection::groupBy('periode','area')
+        $d90h = BillingCollectionPOC::groupBy('periode','area')
             ->selectRaw('periode,
                                 area,
                                     sum(bill_amount_3) as billing , 
@@ -146,19 +151,19 @@ class BillingCollectionController extends Controller
 bc.area as regional,
 bc.area,
 NULL as subarea,
-(Sum( bc.bill_amount_2 ) -  Sum( bc.bucket_2 )) / sum(bc.bill_amount_2) AS billing_1,
-(Sum( bc2.bill_amount_2 ) -  Sum( bc2.bucket_2 )) / sum(bc2.bill_amount_2) AS billing_1_1,
-(Sum( bc.bill_amount_3 ) -  Sum( bc.bucket_3 )) / sum(bc.bill_amount_3) AS billing_2,
-(Sum( bc2.bill_amount_3 ) -  Sum( bc2.bucket_3 )) / sum(bc2.bill_amount_2) AS billing_2_1,
-(( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 )) - (( Sum( bc2.bill_amount_2 ) - Sum( bc2.bucket_2 ) ) / sum( bc2.bill_amount_2 )) AS selisih1,
-(( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 )) - (( Sum( bc2.bill_amount_3 ) - Sum( bc2.bucket_3 ) ) / sum( bc2.bill_amount_3 )) AS selisih2 
+( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) AS billing_1,
+	( Sum( bc2.bill_amount_2 ) - Sum( bc2.bucket_2 ) ) / sum( bc.bill_amount_2 ) AS billing_1_1,
+	( Sum( bc.bill_amount_3 ) - Sum( bc.bucket_3 ) ) / sum( bc.bill_amount_3 ) AS billing_2,
+	( Sum( bc2.bill_amount_3 ) - Sum( bc2.bucket_3 ) ) / sum( bc.bill_amount_2 ) AS billing_2_1,
+	( ( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) ) - ( ( Sum( bc2.bill_amount_2 ) - Sum( bc2.bucket_2 ) ) / sum( bc2.bill_amount_2 ) ) AS selisih1,
+	( ( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) ) - ( ( Sum( bc2.bill_amount_3 ) - Sum( bc2.bucket_3 ) ) / sum( bc2.bill_amount_3 ) ) AS selisih2  
 ')
             ->from('billing_collections_poc','bc')
-            ->LEFTJOIN('billing_collections as bc2',function($q) /*use(null)*/
+            ->LEFTJOIN('billing_collections_poc as bc2',function($q) /*use(null)*/
             {
                 $q->on('bc2.poc', '=', 'bc.poc')
                     ->on('bc2.bill_cycle', '=', 'bc.bill_cycle')
-                    ->where('bc2.periode','=','2020-05-26');
+                    ->where('bc2.periode','=','2020-05-27');
             })
             ->orderBy('area')
             ->where('bc.periode','=' ,'2020-04-30');
@@ -167,19 +172,19 @@ NULL as subarea,
 bc.regional as regional,
 NULL as area,
 bc.area as subarea,
-(Sum( bc.bill_amount_2 ) -  Sum( bc.bucket_2 )) / sum(bc.bill_amount_2) AS billing_1,
-(Sum( bc2.bill_amount_2 ) -  Sum( bc2.bucket_2 )) / sum(bc2.bill_amount_2) AS billing_1_1,
-(Sum( bc.bill_amount_3 ) -  Sum( bc.bucket_3 )) / sum(bc.bill_amount_3) AS billing_2,
-(Sum( bc2.bill_amount_3 ) -  Sum( bc2.bucket_3 )) / sum(bc2.bill_amount_2) AS billing_2_1,
-(( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 )) - (( Sum( bc2.bill_amount_2 ) - Sum( bc2.bucket_2 ) ) / sum( bc2.bill_amount_2 )) AS selisih1,
-(( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 )) - (( Sum( bc2.bill_amount_3 ) - Sum( bc2.bucket_3 ) ) / sum( bc2.bill_amount_3 )) AS selisih2 
+( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) AS billing_1,
+	( Sum( bc2.bill_amount_2 ) - Sum( bc2.bucket_2 ) ) / sum( bc.bill_amount_2 ) AS billing_1_1,
+	( Sum( bc.bill_amount_3 ) - Sum( bc.bucket_3 ) ) / sum( bc.bill_amount_3 ) AS billing_2,
+	( Sum( bc2.bill_amount_3 ) - Sum( bc2.bucket_3 ) ) / sum( bc.bill_amount_2 ) AS billing_2_1,
+	( ( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) ) - ( ( Sum( bc2.bill_amount_2 ) - Sum( bc2.bucket_2 ) ) / sum( bc2.bill_amount_2 ) ) AS selisih1,
+	( ( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) ) - ( ( Sum( bc2.bill_amount_3 ) - Sum( bc2.bucket_3 ) ) / sum( bc2.bill_amount_3 ) ) AS selisih2  
 ')
             ->from('billing_collections_poc','bc')
-            ->LEFTJOIN('billing_collections as bc2',function($q) /*use(null)*/
+            ->LEFTJOIN('billing_collections_poc as bc2',function($q) /*use(null)*/
             {
                 $q->on('bc2.poc', '=', 'bc.poc')
                     ->on('bc2.bill_cycle', '=', 'bc.bill_cycle')
-                    ->where('bc2.periode','=','2020-05-26');
+                    ->where('bc2.periode','=','2020-05-27');
             })
             ->orderBy('bc.area')
             ->where('bc.periode','=' ,'2020-04-30')
@@ -235,6 +240,145 @@ bc.area as subarea,
      */
     public function create(Request $request)
     {
+        error_reporting(E_ALL);
+        ini_set('display_errors', 'On');
+        ini_set('xdebug.var_display_max_depth', '10');
+        ini_set('xdebug.var_display_max_children', '256');
+        ini_set('xdebug.var_display_max_data', '1024');
+        $x = 1;
+        if($request->has('judul')){
+            $x = 0;
+        }
+        $lexer = new Lexer(new LexerConfig());
+        $interpreter = new Interpreter();
+        $j = $i = 0;
+        $arr= array();
+        $arr1= array();
+
+        $final = array();
+        $interpreter->addObserver(function(array $row) use (&$i,&$j,&$x,&$arr1,&$final) {
+
+            $lokal = array();
+            $periode = $row[0];
+            $i += 1;
+            $j += 1;
+            if ($i === $x) {
+                return;
+            }
+            $poc =($row[5] === 'poc' ? '***' : ($row['5']));
+            $bill_cycle = ($row[6] === 'bill_cycle' ? 0 : (int)($row['6']));
+
+
+            if(isset($lokal[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['bill_amount_1'])){
+            }else {
+
+                /*if($bill_cycle === 1 AND strtolower($poc) === 'jakarta'){*/
+                    for ($bc = 1; $bc <= 12; $bc++) {
+                        $lokal[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['bill_amount_'.$bc] = $row[10+$bc-1];
+                    }
+                    for ($bc = 1; $bc <= 13; $bc++) {
+                        $lokal[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['bucket_'.$bc] = $row[22+$bc-1];
+                    }
+                /*}*/
+
+            }
+
+            /*if ($bill_cycle === 1 AND strtolower($poc) === 'jakarta') {*/
+                if(!(isset($arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]))){
+                    for ($bc = 1; $bc <= 12; $bc++) {
+                        $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['bill_amount_'.$bc] = $row[10+$bc-1];
+                    }
+                    for ($bc = 1; $bc <= 13; $bc++) {
+                        $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['bucket_'.$bc] = $row[22+$bc-1];
+                    }
+                    $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['total_trans'] = 0;
+                }else{
+                    for ($bc = 1; $bc <= 12; $bc++) {
+                        $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['bill_amount_'.$bc] = $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['bill_amount_'.$bc] + $row[10+$bc-1];
+                    }
+                    for ($bc = 1; $bc <= 13; $bc++) {
+                        $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['bucket_'.$bc] = $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['bucket_'.$bc] + $row[22+$bc-1];
+                    }
+                }
+
+                $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['total_trans'] = 1 + $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['total_trans'];
+                $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['blocking_status'] =$row[8];
+                $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['customer_type'] =$row[7];
+                $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['bill_cycle'] =$bill_cycle;
+                $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['poc'] =$poc;
+                $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['regional'] =$row[4];
+                $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['area'] =$row[3];
+                $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['periode'] =$periode;
+                $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['import_batch'] =8;
+                $bill_amount_n_v = array();
+                /*for ($l = 1; $l <= 12; $l++) {
+
+                    $bill_amount_n_v['bill_amount_' . $l] = $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['bill_amount_' . $l] + (int)$row[10 - 1 - 1];
+
+                }*/
+                //$arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]] = array('bill_amount' => $bill_amount_n_v);
+            /*}*/
+
+            //$x = $arr;
+
+
+            if($j >= 1000){
+
+                $final = $arr1;
+
+
+               /* $arr = collect($arr);
+                $chunks = $arr->chunk(500);
+                foreach ($chunks as $chunk)
+                {
+                    //BillingCollection::insert($chunk->toArray());
+                }*/
+                $j = 0;
+            }
+            //BillingCollection::create($arr);
+        });
+        $lexer->parse($request->file('file'), $interpreter);
+
+        $finale = array();
+        foreach ($final as $periodes => $bcs){
+            foreach ($bcs as $bc => $pocs)
+            {
+
+                foreach ($pocs as $poc => $customer_types) {
+                    foreach ($customer_types as $customer_type => $blocking_statuses ){
+                        foreach ($blocking_statuses as $row){
+                            $finale[] = $row;
+                        }
+
+                    }
+                }
+            }
+        }
+
+        $finale = collect($finale);
+        $chunks =$finale->chunk(500);
+        foreach ($chunks as $chunk)
+        {
+            BillingCollectionPoc::insert($chunk->toArray());
+        }
+        die();
+        var_dump($arr1);
+        var_dump($arr);
+
+        echo $i;
+        die();
+        $arr = collect($arr);
+        $chunks = $arr->chunk(500*2);
+
+        foreach ($chunks as $chunk)
+        {
+            BillingCollection::insert($chunk->toArray());
+        }
+        //
+
+        echo count($arr);
+        //var_dump($arr);
+        die();
         //
         error_reporting(E_ALL);
 

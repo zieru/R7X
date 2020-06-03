@@ -20,6 +20,9 @@ class CreateBillingCollectionsPocTable extends Migration
             $table->char('regional','32')->nullable(false)->index();
             $table->char('poc','32')->nullable(false)->index();
             $table->integer('bill_cycle')->nullable(false)->index();
+            $table->bigInteger('import_batch')->unsigned();
+            $table->foreign('import_batch')->references('id')->on('importers')->onDelete('cascade');
+            $table->enum('blocking_status',['BLOCKED 1','BLOCKED 2','CANCELLED','UNBLOCKED']);
             $table->enum('customer_type',['S','O']);
             $table->integer('bill_amount_1')->nullable(false)->default(0);
             $table->integer('bill_amount_2')->nullable(false)->default(0);
