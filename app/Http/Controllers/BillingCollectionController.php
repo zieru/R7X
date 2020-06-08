@@ -239,7 +239,7 @@ bc.area as subarea,
      *
      * @return \Illuminate\Http\Response
      */
-    public function create($name, Request $request)
+    public function create($name, Request $request =null)
     {
         error_reporting(E_ALL);
         ini_set('display_errors', 'On');
@@ -249,16 +249,15 @@ bc.area as subarea,
         $x = 1;
 
 
-
         $importer = Importer::create(array(
             'importedRow'=>0,
             'storedRow'=>0,
             'status' => 'QUEUE'
         ));
 
-        if($request->has('judul')){
+       /* if($request->has('judul')){
             $x = 0;
-        }
+        }*/
         $lexer = new Lexer(new LexerConfig());
         $interpreter = new Interpreter();
         $j = $i = 0;
@@ -266,7 +265,7 @@ bc.area as subarea,
         $arr1= array();
 
         $final = array();
-        $interpreter->addObserver(function(array $row) use (&$i,&$j,&$x,&$arr1,&$final) {
+        $interpreter->addObserver(function(array $row) use (&$i,&$j,&$x,&$arr1,&$final,$importer) {
 
             $lokal = array();
             $periode = $row[0];
@@ -348,8 +347,9 @@ bc.area as subarea,
             //BillingCollection::create($arr);
         });
         //$lexer->parse($request->file('file'), $interpreter);
-        $lexer->parse(Storage::disk()->get($name), $interpreter);
 
+        $lexer->parse(Storage::disk()->path($name), $interpreter);
+        if (ob_get_level()) ob_end_clean();
         $finale = array();
         foreach ($final as $periodes => $bcs){
             foreach ($bcs as $bc => $pocs)
