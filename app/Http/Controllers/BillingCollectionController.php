@@ -147,11 +147,13 @@ class BillingCollectionController extends Controller
         return $bilco->toJson();
     }
     public function dashboardApiCompare(Request $request){
-        $d60h = BillingCollectionPOC::groupBy('bc.area')
+
+        $d60h = BillingCollectionPOC::groupBy('bc.bill_cycle', 'bc.area')
             ->selectRaw('
 bc.area as regional,
 bc.area,
 NULL as subarea,
+bc.bill_cycle,
 ( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) AS billing_1,
 	( Sum( bc2.bill_amount_2 ) - Sum( bc2.bucket_2 ) ) / sum( bc.bill_amount_2 ) AS billing_1_1,
 	( Sum( bc.bill_amount_3 ) - Sum( bc.bucket_3 ) ) / sum( bc.bill_amount_3 ) AS billing_2,
@@ -160,19 +162,22 @@ NULL as subarea,
 	( ( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) ) - ( ( Sum( bc2.bill_amount_3 ) - Sum( bc2.bucket_3 ) ) / sum( bc2.bill_amount_3 ) ) AS selisih2  
 ')
             ->from('billing_collections_poc','bc')
-            ->LEFTJOIN('billing_collections_poc as bc2',function($q) /*use(null)*/
+            ->LEFTJOIN('billing_collections_poc as bc2',function($q)use($request) /*use(null)*/
             {
                 $q->on('bc2.poc', '=', 'bc.poc')
                     ->on('bc2.bill_cycle', '=', 'bc.bill_cycle')
-                    ->where('bc2.periode','=','2020-05-27');
+                    ->where('bc2.periode','=', $request->get('end'));
             })
-            ->orderBy('area')
-            ->where('bc.periode','=' ,'2020-04-30');
-        $d90h = BillingCollectionPoc::groupBy('bc.regional')
+
+            ->orderBy('bc.bill_cycle','DESC')
+            ->orderBy('bc.area','ASC')
+            ->where('bc.periode','=' ,$request->get('start'));
+        $d90h = BillingCollectionPoc::groupBy('bc.bill_cycle','bc.regional')
             ->selectRaw('
 bc.regional as regional,
 NULL as area,
 bc.area as subarea,
+bc.bill_cycle,
 ( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) AS billing_1,
 	( Sum( bc2.bill_amount_2 ) - Sum( bc2.bucket_2 ) ) / sum( bc.bill_amount_2 ) AS billing_1_1,
 	( Sum( bc.bill_amount_3 ) - Sum( bc.bucket_3 ) ) / sum( bc.bill_amount_3 ) AS billing_2,
@@ -181,13 +186,15 @@ bc.area as subarea,
 	( ( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) ) - ( ( Sum( bc2.bill_amount_3 ) - Sum( bc2.bucket_3 ) ) / sum( bc2.bill_amount_3 ) ) AS selisih2  
 ')
             ->from('billing_collections_poc','bc')
-            ->LEFTJOIN('billing_collections_poc as bc2',function($q) /*use(null)*/
+            ->LEFTJOIN('billing_collections_poc as bc2',function($q)use($request) /*use(null)*/
             {
                 $q->on('bc2.poc', '=', 'bc.poc')
                     ->on('bc2.bill_cycle', '=', 'bc.bill_cycle')
-                    ->where('bc2.periode','=','2020-05-27');
+                    ->where('bc2.periode','=', $request->get('end'));
             })
-            ->orderBy('bc.area')
+
+            ->orderBy('bc.bill_cycle','DESC')
+            ->orderBy('bc.area','ASC')
             ->where('bc.periode','=' ,'2020-04-30')
             ->union($d60h);
         $bilco = datatables()->of($d90h);
