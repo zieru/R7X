@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Console\Commands;
+use App\Http\Controllers\BillingCollectionController;
 use Storage;
 use Illuminate\Console\Command;
 
@@ -48,10 +49,10 @@ class SyncBilcollection extends Command
         #echo "File downloaded!";
 	$contents = file_get_contents($url);
 	$name = substr($url, strpos($url, '/')+1);
+
 	#$tempfile = tempnam(sys_get_temp_dir(), $imgName);
 	#copy($url,$tempfile);
 	return Storage::put($imgName, $contents);
-
     }
 
     /**
@@ -61,8 +62,11 @@ class SyncBilcollection extends Command
      */
     public function handle()
     {
+        $controller = new BillingCollectionController();
+        echo 'proses download';
         $this->downloadFile("20200606_all.csv",'http://10.250.191.103/collection/consumer/20200606_all.csv','/');
-
+        echo 'proses sum';
+        $controller->create('20200606_all.csv',null);
         //
     }
 }
