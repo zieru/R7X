@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Console\Commands;
-
+use Storage;
 use Illuminate\Console\Command;
 
 class SyncBilcollection extends Command
@@ -11,9 +11,7 @@ class SyncBilcollection extends Command
      *
      * @var string
      */
-    protected $signature = 'SyncBilcollection
-                            {url : The URL to check}
-                            {status=200 : The expected status code}';
+    protected $signature = 'SyncBilcollection';
 
     /**
      * The console command description.
@@ -45,9 +43,14 @@ class SyncBilcollection extends Command
     }
     public function downloadFile( $imgName, $url, $path )
     {
-        $data = $this->file_get_contents_curl( $url );
-        file_put_contents( $path.$imgName, $data );
-        echo "File downloaded!";
+        #$data = $this->file_get_contents_curl( $url );
+        #file_put_contents( $path.$imgName, $data );
+        #echo "File downloaded!";
+	$contents = file_get_contents($url);
+	$name = substr($url, strpos($url, '/')+1);
+	#$tempfile = tempnam(sys_get_temp_dir(), $imgName);
+	#copy($url,$tempfile);
+	return Storage::put($imgName, $contents);
 
     }
 
@@ -58,7 +61,7 @@ class SyncBilcollection extends Command
      */
     public function handle()
     {
-        $this->downloadFile("0200606_all.csv",'http://10.250.191.103/collection/consumer/0200606_all.csv')
+        $this->downloadFile("20200606_all.csv",'http://10.250.191.103/collection/consumer/20200606_all.csv','/');
 
         //
     }
