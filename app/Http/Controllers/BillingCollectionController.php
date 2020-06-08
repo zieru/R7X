@@ -11,6 +11,7 @@ use Rap2hpoutre\FastExcel\FastExcel;
 use Goodby\CSV\Import\Standard\Lexer;
 use Goodby\CSV\Import\Standard\Interpreter;
 use Goodby\CSV\Import\Standard\LexerConfig;
+use Storage;
 use test\Mockery\Fixtures\MethodWithVoidReturnType;
 
 
@@ -238,7 +239,7 @@ bc.area as subarea,
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
+    public function create($name, Request $request)
     {
         error_reporting(E_ALL);
         ini_set('display_errors', 'On');
@@ -246,6 +247,15 @@ bc.area as subarea,
         ini_set('xdebug.var_display_max_children', '256');
         ini_set('xdebug.var_display_max_data', '1024');
         $x = 1;
+
+
+
+        $importer = Importer::create(array(
+            'importedRow'=>0,
+            'storedRow'=>0,
+            'status' => 'QUEUE'
+        ));
+
         if($request->has('judul')){
             $x = 0;
         }
@@ -309,7 +319,7 @@ bc.area as subarea,
                 $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['regional'] =$row[4];
                 $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['area'] =$row[3];
                 $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['periode'] =$periode;
-                $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['import_batch'] =8;
+                $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['import_batch'] = $importer->id;
                 $bill_amount_n_v = array();
                 /*for ($l = 1; $l <= 12; $l++) {
 
@@ -337,7 +347,8 @@ bc.area as subarea,
             }
             //BillingCollection::create($arr);
         });
-        $lexer->parse($request->file('file'), $interpreter);
+        //$lexer->parse($request->file('file'), $interpreter);
+        $lexer->parse(Storage::disk()->get($name), $interpreter);
 
         $finale = array();
         foreach ($final as $periodes => $bcs){
@@ -361,6 +372,8 @@ bc.area as subarea,
         {
             BillingCollectionPoc::insert($chunk->toArray());
         }
+        $importer->status = "Finish";
+        $importer->save();
         die();
         var_dump($arr1);
         var_dump($arr);
