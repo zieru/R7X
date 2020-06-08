@@ -12,6 +12,7 @@ namespace App\Http\Controllers\Front;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Storage;
 use Session;
 use Illuminate\Routing\Redirector;
 
@@ -19,6 +20,7 @@ class HomeController extends FrontController
 {
     public function index()
     {
+        dd(Storage::disk('public')->files('datacollection'));
         return view('layouts.front');
     }
 
