@@ -151,7 +151,7 @@ class BillingCollectionController extends Controller
         $d60h = BillingCollectionPOC::groupBy('bc.bill_cycle', 'bc.area')
             ->selectRaw('
             "60H" AS LABEL,
-            ROW_NUMBER() OVER () AS ROWNUM,
+            @row_num:= @row_num+1 AS ROWNUM,
 bc.area as regional,
 bc.area,
 NULL as subarea,
@@ -177,7 +177,7 @@ bc.bill_cycle,
         $d90h = BillingCollectionPoc::groupBy('bc.bill_cycle','bc.regional')
             ->selectRaw('
             "90H" AS LABEL,
-            ROW_NUMBER() OVER () AS ROWNUM,
+            @row_num:= @row_num+1,
 bc.regional as regional,
 NULL as area,
 bc.area as subarea,

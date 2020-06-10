@@ -64,9 +64,9 @@ class SyncBilcollection extends Command
     {
         $controller = new BillingCollectionController();
         echo 'proses download';
-        $this->downloadFile("20200606_all.csv",'http://10.250.191.103/collection/consumer/20200606_all.csv','/');
+        $this->downloadFile("20200607_all.csv",'http://10.250.191.103/collection/consumer/20200607_all.csv','/');
         echo 'proses sum';
-        $controller->create('20200606_all.csv',null);
+        $controller->create('20200607_all.csv',null);
         //
     }
 }
