@@ -206,7 +206,7 @@ bc.bill_cycle,
             ->orderBy('bc.bill_cycle','DESC')
             ->orderBy('bc.area','ASC')
             ->where('bc.periode','=' ,'2020-04-30')
-            ->groupBy( 'bc.area');
+            ->groupBy( 'bc.regional');
             if($bc === true) $d90h->groupBy( 'bc.bill_cycle');
 
             $d90h->union($d60h);
