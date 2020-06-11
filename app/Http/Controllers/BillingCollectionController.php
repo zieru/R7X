@@ -147,9 +147,13 @@ class BillingCollectionController extends Controller
         return $bilco->toJson();
     }
     public function dashboardApiCompare(Request $request){
+        $bc = false;
+        if($request->has('bc')){
+            $bc = true;
+        }
 
-        $d60h = BillingCollectionPOC::groupBy('bc.bill_cycle', 'bc.area')
-            ->selectRaw('
+
+        $d60h = BillingCollectionPOC::selectRaw('
             "60H" AS LABEL,
             @row_num:= @row_num+1 AS ROWNUM,
 bc.area as regional,
@@ -173,9 +177,11 @@ bc.bill_cycle,
 
             ->orderBy('bc.bill_cycle','DESC')
             ->orderBy('bc.area','ASC')
-            ->where('bc.periode','=' ,$request->get('start'));
-        $d90h = BillingCollectionPoc::groupBy('bc.bill_cycle','bc.regional')
-            ->selectRaw('
+            ->where('bc.periode','=' ,$request->get('start'))
+            ->groupBy( 'bc.area');
+        if($bc === true) $d60h->groupBy( 'bc.bill_cycle');
+
+        $d90h = BillingCollectionPoc::selectRaw('
             "90H" AS LABEL,
             @row_num:= @row_num+1,
 bc.regional as regional,
@@ -200,7 +206,10 @@ bc.bill_cycle,
             ->orderBy('bc.bill_cycle','DESC')
             ->orderBy('bc.area','ASC')
             ->where('bc.periode','=' ,'2020-04-30')
-            ->union($d60h);
+            ->groupBy( 'bc.area');
+            if($bc === true) $d90h->groupBy( 'bc.bill_cycle');
+
+            $d90h->union($d60h);
         $bilco = datatables()->of($d90h);
         return $bilco->toJson();
     }
