@@ -81,9 +81,9 @@ class BillingCollectionController extends Controller
     }
 
     public function dashboardApi(){
-        $d60h = BillingCollectionPOC::groupBy('periode','poc')
+        $d60h = BillingCollectionPOC::groupBy('periode','regional')
             ->selectRaw('periode,
-                                poc as regional,
+                                regional,
                                     sum(bill_amount_2) as billing , 
                                     sum(`bucket_2`) as osbalance,
                                     sum(`bill_amount_2`) - sum(`bucket_2`) as collection,
@@ -93,9 +93,9 @@ class BillingCollectionController extends Controller
             ->orderBy('periode')
             ->orderBy('poc')
             ->having('billing','>',0);
-        $d90h = BillingCollectionPoc::groupBy('periode','poc')
+        $d90h = BillingCollectionPoc::groupBy('periode','regional')
             ->selectRaw('periode,
-                                poc as regional,
+                                regional,
                                     sum(bill_amount_3) as billing , 
                                     sum(`bucket_3`) as osbalance,
                                     sum(`bill_amount_3`) - sum(`bucket_3`) as collection,
@@ -172,12 +172,14 @@ bc.bill_cycle,
             {
                 $q->on('bc2.poc', '=', 'bc.poc')
                     ->on('bc2.bill_cycle', '=', 'bc.bill_cycle')
-                    ->where('bc2.periode','=', $request->get('end'));
+                    ->where('bc2.periode','=', $request->get('end'))
+		    ->where('bc2.customer_type','=','S');
             })
 
             ->orderBy('bc.bill_cycle','DESC')
             ->orderBy('bc.area','ASC')
             ->where('bc.periode','=' ,$request->get('start'))
+	    		    ->where('bc.customer_type','=','S')
             ->groupBy( 'bc.area');
         if($bc === true) $d60h->groupBy( 'bc.bill_cycle');
 
@@ -200,12 +202,14 @@ bc.bill_cycle,
             {
                 $q->on('bc2.poc', '=', 'bc.poc')
                     ->on('bc2.bill_cycle', '=', 'bc.bill_cycle')
-                    ->where('bc2.periode','=', $request->get('end'));
+                    ->where('bc2.periode','=', $request->get('end'))
+		    ->where('bc2.customer_type','=','S');
             })
 
             ->orderBy('bc.bill_cycle','DESC')
             ->orderBy('bc.area','ASC')
             ->where('bc.periode','=' ,'2020-04-30')
+		    ->where('bc.customer_type','=','S')
             ->groupBy( 'bc.regional');
             if($bc === true) $d90h->groupBy( 'bc.bill_cycle');
 
@@ -350,8 +354,8 @@ bc.bill_cycle,
 
             //$x = $arr;
 
-
-            if($j >= 1000){
+//$final = $arr1;
+            //if($j >= 1000){
 
                 $final = $arr1;
 
@@ -362,8 +366,8 @@ bc.bill_cycle,
                 {
                     //BillingCollection::insert($chunk->toArray());
                 }*/
-                $j = 0;
-            }
+                //$j = 0;
+            //}
             //BillingCollection::create($arr);
         });
         //$lexer->parse($request->file('file'), $interpreter);
@@ -374,13 +378,11 @@ bc.bill_cycle,
         foreach ($final as $periodes => $bcs){
             foreach ($bcs as $bc => $pocs)
             {
-
                 foreach ($pocs as $poc => $customer_types) {
                     foreach ($customer_types as $customer_type => $blocking_statuses ){
                         foreach ($blocking_statuses as $row){
                             $finale[] = $row;
                         }
-
                     }
                 }
             }
@@ -394,6 +396,7 @@ bc.bill_cycle,
         }
         $importer->status = "Finish";
         $importer->save();
+var_dump($arr1);
         die();
         var_dump($arr1);
         var_dump($arr);

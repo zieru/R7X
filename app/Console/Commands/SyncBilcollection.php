@@ -12,7 +12,7 @@ class SyncBilcollection extends Command
      *
      * @var string
      */
-    protected $signature = 'SyncBilcollection';
+    protected $signature = 'SyncBilcollection {file}';
 
     /**
      * The console command description.
@@ -62,11 +62,15 @@ class SyncBilcollection extends Command
      */
     public function handle()
     {
+
+	$filename = $this->arguments()['file'];
+//echo $filename;
+//die();
         $controller = new BillingCollectionController();
         echo 'proses download';
-        $this->downloadFile("20200607_all.csv",'http://10.250.191.103/collection/consumer/20200607_all.csv','/');
+        $this->downloadFile($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/');
         echo 'proses sum';
-        $controller->create('20200607_all.csv',null);
+        $controller->create($filename,null);
         //
     }
 }
