@@ -202,24 +202,32 @@ class BillingCollectionController extends Controller
 
         DB::statement(DB::raw('SET @rankarea60h = 0;'));
         DB::statement(DB::raw('SET @rankarea90h = 0;'));
-        $d60h = BillingCollectionPOC::selectRaw('
-                                            "AREA" AS LABEL,
-                                                IF(area NOT IN (\'AREA I\',\'AREA II\',\'AREA III\',\'AREA IV\'), "NON AREA", area) as regional,
-                                                bc.area,
-                                                NULL AS subarea,
-                                                bc.bill_cycle,
-                                                ( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) AS billing_1,
-                                                ( Sum( bc.bill_amount_3 ) - Sum( bc.bucket_3 ) ) / sum( bc.bill_amount_3 ) AS billing_2,
-                                                NULL as rank90h,
-                                                NULL as rank60h,
+        $d60h = BillingCollectionPOC::selectRaw('*')->fromSub(function ($query) use($request) {
+            $query->selectRaw('*')
+                ->fromSub(function ($query) use($request) {
+                $query->selectRaw('*')
+                    ->fromSub(function ($query) use($request) {
+                    $query->selectRaw('
+                                    "AREA" AS LABEL,
+                                        IF(area NOT IN ("AREA I","AREA II","AREA III","AREA IV"), "NON AREA", area) as regional,
+                                        bc.area,
+                                        NULL AS subarea,
+                                        bc.bill_cycle,
+                                        ( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) AS billing_1,
+                                        ( Sum( bc.bill_amount_3 ) - Sum( bc.bucket_3 ) ) / sum( bc.bill_amount_3 ) AS billing_2,
+                                        NULL as rank90h,
+                                        @rankarea60h := @rankarea60h + 1 AS rank60h,
                                                 NULL as selisih
-                                            ')
-            ->from('billing_collections_poc', 'bc')
-            ->where('bc.periode', '=', $request->get('start'))
-            ->where('bc.customer_type', '=', 'S')
-            ->whereIn('bc.area', ['AREA I', 'AREA II', 'AREA III', 'AREA IV'])
-            ->groupBy('bc.area')
-            ->orderBy('bc.area','DESC');
+                                    ')
+                            ->from('billing_collections_poc', 'bc')
+                            ->where('bc.periode', '=', $request->get('start'))
+                            ->where('bc.customer_type', '=', 'S')
+                            ->whereIn('bc.area', ['AREA I', 'AREA II', 'AREA III', 'AREA IV'])
+                            ->orderBy('billing_1','DESC')
+                            ->groupBy('bc.area');
+                    },'bilco');
+                },'bilco1')->orderBy('area','ASC');
+            },'bilco2')->orderBy('area','ASC');
         if($bc === true) $d60h->groupBy( 'bc.bill_cycle');
 
 
@@ -258,24 +266,30 @@ class BillingCollectionController extends Controller
 
         DB::statement(DB::raw('SET @rankarea60h = 0;'));
         DB::statement(DB::raw('SET @rankarea90h = 0;'));
-        $d60h2 = BillingCollectionPOC::selectRaw('
-                                            "AREA" AS LABEL,
-                                                IF(area NOT IN (\'AREA I\',\'AREA II\',\'AREA III\',\'AREA IV\'), "NON AREA", area) as regional,
-                                                bc.area,
-                                                NULL AS subarea,
-                                                bc.bill_cycle,
-                                                ( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) AS billing_1,
-                                                ( Sum( bc.bill_amount_3 ) - Sum( bc.bucket_3 ) ) / sum( bc.bill_amount_3 ) AS billing_2,
-                                                NULL as rank90h,
-                                                NULL as rank60h,
-                                                NULL as selisih
-                                            ')
-            ->from('billing_collections_poc', 'bc')
-            ->where('bc.periode', '=', $request->get('end'))
-            ->where('bc.customer_type', '=', 'S')
-            ->whereIn('bc.area', ['AREA I', 'AREA II', 'AREA III', 'AREA IV'])
-            ->groupBy('bc.area')
-            ->orderBy('bc.area','DESC');
+        $d60h2 = BillingCollectionPOC::selectRaw('*')->fromSub(function ($query) use($request) {
+            $query->selectRaw('*,@rankarea60h := @rankarea60h + 1 AS rank60h,
+                                        NULL as selisih')
+                ->fromSub(function ($query) use($request) {
+                    $query->selectRaw('*,@rankarea90h := @rankarea90h + 1 AS rank90h')
+                        ->fromSub(function ($query) use($request) {
+                            $query->selectRaw('
+                                    "AREA" AS LABEL,
+                                        IF(area NOT IN ("AREA I","AREA II","AREA III","AREA IV"), "NON AREA", area) as regional,
+                                        bc.area,
+                                        NULL AS subarea,
+                                        bc.bill_cycle,
+                                        ( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) AS billing_1,
+                                        ( Sum( bc.bill_amount_3 ) - Sum( bc.bucket_3 ) ) / sum( bc.bill_amount_3 ) AS billing_2
+                                    ')
+                                ->from('billing_collections_poc', 'bc')
+                                ->where('bc.periode', '=', $request->get('end'))
+                                ->where('bc.customer_type', '=', 'S')
+                                ->whereIn('bc.area', ['AREA I', 'AREA II', 'AREA III', 'AREA IV'])
+                                ->orderBy('billing_2','DESC')
+                                ->groupBy('bc.area');
+                        },'bilco')->orderBy('billing_1','DESC');
+                },'bilco1')->orderBy('area','ASC');
+        },'bilco2')->orderBy('area','ASC');
       if($bc === true) $d60h2->groupBy( 'bc.bill_cycle');
       DB::statement(DB::raw('SET @rankregional60h = 0;'));
         DB::statement(DB::raw('SET @rankregional90h = 0;'));
