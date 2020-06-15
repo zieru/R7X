@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 use App\Http\Controllers\BillingCollectionController;
 use Storage;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Console\Command;
 
 class SyncBilcollection extends Command
@@ -42,6 +44,12 @@ class SyncBilcollection extends Command
 
         return $data;
     }
+
+    public function guzzleDownload( $imgName, $url, $path ){
+        $guzzle = new Client();
+        $response = $guzzle->request('GET', $url, ['proxy' => 'http://10.59.82.1:8080']);
+        Storage::put($path.$imgName, $response->getBody());
+    }
     public function downloadFile( $imgName, $url, $path )
     {
         #$data = $this->file_get_contents_curl( $url );
@@ -63,14 +71,16 @@ class SyncBilcollection extends Command
     public function handle()
     {
 
-	$filename = $this->arguments()['file'];
+	    $filename = $this->arguments()['file'];
 //echo $filename;
 //die();
         $controller = new BillingCollectionController();
-        echo 'proses download';
-        $this->downloadFile($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/');
-        echo 'proses sum';
+        echo 'proses download '.$filename;
+        $this->guzzleDownload($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/');
+        $this->info('Downloaded :'.$filename);
+        $this->info('proses sum '. PHP_EOL);
         $controller->create($filename,null);
+        //$controller->compactPOC('2020-06-09');
         //
     }
 }
