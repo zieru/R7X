@@ -521,21 +521,24 @@ class BillingCollectionController extends Controller
             $area['perfomansi_nominal'][] = $x['perfomansi_90h_gap'] * $row['billing_3'];
         }
 
-        $temp[] = array(
-            'regional' => 'AREA I',
-            'kpi' => '90h',
-            'area' => 'AREA I',
-            'bill_cycle' => NULL,
-            'billing' => (float) $row['billing_3'],
-            'bucket' => (float) $row['bucket_3'],
-            'collection' => 0,
-            'perfomansi' => 0,
-            'perfomansi_target' => number_format(array_sum($area['perfomansi_target']) / count($area['perfomansi_target'])*100,2),
-            'perfomansi_percent' => number_format(array_sum($area['perfomansi_percent']) / count($area['perfomansi_percent'])*100,2),
-            'perfomansi_gap' => number_format(array_sum($area['perfomansi_gap']) / count($area['perfomansi_gap'])*100,2),
-            'perfomansi_nominal' => array_sum($area['perfomansi_nominal']),
-            'target' => 0,
-        );
+        if(isset($row)){
+            $temp[] = array(
+                'regional' => 'AREA I',
+                'kpi' => '90h',
+                'area' => 'AREA I',
+                'bill_cycle' => NULL,
+                'billing' => (float) $row['billing_3'],
+                'bucket' => (float) $row['bucket_3'],
+                'collection' => 0,
+                'perfomansi' => 0,
+                'perfomansi_target' => number_format(array_sum($area['perfomansi_target']) / count($area['perfomansi_target'])*100,2),
+                'perfomansi_percent' => number_format(array_sum($area['perfomansi_percent']) / count($area['perfomansi_percent'])*100,2),
+                'perfomansi_gap' => number_format(array_sum($area['perfomansi_gap']) / count($area['perfomansi_gap'])*100,2),
+                'perfomansi_nominal' => array_sum($area['perfomansi_nominal']),
+                'target' => 0,
+            );
+        }
+
 
         //dd($temp);
         $bilco = datatables()->of($temp);
