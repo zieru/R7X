@@ -75,8 +75,8 @@ class SyncBilcollection extends Command
 //echo $filename;
 //die();
         $controller = new BillingCollectionController();
-        echo 'proses download '.$filename;
-        $this->guzzleDownload($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/');
+        $this->info('proses download '.$filename);
+	$this->guzzleDownload($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/');
         $this->info('Downloaded :'.$filename);
         $this->info('proses sum '. PHP_EOL);
         $controller->create($filename,null);

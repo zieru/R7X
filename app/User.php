@@ -2,6 +2,9 @@
 
 namespace App;
 
+use Hash;
+use Illuminate\Support\Arr;
+use App\Components\User\Models\Group;
 use App\Models\LinkedSocialAccount;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -11,7 +14,20 @@ use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
+  protected $fillable = [
+    'name', 'email', 'password','remember_token','permissions','last_login','active','activation_key','area','mediaselid','username'
+  ];
+
+  /**
+   * The attributes that should be hidden for arrays.
+   *
+   * @var array
+   */
+  protected $hidden = [
+    'password', 'remember_token',
+  ];
+
+  use HasApiTokens, Notifiable;
 
     public function recording_loglaporan(){
 
@@ -26,6 +42,9 @@ class User extends Authenticatable
 
     public function recording_tbllaporan(){
         return $this->hasMany(recording_tbllaporan::class);
+    }
+    public function FormAdjustment(){
+      return $this->hasMany(FormAdjustment::class);
     }
 
     public function setPasswordAttribute($password)
@@ -55,6 +74,15 @@ class User extends Authenticatable
         return unserialize($this->attributes['permissions']);
     }
 
+  /**
+   * returns the groups of the user
+   *
+   * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+   */
+  public function getgroups()
+  {
+    return $this->hasOne(Group::class,'user_group_pivot_table','user_id');
+  }
     /**
      * returns the groups of the user
      *

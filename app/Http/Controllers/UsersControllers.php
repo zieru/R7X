@@ -10,12 +10,16 @@ use Redirect;
 use Validator;
 use Exception;
 use Illuminate\Http\Request;
-use Laravel\Passport\Client as OClient;
+use Laravel\Passport\Client as OClient;use App\Components\User\Repositories\UserRepository;
 
 class UsersController extends Controller
 {
+  private  $userRepository;
     public $successStatus = 200;
-
+  public function __construct(UserRepository $userRepository)
+  {
+    $this->userRepository = $userRepository;
+  }
     public function login(Request $request) {
         if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
             $oClient = OClient::where('password_client', 1)->first();
@@ -104,19 +108,21 @@ class UsersController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users',
             'password' => 'required',
-            'c_password' => 'required|same:password',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['error'=>$validator->errors()], 401);
         }
 
+        echo 'pass';
         $password = $request->password;
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
         $user = User::create($input);
-        $oClient = OClient::where('password_client', 1)->first();
-        return $this->getTokenAndRefreshToken($oClient, $user->email, $password);
+        $user->groups()->attach($request->post('group'));
+        return $user;
+        //$oClient = OClient::where('password_client', 1)->first();
+        //return $this->getTokenAndRefreshToken($oClient, $user->email, $password);
     }
 
     public function refreshToken(Request $request) {
@@ -205,33 +211,44 @@ class UsersController extends Controller
         $result = json_decode((string) $response->getBody(), true);
         return response()->json($result, $this->successStatus);
     }
+  public function userlist(){
+
+    $data = datatables()->of($this->userRepository->listUsers(request()->all())->toArray()['data']);
+    return $data->toJson();
+  }
 
     public function details() {
+      $user_perm = array('dashboard','formrefund','formadj');
+      $perm_combine = array();
         $user = Auth::user();
         $permission = $user->getCombinedPermissions();
 
+        $user['user_group'] = $user_group = User::with('groups')->find($user->id)->groups->first();
+        $user['user_group_id'] = $user_group->id;
+          switch ($user_group->id){
+            case 1:
+              $user_perm[] = 'admin';
+              break;
+            default:
+              $user_perm[] = 'user';
+          }
+
+          foreach ($user_perm as $x){
+            $perm_combine[] = array(
+              'roleId'=>'admin',
+              'permissionId'=> $x,
+              'permissionName'=> '仪表盘',
+              'actions'=> '[{"action":"add","defaultCheck":false,"describe":"新增"},{"action":"query","defaultCheck":false,"describe":"查询"},{"action":"get","defaultCheck":false,"describe":"详情"},{"action":"update","defaultCheck":false,"describe":"修改"},{"action":"delete","defaultCheck":false,"describe":"删除"}]',
+              'actionList'=> null,
+              'dataAccess'=> null
+            );
+          }
+        $user['group'] = '2x';
         $user['permission']  = $permission;
         $user['role']  = array('id'=> 'admin', 'name'=> "管理员", 'describe'=> "拥有所有权限",'status' => 1, 'creatorId'=> "system",
-            "permissionList"=> array('dashboard'),
-            'permissions' =>
-                array(
-                    array(
-                    'roleId'=>'admin',
-                    'permissionId'=> 'dashboard',
-                    'permissionName'=> '仪表盘',
-                    'actions'=> '[{"action":"add","defaultCheck":false,"describe":"新增"},{"action":"query","defaultCheck":false,"describe":"查询"},{"action":"get","defaultCheck":false,"describe":"详情"},{"action":"update","defaultCheck":false,"describe":"修改"},{"action":"delete","defaultCheck":false,"describe":"删除"}]',
-                    'actionList'=> null,
-                    'dataAccess'=> null
-                    ),
-                    array(
-                    'roleId'=>'admin',
-                    'permissionId'=> 'user',
-                    'permissionName'=> '仪表盘',
-                    'actions'=> '[{"action":"add","defaultCheck":false,"describe":"新增"},{"action":"query","defaultCheck":false,"describe":"查询"},{"action":"get","defaultCheck":false,"describe":"详情"},{"action":"update","defaultCheck":false,"describe":"修改"},{"action":"delete","defaultCheck":false,"describe":"删除"}]',
-                    'actionList'=> null,
-                    'dataAccess'=> null
-                ),
-                ));
+            "permissionList"=> $user_perm,
+            'permissions' => $perm_combine
+        );
 
         $user['roleId']  = "admin";
         $user['avatar'] = 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png';
@@ -248,5 +265,19 @@ class UsersController extends Controller
 
     public function unauthorized() {
         return response()->json("unauthorized", 401);
+    }
+
+    public function activateUser(){
+      $stat = false;
+      $return = array('success' => $stat,'active'=> null, 'name' => null);
+      $user = User::find(request('user_id'));
+      $user->active = request('active');
+      $user->save();
+      if($user->wasChanged('active')){
+        $stat = true;
+        $return = array('success' => $stat,'active'=> $user->active, 'name' => $user->name);
+      }
+
+      return datatables()->of(array($return))->toJson();
     }
 }

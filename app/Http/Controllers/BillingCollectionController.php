@@ -99,6 +99,7 @@ class BillingCollectionController extends Controller
             ->orderBy('periode')
             ->orderBy('poc')
             ->where('periode', '=', $request->get('start'))
+            ->where('customer_type','=','S')
             ->having('billing','>',0);
         $d90h = BillingCollectionPoc::groupBy('periode','regional')
             ->selectRaw('periode,
@@ -110,6 +111,7 @@ class BillingCollectionController extends Controller
                                     (SUM(`bill_amount_3`) - sum(`bucket_3`)) / SUM(`bill_amount_3`) as performansi
                                     ')
             ->where('periode', '=', $request->get('start'))
+            ->where('customer_type','=','S')
             ->orderBy('periode')
             ->orderBy('poc')
             ->having('billing','>',0)
@@ -134,6 +136,7 @@ class BillingCollectionController extends Controller
             ->orderBy('periode')
             ->orderBy('area')
             ->where('periode', '=', $request->get('start'))
+            ->where('customer_type','=','S')
             ->having('billing','>',0);
         $d90h = BillingCollectionPOC::groupBy('periode','area')
             ->selectRaw('periode,
@@ -147,6 +150,7 @@ class BillingCollectionController extends Controller
             ->orderBy('periode')
             ->orderBy('area')
             ->where('periode', '=', $request->get('start'))
+            ->where('customer_type','=','S')
             ->having('billing','>',0)
             ->union($d60h);
 
@@ -196,7 +200,7 @@ class BillingCollectionController extends Controller
 
   }
 
-    public function dashboardApiComparedev(Request $request){
+    public function dashboardApiComparedevx(Request $request){
 
         DB::connection()->enableQueryLog();
 
@@ -443,12 +447,117 @@ class BillingCollectionController extends Controller
             );
         }
     }
+  public function dashboardApiTargetxs(Request $request){
+    ini_set('precision', 15);
+    $bc = false;
+    $d = new DateTime($request->get('periode'));
+    $d->modify('first day of this month');
+    $d90h = BillingCollectionPoc::selectRaw('
+                                        "REGIONAL" AS LABEL,
+                                        CONCAT(bc.regional) AS regional,
+                                        area,
+                                        bc.regional AS subarea,
+                                        bc.bill_cycle,
+                                        sum( bc.bill_amount_2 ) AS billing_2,
+                                        sum( bc.bill_amount_3 ) AS billing_3,
+                                        sum( bc.bucket_2 ) AS bucket_2,
+                                        sum( bc.bucket_3 ) AS bucket_3,
+                                        billing_collections_targets.target as target  
+                                    ')
+      ->from('billing_collections_poc','bc')
+      ->leftjoin('billing_collections_targets','bc.regional','=','billing_collections_targets.regional')
+      ->orderBy('billing_2','DESC')
+      ->groupBy( 'bc.regional')
+      ->where('billing_collections_targets.periode','=' ,$d->format('Y-m-d'))
+      ->where('bc.periode','=' ,$request->get('end'))
+      ->where('bc.regional','!=' ,'**************')
+      ->where('bc.area','=' ,'AREA I')
+      ->where('bc.customer_type','=','S');
+    $d90harr =  $d90h->get()->toArray();
+    $temp = array();
+    $target = (float) 0.974820372699075;
+    $area = array();
+    foreach ($d90harr as $row)
+    {
+      $target = (float) $row['target'];
 
-    public function dashboardApiTarget(Request $request){
+      $x= array();
+      $x['collection_60h'] = $row['billing_2'] - $row['bucket_2'];
+      $x['perfomansi_60h'] = $x['collection_60h'] / $row['billing_2'];
+      $x['perfomansi_60h_gap'] = $target - $x['perfomansi_60h'];
+      $x['collection_90h'] = $row['billing_3'] - $row['bucket_3'];
+      $x['perfomansi_90h'] = $x['collection_90h'] / $row['billing_3'];
+      $x['perfomansi_90h_gap'] = $target - $x['perfomansi_90h'];
+      /*$temp[] = array(
+          'regional' => $row['regional'],
+          'kpi' => '60h',
+          'area' => $row['area'],
+          'bill_cycle' => $row['bill_cycle'],
+          'billing' => (float) $row['billing_2'],
+          'bucket' => (float) $row['bucket_2'],
+          'collection' => $x['collection_60h'],
+          'perfomansi' => $x['perfomansi_60h'],
+          'perfomansi_target' => number_format($target*100,2),
+          'perfomansi_percent' => number_format($x['perfomansi_60h']*100,2),
+          'perfomansi_gap' => number_format($x['perfomansi_60h_gap']*100,2),
+          'perfomansi_nominal' => number_format($x['perfomansi_60h_gap'] * $row['billing_2']),
+          'target' => $target,
+      );*/
+      $temp[] = array(
+        'regional' => $row['regional'],
+        'kpi' => '90h',
+        'area' => $row['area'],
+        'bill_cycle' => $row['bill_cycle'],
+        'billing' => (float) $row['billing_3'],
+        'bucket' => (float) $row['bucket_3'],
+        'collection' => $x['collection_90h'],
+        'perfomansi' => $x['perfomansi_90h'],
+        'perfomansi_target' => number_format($target*100,2),
+        'perfomansi_percent' => number_format($x['perfomansi_90h']*100,2),
+        'perfomansi_gap' => number_format($x['perfomansi_90h_gap']*100,2),
+        'perfomansi_nominal' => number_format($x['perfomansi_90h_gap'] * $row['billing_3']),
+        'target' => $target,
+      );
+      $area['perfomansi_target'][] = $target;
+      $area['perfomansi_percent'][] = $x['perfomansi_90h'];//actual
+      $area['perfomansi_gap'][] = $x['perfomansi_90h_gap'];
+      $area['perfomansi_nominal'][] = $x['perfomansi_90h_gap'] * $row['billing_3'];
+    }
+
+    if(isset($row)){
+      $temp[] = array(
+        'regional' => 'AREA I',
+        'kpi' => '90h',
+        'area' => 'AREA I',
+        'bill_cycle' => NULL,
+        'billing' => (float) $row['billing_3'],
+        'bucket' => (float) $row['bucket_3'],
+        'collection' => 0,
+        'perfomansi' => 0,
+        'perfomansi_target' => number_format(array_sum($area['perfomansi_target']) / count($area['perfomansi_target'])*100,2),
+        'perfomansi_percent' => number_format(array_sum($area['perfomansi_percent']) / count($area['perfomansi_percent'])*100,2),
+        'perfomansi_gap' => number_format(array_sum($area['perfomansi_gap']) / count($area['perfomansi_gap'])*100,2),
+        'perfomansi_nominal' => array_sum($area['perfomansi_nominal']),
+        'target' => 0,
+      );
+    }
+
+
+    //dd($temp);
+    $bilco = datatables()->of($temp);
+    //dd($bilco->toJson());
+    return $bilco->toJson();
+  }
+
+    public function dashboardApiTarget(Request $request)
+    {
         ini_set('precision', 15);
         $bc = false;
-        $d = new DateTime($request->get('periode'));
-        $d->modify('first day of this month');
+        if($request->has('bc')){
+            $bc = true;
+        }
+        $d = new DateTime($request->get('end'));
+        //dd($d);
         $d90h = BillingCollectionPoc::selectRaw('
                                         "REGIONAL" AS LABEL,
                                         CONCAT(bc.regional) AS regional,
@@ -461,24 +570,28 @@ class BillingCollectionController extends Controller
                                         sum( bc.bucket_3 ) AS bucket_3,
                                         billing_collections_targets.target as target  
                                     ')
-            ->from('billing_collections_poc','bc')
-            ->leftjoin('billing_collections_targets','bc.regional','=','billing_collections_targets.regional')
-            ->orderBy('billing_2','DESC')
-            ->groupBy( 'bc.regional')
-            ->where('billing_collections_targets.periode','=' ,$d->format('Y-m-d'))
-            ->where('bc.periode','=' ,$request->get('end'))
-            ->where('bc.regional','!=' ,'**************')
-            ->where('bc.area','=' ,'AREA I')
-            ->where('bc.customer_type','=','S');
-        $d90harr =  $d90h->get()->toArray();
+            ->from('billing_collections_poc', 'bc')
+            ->leftjoin('billing_collections_targets', 'bc.regional', '=', 'billing_collections_targets.regional')
+            ->orderBy('billing_2', 'DESC')
+            ->groupBy('bc.regional')
+            ->where('billing_collections_targets.periode', '=', $d->format('Y-m-1'))
+            ->where('bc.periode', '=', $request->get('end'))
+            ->where('bc.regional', '!=', '**************')
+            ->where('bc.area', '=', 'AREA I')
+            ->where('bc.customer_type', '=', 'S');
+        if($bc){
+            if($request->has('bc_val')){
+                $d90h->where('bc.bill_cycle','=',$request->get('bc_val'));
+            }
+        }
+        $d90harr = $d90h->get()->toArray();
         $temp = array();
-        $target = (float) 0.974820372699075;
+        $target = (float)0.974820372699075;
         $area = array();
-        foreach ($d90harr as $row)
-        {
-            $target = (float) $row['target'];
+        foreach ($d90harr as $row) {
+            $target = (float)$row['target'];
 
-            $x= array();
+            $x = array();
             $x['collection_60h'] = $row['billing_2'] - $row['bucket_2'];
             $x['perfomansi_60h'] = $x['collection_60h'] / $row['billing_2'];
             $x['perfomansi_60h_gap'] = $target - $x['perfomansi_60h'];
@@ -500,19 +613,22 @@ class BillingCollectionController extends Controller
                 'perfomansi_nominal' => number_format($x['perfomansi_60h_gap'] * $row['billing_2']),
                 'target' => $target,
             );*/
+
+
+
             $temp[] = array(
                 'regional' => $row['regional'],
                 'kpi' => '90h',
                 'area' => $row['area'],
                 'bill_cycle' => $row['bill_cycle'],
-                'billing' => (float) $row['billing_3'],
-                'bucket' => (float) $row['bucket_3'],
+                'billing' => (float)$row['billing_3'],
+                'bucket' => (float)$row['bucket_3'],
                 'collection' => $x['collection_90h'],
                 'perfomansi' => $x['perfomansi_90h'],
-                'perfomansi_target' => number_format($target*100,2),
-                'perfomansi_percent' => number_format($x['perfomansi_90h']*100,2),
-                'perfomansi_gap' => number_format($x['perfomansi_90h_gap']*100,2),
-                'perfomansi_nominal' => number_format($x['perfomansi_90h_gap'] * $row['billing_3']),
+                'perfomansi_target' => number_format($target * 100, 2),
+                'perfomansi_percent' => number_format($x['perfomansi_90h'] * 100, 2),
+                'perfomansi_gap' => number_format($x['perfomansi_90h_gap'] * 100, 2,'.', ''),
+                'perfomansi_nominal' => number_format($x['perfomansi_90h_gap'] * $row['billing_3'],false,'.', '.'),
                 'target' => $target,
             );
             $area['perfomansi_target'][] = $target;
@@ -520,21 +636,34 @@ class BillingCollectionController extends Controller
             $area['perfomansi_gap'][] = $x['perfomansi_90h_gap'];
             $area['perfomansi_nominal'][] = $x['perfomansi_90h_gap'] * $row['billing_3'];
         }
+        $region_sort = array_column($temp, 'regional');
+        array_multisort($region_sort, SORT_DESC, $temp);
 
-        if(isset($row)){
+        if (isset($temp)) {
+            $bill_3 = 0; $bucket_3 = 0;
+            if(isset($row)){
+
+                if(array_key_exists('billing_3',$row)){
+                    $bill_3 = (float)$row['billing_3'];
+                }
+                if(array_key_exists('bucket_3', $row)){
+                    $bucket_3 = (float)$row['bucket_3'];
+                }
+            }
+
             $temp[] = array(
                 'regional' => 'AREA I',
                 'kpi' => '90h',
                 'area' => 'AREA I',
                 'bill_cycle' => NULL,
-                'billing' => (float) $row['billing_3'],
-                'bucket' => (float) $row['bucket_3'],
+                'billing' => $bill_3,
+                'bucket' => $bucket_3,
                 'collection' => 0,
                 'perfomansi' => 0,
-                'perfomansi_target' => number_format(array_sum($area['perfomansi_target']) / count($area['perfomansi_target'])*100,2),
-                'perfomansi_percent' => number_format(array_sum($area['perfomansi_percent']) / count($area['perfomansi_percent'])*100,2),
-                'perfomansi_gap' => number_format(array_sum($area['perfomansi_gap']) / count($area['perfomansi_gap'])*100,2),
-                'perfomansi_nominal' => array_sum($area['perfomansi_nominal']),
+                'perfomansi_target' => number_format(array_sum($area['perfomansi_target']) / count($area['perfomansi_target']) * 100, 2),
+                'perfomansi_percent' => number_format(array_sum($area['perfomansi_percent']) / count($area['perfomansi_percent']) * 100, 2),
+                'perfomansi_gap' => number_format(array_sum($area['perfomansi_gap']) / count($area['perfomansi_gap']) * 100, 2),
+                'perfomansi_nominal' => number_format(array_sum($area['perfomansi_nominal']),false,'.','.'),
                 'target' => 0,
             );
         }
@@ -545,6 +674,337 @@ class BillingCollectionController extends Controller
         //dd($bilco->toJson());
         return $bilco->toJson();
     }
+
+    public function dashboardApiComparedev(Request $request){
+            ini_set('xdebug.var_display_max_depth', '10');
+            ini_set('xdebug.var_display_max_children', '256');
+            ini_set('xdebug.var_display_max_data', '1024');
+            DB::connection()->enableQueryLog();
+
+
+            $bc = false;
+            if($request->has('bc')){
+                $bc = true;
+            }
+
+
+            DB::statement(DB::raw('SET @rankarea60h = 0;'));
+            DB::statement(DB::raw('SET @rankarea90h = 0;'));
+
+            $d60h = BillingCollectionPoc::selectRaw('
+            *,billing_1 - billing_2 AS selisih')
+                ->fromSub(function ($query) use($request,$bc) {
+                    $query->selectRaw('*')
+                        ->fromSub(function ($query) use($request,$bc) {
+                            $query->selectRaw('*,@rankarea60h := @rankarea60h + 1 AS rank60h')
+                                ->fromSub(function ($query) use($request,$bc) {
+                                    $query->selectRaw('*,@rankarea90h := @rankarea90h + 1 AS rank90h')
+                                        ->fromSub(function ($query) use($request,$bc) {
+                                            $group = array();
+                                            if($bc){
+                                                $group[] = 'bill_cycle';
+                                            }
+                                            $group[] = 'bc.area';
+                                            $query->selectRaw('
+                                        "AREA" AS LABEL,
+                                        IF(area NOT IN ("AREA I","AREA II","AREA III","AREA IV"), "NON AREA", area) as regional,
+                                        area,
+                                        regional AS subarea,
+                                        bc.bill_cycle,
+                                        Sum( bc.bill_amount_2 ) AS bill_amount_2,
+                                        Sum( bc.bill_amount_3 ) AS bill_amount_3,
+                                        Sum( bc.bucket_2 ) AS bucket_2,
+                                        Sum( bc.bucket_3 ) AS bucket_3,
+                                        ( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) AS billing_1,
+                                        ( Sum( bc.bill_amount_3 ) - Sum( bc.bucket_3 ) ) / sum( bc.bill_amount_3 ) AS billing_2   
+                                    ')
+                                                ->from('billing_collections_poc','bc')
+                                                ->orderBy('billing_2','DESC')
+                                                ->groupBy( $group)
+                                                ->where('bc.periode','=' ,$request->get('start'))
+                                                ->where('bc.customer_type','=','S')
+                                                ->whereIn('bc.area', ['AREA I', 'AREA II', 'AREA III', 'AREA IV']);
+                                        }, 'sub');
+                                },'order_billing_2')
+                                ->orderBy('billing_1','DESC');
+                        },'order_biling_1')->orderBy('area');
+                },'sub1');
+
+            DB::statement(DB::raw('SET @rankregional60h = 0;'));
+            DB::statement(DB::raw('SET @rankregional90h = 0;'));
+            $d90h = BillingCollectionPoc::selectRaw('
+            *,billing_1 - billing_2 AS selisih')
+                ->fromSub(function ($query) use($request,$bc) {
+                    $query->selectRaw('*')
+                        ->fromSub(function ($query) use($request,$bc) {
+                            $query->selectRaw('*,@rankregional60h := @rankregional60h + 1 AS rank60h')
+                                ->fromSub(function ($query) use($request,$bc) {
+
+                                    $query->selectRaw('*, @rankregional90h := @rankregional90h + 1 AS rank90h')
+                                        ->fromSub(function ($query) use($request,$bc) {
+                                            $group = array();
+                                            if($bc){
+                                                $group[] = 'bill_cycle';
+                                            }
+                                            $group[] = 'bc.regional';
+                                            $query->selectRaw('
+                                        "REGIONAL" AS LABEL,
+                                        CONCAT("--- " ,bc.regional) AS regional,
+                                        area,
+                                        regional AS subarea,
+                                        bc.bill_cycle,
+                                        Sum( bc.bill_amount_2 ) AS bill_amount_2,
+                                        Sum( bc.bill_amount_3 ) AS bill_amount_3,
+                                        Sum( bc.bucket_2 ) AS bucket_2,
+                                        Sum( bc.bucket_3 ) AS bucket_3,
+                                        ( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) AS billing_1,
+                                        ( Sum( bc.bill_amount_3 ) - Sum( bc.bucket_3 ) ) / sum( bc.bill_amount_3 ) AS billing_2   
+                                    ')
+                                                ->from('billing_collections_poc','bc')
+                                                ->orderBy('billing_2','DESC')
+                                                ->groupBy( $group)
+                                                ->where('bc.periode','=' ,$request->get('start'))
+                                                ->where('bc.regional','!=' ,'**************')
+                                                ->where('bc.customer_type','=','S');
+                                        }, 'sub');
+                                },'order_billing_2')
+                                ->orderBy('billing_1','DESC');
+                        },'order_biling_1');
+                },'sub1');
+
+            DB::statement(DB::raw('SET @rankarea60h = 0;'));
+            DB::statement(DB::raw('SET @rankarea90h = 0;'));
+            $d60h2 = BillingCollectionPoc::selectRaw('
+            *,billing_1 - billing_2 AS selisih')
+                ->fromSub(function ($query) use($request,$bc) {
+                    $query->selectRaw('*')
+                        ->fromSub(function ($query) use($request,$bc) {
+                            $query->selectRaw('*,@rankarea60h := @rankarea60h + 1 AS rank60h')
+                                ->fromSub(function ($query) use($request,$bc) {
+                                    $query->selectRaw('*,@rankarea90h := @rankarea90h + 1 AS rank90h')
+                                        ->fromSub(function ($query) use($request,$bc) {
+                                            if($bc){
+                                                $group[] = 'bill_cycle';
+                                            }
+                                            $group[] = 'bc.area';
+                                            $query->selectRaw('
+                                        "AREA" AS LABEL,
+                                        IF(area NOT IN ("AREA I","AREA II","AREA III","AREA IV"), "NON AREA", area) as regional,
+                                        area,
+                                        regional AS subarea,
+                                        bc.bill_cycle,
+                                        Sum( bc.bill_amount_2 ) AS bill_amount_2,
+                                        Sum( bc.bill_amount_3 ) AS bill_amount_3,
+                                        Sum( bc.bucket_2 ) AS bucket_2,
+                                        Sum( bc.bucket_3 ) AS bucket_3,
+                                        ( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) AS billing_1,
+                                        ( Sum( bc.bill_amount_3 ) - Sum( bc.bucket_3 ) ) / sum( bc.bill_amount_3 ) AS billing_2   
+                                    ')
+                                                ->from('billing_collections_poc','bc')
+                                                ->orderBy('billing_2','DESC')
+                                                ->groupBy( $group)
+                                                ->where('bc.periode','=' ,$request->get('end'))
+                                                ->where('bc.customer_type','=','S')
+                                                ->whereIn('bc.area', ['AREA I', 'AREA II', 'AREA III', 'AREA IV']);
+                                        }, 'sub');
+                                },'order_billing_2')
+                                ->orderBy('billing_1','DESC');
+                        },'order_biling_1')->orderBy('area');
+                },'sub1');
+            DB::statement(DB::raw('SET @rankregional60h = 0;'));
+            DB::statement(DB::raw('SET @rankregional90h = 0;'));
+            $d90h2 = BillingCollectionPoc::selectRaw('
+            *,billing_1 - billing_2 AS selisih')
+                ->fromSub(function ($query) use($request,$bc) {
+                    $query->selectRaw('*')
+                        ->fromSub(function ($query) use($request, $bc) {
+                            $query->selectRaw('*,@rankregional60h := @rankregional60h + 1 AS rank60h')
+                                ->fromSub(function ($query) use($request, $bc) {
+                                    $query->selectRaw('*, @rankregional90h := @rankregional90h + 1 AS rank90h')
+                                        ->fromSub(function ($query) use($request, $bc) {
+                                            if($bc){
+                                                $group[] = 'bill_cycle';
+                                            }
+                                            $group[] = 'bc.regional';
+                                            $query->selectRaw('
+                                        "REGIONAL" AS LABEL,
+                                        CONCAT("--- " ,bc.regional) AS regional,
+                                        area,
+                                        regional AS subarea,
+                                        bc.bill_cycle,
+                                        Sum( bc.bill_amount_2 ) AS bill_amount_2,
+                                        Sum( bc.bill_amount_3 ) AS bill_amount_3,
+                                        Sum( bc.bucket_2 ) AS bucket_2,
+                                        Sum( bc.bucket_3 ) AS bucket_3,
+                                        ( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) AS billing_1,
+                                        ( Sum( bc.bill_amount_3 ) - Sum( bc.bucket_3 ) ) / sum( bc.bill_amount_3 ) AS billing_2   
+                                    ')
+                                                ->from('billing_collections_poc','bc')
+                                                ->orderBy('billing_2','DESC')
+                                                ->groupBy( $group)
+                                                ->where('bc.periode','=' ,$request->get('end'))
+                                                ->where('bc.regional','!=' ,'**************')
+                                                ->where('bc.customer_type','=','S');
+                                        }, 'sub');
+                                },'order_billing_2')
+                                ->orderBy('billing_1','DESC');
+                        },'order_biling_1');
+                },'sub1');
+
+
+
+
+            $d60h->union($d90h);
+            $d60h2->union($d90h2);
+            $temp = array();
+            $finaltemp = array();
+            $d60h2arr = $d60h2->get()->toArray();
+            //var_dump($d60h2arr);
+            //die();
+            //die( var_dump(DB::getQueryLog($d90h2)[8]));
+            //dd($d60h2arr);
+            //die( DB::getQueryLog($d90h2)[4]['query']);
+            $d60harr = $d60h->get()->toArray();
+            //echo Str::replaceArray('?', $d90h->getBindings(), $d90h->toSql());
+            //dd($d90h->get()->toArray());
+            ini_set('precision', 15);
+            foreach ($d60harr as $row){
+                if($bc){
+                    if($row['billing_1'] != null OR $row['billing_2'] != null){
+                        $temp[$row['bill_cycle']][$row['area']][$row['regional']]['bill_cycle'] = $row['bill_cycle'];
+                        $temp[$row['bill_cycle']][$row['area']][$row['regional']]['regional'] = $row['area'] ;
+                        $temp[$row['bill_cycle']][$row['area']][$row['regional']]['billing_1'] = $temp[$row['area']][$row['regional']]['billing_2']= null;
+                        $temp[$row['bill_cycle']][$row['area']][$row['regional']]['billing_1'] = (float) number_format(((($row['bill_amount_2'] - $row['bucket_2'])/$row['bill_amount_2']) * 100),2);
+                        $temp[$row['bill_cycle']][$row['area']][$row['regional']]['billing_2'] = (float) number_format(((($row['bill_amount_3'] - $row['bucket_3'])/$row['bill_amount_3']) * 100),2);
+                        $temp[$row['bill_cycle']][$row['area']][$row['regional']]['bill_amount_2']= $row['bill_amount_2'];
+                        $temp[$row['bill_cycle']][$row['area']][$row['regional']]['bill_amount_3']= $row['bill_amount_3'];
+                        $temp[$row['bill_cycle']][$row['area']][$row['regional']]['rank_60h'] =  $row['rank60h'];
+                        $temp[$row['bill_cycle']][$row['area']][$row['regional']]['rank_90h'] =  $row['rank90h'];
+                    }
+
+                }else{
+                    $temp[$row['area']][$row['regional']]['regional'] = $row['regional'];
+                    $temp[$row['area']][$row['regional']]['billing_1'] = $temp[$row['area']][$row['regional']]['billing_2']= null;
+                    $temp[$row['area']][$row['regional']]['billing_1'] = (float) number_format(((($row['bill_amount_2'] - $row['bucket_2'])/$row['bill_amount_2']) * 100),2);
+                    $temp[$row['area']][$row['regional']]['billing_2'] = (float) number_format(((($row['bill_amount_3'] - $row['bucket_3'])/$row['bill_amount_3']) * 100),2);
+                    $temp[$row['area']][$row['regional']]['bill_amount_2']= $row['bill_amount_2'];
+                    $temp[$row['area']][$row['regional']]['bucket_2']= $row['bucket_2'];
+                    $temp[$row['area']][$row['regional']]['bill_amount_3']= $row['bill_amount_3'];
+                    $temp[$row['area']][$row['regional']]['rank_60h'] =  $row['rank60h'];
+                    $temp[$row['area']][$row['regional']]['rank_90h'] =  $row['rank90h'];
+                }
+
+            }
+
+
+            foreach ($d60h2arr as $row){
+                if($bc){
+                    if($row['billing_1'] != null OR $row['billing_2'] != null) {
+                        $temp[$row['bill_cycle']][$row['area']][$row['regional']]['bill_cycle'] = $row['bill_cycle'];
+                        $temp[$row['bill_cycle']][$row['area']][$row['regional']]['regional'] = $row['regional'];
+                        //$temp[$row['bill_cycle']][$row['area']][$row['regional']]['billing_1_1'] = $temp[$row['area']][$row['regional']]['billing_2_1'] = null;
+                        $temp[$row['bill_cycle']][$row['area']][$row['regional']]['billing_1_1'] = (float) number_format(((($row['bill_amount_2'] - $row['bucket_2'])/$row['bill_amount_2']) * 100),2);
+                        $temp[$row['bill_cycle']][$row['area']][$row['regional']]['billing_2_1'] = (float) number_format(((($row['bill_amount_3'] - $row['bucket_3'])/$row['bill_amount_3']) * 100),2);
+                        $temp[$row['bill_cycle']][$row['area']][$row['regional']]['rank_60h'] = $row['rank60h'];
+                        $temp[$row['bill_cycle']][$row['area']][$row['regional']]['rank_90h'] = $row['rank90h'];
+                    }
+                }else{
+                    $temp[$row['area']][$row['regional']]['regional'] =  $row['regional'];
+                    $temp[$row['area']][$row['regional']]['billing_1_1'] = $temp[$row['area']][$row['regional']]['billing_2_1']= null;
+                    $temp[$row['area']][$row['regional']]['billing_1_1'] = (float) number_format(((($row['bill_amount_2'] - $row['bucket_2'])/$row['bill_amount_2']) * 100),2);
+                    $temp[$row['area']][$row['regional']]['billing_2_1'] = (float) number_format(((($row['bill_amount_3'] - $row['bucket_3'])/$row['bill_amount_3']) * 100),2);
+                    $temp[$row['area']][$row['regional']]['rank_60h'] =  $row['rank60h'];
+                    $temp[$row['area']][$row['regional']]['rank_90h'] =  $row['rank90h'];
+                }
+
+            }
+
+            if($bc){
+                foreach ($temp as $key => $value) {
+                    if (!is_int($key)) {
+                        unset($temp[$key]);
+                    }
+                }
+            }
+            if($bc){
+                foreach ($temp as $bc) {
+                    foreach ($bc as $area => $data) {
+                        foreach ($data as $row) {
+                            $temp[$row['bill_cycle']][$area][$row['regional']]['selisih1'] = $temp[$area][$row['regional']]['selisih2'] = null;
+                            if (array_key_exists('billing_1', $row) AND array_key_exists('billing_1_1', $row)) {
+                                $temp[$row['bill_cycle']][$area][$row['regional']]['selisih1'] = (float)number_format($row['billing_1_1'] - $row['billing_1'], 2);
+                            }
+                            if (array_key_exists('billing_2', $row) AND array_key_exists('billing_2_1', $row)) {
+                                $temp[$row['bill_cycle']][$area][$row['regional']]['selisih2'] = (float)number_format($row['billing_2_1'] - $row['billing_2'], 2);
+                            }
+
+                            if (!(array_key_exists('billing_1', $row))) $temp[$row['bill_cycle']][$area][$row['regional']]['billing_1'] = null;
+                            if (!(array_key_exists('billing_2', $row))) $temp[$row['bill_cycle']][$area][$row['regional']]['billing_2'] = null;
+                            if (!(array_key_exists('billing_1_1', $row))) $temp[$row['bill_cycle']][$area][$row['regional']]['billing_1_1'] = null;
+                            if (!(array_key_exists('billing_2_1', $row))) $temp[$row['bill_cycle']][$area][$row['regional']]['billing_2_1'] = null;
+                        }
+                    }
+                }
+
+            }else{
+                foreach ($temp as $area => $data){
+                    foreach ($data as $row){
+                        $temp[$area][$row['regional']]['selisih1'] = $temp[$area][$row['regional']]['selisih2'] = null;
+                        if(array_key_exists('billing_1',$row) AND  array_key_exists('billing_1_1',$row))
+                        {
+                            $temp[$area][$row['regional']]['selisih1'] = (float) number_format($row['billing_1_1'] - $row['billing_1'] ,2);
+                        }
+                        if(array_key_exists('billing_2',$row) AND  array_key_exists('billing_2_1',$row))
+                        {
+                            $temp[$area][$row['regional']]['selisih2'] = (float) number_format($row['billing_2_1'] - $row['billing_2'],2);
+                        }
+
+                        if(!(array_key_exists('billing_1',$row))) $temp[$area][$row['regional']]['billing_1'] = null;
+                        if(!(array_key_exists('billing_2',$row))) $temp[$area][$row['regional']]['billing_2'] = null;
+                        if(!(array_key_exists('billing_1_1',$row))) $temp[$area][$row['regional']]['billing_1_1'] = null;
+                        if(!(array_key_exists('billing_2_1',$row))) $temp[$area][$row['regional']]['billing_2_1'] = null;
+                    }
+                }
+            }
+
+            if($bc){
+                foreach ($temp as $key => $value) {
+                    if (!is_int($key)) {
+                        unset($temp[$key]);
+                    }
+                }
+                foreach ($temp as $r => $x){
+                    foreach ($x as $y){
+                        foreach ($y as $z){
+                            $finaltemp[] = $z;
+                        }
+
+                    }
+                }
+            }else{
+                foreach ($temp as $r => $x){
+                    foreach ($x as $y){
+                        $finaltemp[] = $y;
+                    }
+                }
+            }
+
+
+
+
+            //dd($finaltemp);
+            /*var_dump(usort($finaltemp, function($a, $b) {;
+              return $a['billing_2'] <=> $b['billing_2'];
+            }));
+            foreach (array_reverse($finaltemp) as $row){
+              var_dump($row);
+            }
+            var_dump($finaltemp);
+      die();*/
+            //dd($finaltemp);
+            $bilco = datatables()->of($finaltemp);
+            return $bilco->toJson();
+        }
     public function dashboardApiCompare(Request $request){
         ini_set('xdebug.var_display_max_depth', '10');
         ini_set('xdebug.var_display_max_children', '256');
@@ -590,6 +1050,11 @@ class BillingCollectionController extends Controller
                                             ->where('bc.periode','=' ,$request->get('start'))
                                             ->where('bc.customer_type','=','S')
                                             ->whereIn('bc.area', ['AREA I', 'AREA II', 'AREA III', 'AREA IV']);
+                                        if($bc){
+                                            if($request->has('bc_val')){
+                                                $query->where('bill_cycle','=',$request->get('bc_val'));
+                                            }
+                                        }
                                     }, 'sub');
                             },'order_billing_2')
                             ->orderBy('billing_1','DESC');
@@ -629,6 +1094,11 @@ class BillingCollectionController extends Controller
                                             ->where('bc.regional','!=' ,'**************')
                                             ->where('bc.customer_type','=','S');
                                     }, 'sub');
+                                if($bc){
+                                    if($request->has('bc_val')){
+                                        $query->where('bill_cycle','=',$request->get('bc_val'));
+                                    }
+                                }
                             },'order_billing_2')
                             ->orderBy('billing_1','DESC');
                     },'order_biling_1');
@@ -664,6 +1134,11 @@ class BillingCollectionController extends Controller
                                             ->where('bc.periode','=' ,$request->get('end'))
                                             ->where('bc.customer_type','=','S')
                                         ->whereIn('bc.area', ['AREA I', 'AREA II', 'AREA III', 'AREA IV']);
+                                        if($bc){
+                                            if($request->has('bc_val')){
+                                                $query->where('bill_cycle','=',$request->get('bc_val'));
+                                            }
+                                        }
                                     }, 'sub');
                             },'order_billing_2')
                             ->orderBy('billing_1','DESC');
@@ -699,6 +1174,11 @@ class BillingCollectionController extends Controller
                                             ->where('bc.periode','=' ,$request->get('end'))
                                             ->where('bc.regional','!=' ,'**************')
                                             ->where('bc.customer_type','=','S');
+                                        if($bc){
+                                            if($request->has('bc_val')){
+                                                $query->where('bill_cycle','=',$request->get('bc_val'));
+                                            }
+                                        }
                                     }, 'sub');
                             },'order_billing_2')
                             ->orderBy('billing_1','DESC');
@@ -725,7 +1205,7 @@ class BillingCollectionController extends Controller
             if($bc){
                 if($row['billing_1'] != null OR $row['billing_2'] != null){
                     $temp[$row['bill_cycle']][$row['area']][$row['regional']]['bill_cycle'] = $row['bill_cycle'];
-                    $temp[$row['bill_cycle']][$row['area']][$row['regional']]['regional'] = $row['area'] ;
+                    $temp[$row['bill_cycle']][$row['area']][$row['regional']]['regional'] = $row['regional'] ;
                     $temp[$row['bill_cycle']][$row['area']][$row['regional']]['billing_1'] = $temp[$row['area']][$row['regional']]['billing_2']= null;
                     $temp[$row['bill_cycle']][$row['area']][$row['regional']]['billing_1'] = (float) number_format(($row['billing_1'] * 100),2);
                     $temp[$row['bill_cycle']][$row['area']][$row['regional']]['billing_2'] = (float) number_format(($row['billing_2'] * 100),2);
@@ -734,7 +1214,7 @@ class BillingCollectionController extends Controller
                 }
 
             }else{
-                $temp[$row['area']][$row['regional']]['regional'] = $row['area'] ;
+                $temp[$row['area']][$row['regional']]['regional'] = $row['regional'] ;
                 $temp[$row['area']][$row['regional']]['billing_1'] = $temp[$row['area']][$row['regional']]['billing_2']= null;
                 $temp[$row['area']][$row['regional']]['billing_1'] = (float) number_format(($row['billing_1'] * 100),2);
                 $temp[$row['area']][$row['regional']]['billing_2'] = (float) number_format(($row['billing_2'] * 100),2);

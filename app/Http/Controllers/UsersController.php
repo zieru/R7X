@@ -1,5 +1,5 @@
 <?php
-
+/*
 namespace App\Http\Controllers;
 use Auth;
 use GuzzleHttp\Client;
@@ -14,6 +14,16 @@ use Laravel\Passport\Client as OClient;
 
 class UsersController extends Controller
 {
+  private $userRepository;
+
+  /**
+   * UserController constructor.
+   * @param UserRepository $userRepository
+   */
+  public function __construct(UserRepository $userRepository)
+  {
+    $this->userRepository = $userRepository;
+  }
     public $successStatus = 200;
 
     public function login(Request $request) {
@@ -210,6 +220,7 @@ class UsersController extends Controller
         $user = Auth::user();
         $permission = $user->getCombinedPermissions();
 
+        $user['group'] = 'x';
         $user['permission']  = $permission;
         $user['role']  = array('id'=> 'admin', 'name'=> "管理员", 'describe'=> "拥有所有权限",'status' => 1, 'creatorId'=> "system",
             "permissionList"=> array('dashboard'),
@@ -247,7 +258,15 @@ class UsersController extends Controller
         ]);
     }
 
+    public function userlist(){
+      echo 'x';
+      $data = $this->userRepository->listUsers(request()->all());
+
+      return $this->sendResponseOk($data,"list users ok.");
+    }
+
     public function unauthorized() {
         return response()->json("unauthorized", 401);
     }
 }
+*/
