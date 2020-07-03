@@ -30,14 +30,32 @@ Route::prefix('admin')->namespace('API')->middleware(['auth'])->group(function()
     route::apiResource('filestorage','Files');
 });
 
-Route::group(['prefix' => 'v1'], function () {
+
+
+Route::prefix('v1')->middleware(['CheckClientCredentials','auth:api'])->group(function() {
     Route::any('billCo/dashboard/poc', 'BillingCollectionController@dashboardApiPOC')->name('api.v1.bilco.dashboard.poc');
     Route::any('billCo/dashboard', 'BillingCollectionController@dashboardApi')->name('api.v1.bilco.dashboard');
     Route::any('billCo/dashboard/area', 'BillingCollectionController@dashboardApiArea')->name('api.v1.bilco.dashboard.area');
     Route::any('billCo/dashboard/compare', 'BillingCollectionController@dashboardApiCompare')->name('api.v1.bilco.dashboard.compare');
-    Route::middleware(['auth'])->group(function() {
+    Route::any('billCo/dashboard/comparedev', 'BillingCollectionController@dashboardApiCompareDev')->name('api.v1.bilco.dashboard.comparedev');
+    Route::any('billCo/dashboard/target', 'BillingCollectionController@dashboardApiTarget')->name('api.v1.bilco.dashboard.target');
+    Route::get('billCo/dashboard/inputtarget', 'BillingCollectionController@targetDateYear')->name('api.v1.bilco.dashboard.inputtarget');
+    Route::post('billCo/dashboard/inputtarget', 'BillingCollectionController@targetDateYearPost')->name('api.v1.bilco.dashboard.inputtargetpost');
 
+    route::apiResource('adjustment','API\FormAdjustmentController');
+    Route::get('adjustmentreport', 'API\FormAdjustmentController@report')->name('api.v1.bilco.adjustment.report');
+    Route::get('adjustmentreportreason', 'API\FormAdjustmentController@reportreason')->name('api.v1.bilco.adjustment.report.reason');
+    route::apiResource('refund','API\FormRefundController');
+  Route::group(['prefix' => 'manage'], function () {
+    Route::group(['prefix' => 'user'], function () {
+      Route::get('list', 'UsersController@userlist')->name('api.v1.manage.user.list');
+      Route::post('activateuser', 'UsersController@activateUser')->name('api.v1.manage.user.activateUser');
     });
+  });
+
+});
+Route::group(['prefix' => 'v1'], function () {
+
 
 
     Route::post('login', 'UsersController@login')->name('api.v1.login');
@@ -50,6 +68,9 @@ Route::group(['prefix' => 'v1'], function () {
 
     Route::get('/unauthorized', 'UsersController@unauthorized');
     Route::group(['middleware' => ['CheckClientCredentials','auth:api']], function() {
+
+
+
         Route::post('logout', 'UsersController@logout');
         Route::get('details', 'UsersController@details');
     });
