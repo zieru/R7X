@@ -32,26 +32,28 @@ class FormRefundController extends Controller
      */
     public function store(Request $request)
     {
-      header("Access-Control-Allow-Origin: *");
+     // header("Access-Control-Allow-Origin: *");
 
       $importer = Importer::create(array(
         'importedRow'=>0,
         'storedRow'=>0,
         'status' => 'QUEUE'
       ));
+        $rowx = array();
      $excel = Excel::toArray(new FormAdjustmentImport, $request->file('files'));
-     foreach ($excel as $rows){
-       foreach ($rows as $row){
-         $row['import_batch'] = $importer->id;
-         $row['author'] = Auth::user()->id;
-         $row['tanggal_permintaan'] = gmdate("Y-m-d", ($row['tgl_permintaan'] - 25569) * 86400);
-         $row['tanggal_eksekusi'] = gmdate("Y-m-d", ($row['tgl_eksekusi'] - 25569) * 86400);
+     foreach ($excel[0] as $row){
+         if($row['shop'] != null) {
+             $row['import_batch'] = $importer->id;
+             $row['author'] = Auth::user()->id;
+             $row['tanggal_permintaan'] = gmdate("Y-m-d", ($row['tgl_permintaan'] - 25569) * 86400);
+             $row['tanggal_eksekusi'] = gmdate("Y-m-d", ($row['tgl_eksekusi'] - 25569) * 86400);
 
-         unset($row['tgl_permintaan']);unset($row['tgl_eksekusi']);
-       }
-
+             unset($row['tgl_permintaan']);
+             unset($row['tgl_eksekusi']);
+             $rowx = $row;
+         }
      }
-      FormRefund::insert($row);
+      FormRefund::insert($rowx);
       $importer->status = "Finish";
       $importer->save();
       echo 'x';

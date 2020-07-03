@@ -26,8 +26,8 @@ class FormAdjustmentController extends Controller
     }
 
     public function report(){
-      $f=  FormAdjustment::with('User')->groupBy('author')
-        ->selectRaw('author,count(msisdn) as msisdn,sum(nominal) as nominal');
+      $f=  FormAdjustment::groupBy('user_eksekutor')
+        ->selectRaw('user_eksekutor,count(msisdn) as msisdn,sum(nominal) as nominal');
       return datatables()->of($f)->toJson();
     }
     public function reportreason(){

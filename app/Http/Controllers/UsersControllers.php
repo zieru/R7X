@@ -20,6 +20,24 @@ class UsersController extends Controller
   {
     $this->userRepository = $userRepository;
   }
+    public function authCheck(Request $request)
+    {
+        $input = $request->all();
+
+        $this->validate($request, [
+            'username' => 'required',
+            'password' => 'required',
+        ]);
+
+        $fieldType = filter_var($request->username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        if (auth()->attempt(array($fieldType => $input['username'], 'password' => $input['password'], 'active' => 1),false,false)){
+            return response()->json(Auth::user(), 200);
+        }else{
+            return response()->json(['error'=>'Unauthorised'], 401);
+        }
+
+    }
+
     public function login(Request $request) {
         if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
             $oClient = OClient::where('password_client', 1)->first();
@@ -262,6 +280,8 @@ class UsersController extends Controller
             'message' => 'Successfully logged out'
         ]);
     }
+
+
 
     public function unauthorized() {
         return response()->json("unauthorized", 401);
