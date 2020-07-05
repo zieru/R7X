@@ -33,6 +33,7 @@ Route::prefix('admin')->namespace('API')->middleware(['auth'])->group(function()
 
 
 Route::prefix('v1')->middleware(['CheckClientCredentials','auth:api'])->group(function() {
+    Route::apiResource('importer', 'ImporterController');
     Route::any('billCo/dashboard/poc', 'BillingCollectionController@dashboardApiPOC')->name('api.v1.bilco.dashboard.poc');
     Route::any('billCo/dashboard', 'BillingCollectionController@dashboardApi')->name('api.v1.bilco.dashboard');
     Route::any('billCo/dashboard/area', 'BillingCollectionController@dashboardApiArea')->name('api.v1.bilco.dashboard.area');
@@ -57,7 +58,7 @@ Route::prefix('v1')->middleware(['CheckClientCredentials','auth:api'])->group(fu
 Route::group(['prefix' => 'v1'], function () {
 
 
-
+    Route::post('authcheck', 'UsersController@authCheck')->name('api.v1.authCheck');
     Route::post('login', 'UsersController@login')->name('api.v1.login');
     Route::get('login/google', 'UsersController@redirectToProvider')->name('api.v1.login.google');
     Route::get('login/google/callback', 'UsersController@handleProviderCallback')->name('api.v1.login.google.callback');
