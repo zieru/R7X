@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Console\Commands;
+use Carbon\Carbon;
 use App\Http\Controllers\BillingCollectionController;
 use Storage;
 use GuzzleHttp\Client;
@@ -14,7 +15,7 @@ class SyncBilcollection extends Command
      *
      * @var string
      */
-    protected $signature = 'SyncBilcollection {file}';
+    protected $signature = 'SyncBilcollection {--file=} {--testing=false}';
 
     /**
      * The console command description.
@@ -63,6 +64,15 @@ class SyncBilcollection extends Command
 	return Storage::put($imgName, $contents);
     }
 
+    public function proses($filename){
+        $controller = new BillingCollectionController();
+        if(!$this->option('testing') === false)$this->guzzleDownload($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/');
+
+        $this->info('Downloaded :'.$filename);
+        $this->info('proses sum '. PHP_EOL);
+        if(!$this->option('testing') === 'false')$controller->create($filename,null);
+    }
+
     /**
      * Execute the console command.
      *
@@ -70,16 +80,31 @@ class SyncBilcollection extends Command
      */
     public function handle()
     {
+        $areas = array('Bali%20Nusra','Jabodetabek','Jawa%20Barat','Jawa%20Tengah','Jawa%Timur','Kalimantan','Puma','Sulawesi','Sumbagsel','Sumbagteng','Sumbagut','xxxxxxxxxxxxxx');
+	    //$filename = $this->arguments()['file'];
+        $filename = $this->option('file');
 
-	    $filename = $this->arguments()['file'];
+        if($filename== null){
+            $date = Carbon::now()->subHours(48)->format('Ymd');
+            foreach($areas as $area){
+                $filename[] = sprintf('%s_%s.csv',$area,$date);
+            }
+        }
 //echo $filename;
 //die();
-        $controller = new BillingCollectionController();
-        $this->info('proses download '.$filename);
-	$this->guzzleDownload($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/');
-        $this->info('Downloaded :'.$filename);
-        $this->info('proses sum '. PHP_EOL);
-        $controller->create($filename,null);
+
+        if(is_array($filename)){
+            foreach ($filename as $name){
+                $this->info('proses download '.$name);
+                $this->proses($name);
+            }
+
+        }else{
+            $this->info('proses download '.$filename);
+            $this->proses($filename);
+        }
+
+
         //$controller->compactPOC('2020-06-09');
         //
     }

@@ -18,6 +18,11 @@ class Kernel extends ConsoleKernel
         Commands\SyncBilcollection::class
     ];
 
+    protected function scheduleTimezone()
+    {
+        return 'Asia/Jakarta';
+    }
+
     /**
      * Define the application's command schedule.
      *
@@ -28,6 +33,9 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')
         //          ->hourly();
+        $schedule->command('SyncBilcollection')
+            ->at('09:00')
+            ->appendOutputTo(storage_path() . "/logs/mail.recent");
     }
 
     /**
