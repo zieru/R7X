@@ -56,21 +56,28 @@ class SyncBilcollection extends Command
         #$data = $this->file_get_contents_curl( $url );
         #file_put_contents( $path.$imgName, $data );
         #echo "File downloaded!";
-	$contents = file_get_contents($url);
-	$name = substr($url, strpos($url, '/')+1);
+        $contents = file_get_contents($url);
+        $name = substr($url, strpos($url, '/')+1);
 
-	#$tempfile = tempnam(sys_get_temp_dir(), $imgName);
-	#copy($url,$tempfile);
-	return Storage::put($imgName, $contents);
+        #$tempfile = tempnam(sys_get_temp_dir(), $imgName);
+        #copy($url,$tempfile);
+        return Storage::put($imgName, $contents);
     }
 
     public function proses($filename){
         $controller = new BillingCollectionController();
-        if(!$this->option('testing') === false)$this->guzzleDownload($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/');
-
-        $this->info('Downloaded :'.$filename);
-        $this->info('proses sum '. PHP_EOL);
-        if(!$this->option('testing') === 'false')$controller->create($filename,null);
+        //var_dump($this->option('testing'));
+        if(is_array($filename)){
+            foreach ($filename as $name){
+                shell_exec(sprintf("cd /home/sabyan/R7S/ && php artisan Syncbilcollection --file=%s >> /home/sabyan/log.log 2>&1",$name));
+            }
+        }else{
+            $this->info('proses download :'.$filename);
+            if($this->option('testing') == "false")$this->guzzleDownload($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/');
+            $this->info('Downloaded :'.$filename);
+            $this->info('proses sum '. PHP_EOL);
+            if($this->option('testing') == "false")$controller->create($filename,null);
+        };
     }
 
     /**
@@ -80,28 +87,26 @@ class SyncBilcollection extends Command
      */
     public function handle()
     {
-        $areas = array('Bali%20Nusra','Jabodetabek','Jawa%20Barat','Jawa%20Tengah','Jawa%Timur','Kalimantan','Puma','Sulawesi','Sumbagsel','Sumbagteng','Sumbagut','xxxxxxxxxxxxxx');
-	    //$filename = $this->arguments()['file'];
+        $areas = array('Bali%20Nusra','Jabotabek','Jawa%20Barat','Jawa%20Tengah','Jawa%20Timur','Kalimantan','Puma','Sulawesi','Sumbagsel','Sumbagteng','Sumbagut','xxxxxxxxxxxxxx');
         $filename = $this->option('file');
 
         if($filename== null){
             $date = Carbon::now()->subHours(48)->format('Ymd');
             foreach($areas as $area){
-                $filename[] = sprintf('%s_%s.csv',$area,$date);
+                $filename[] = sprintf('%s_%s.csv',$date,$area);
             }
         }
-//echo $filename;
-//die();
 
+        $this->proses($filename);
         if(is_array($filename)){
             foreach ($filename as $name){
-                $this->info('proses download '.$name);
-                $this->proses($name);
+                //        $this->info('proses download '.$name);
+                //        $this->proses($name);
             }
 
         }else{
-            $this->info('proses download '.$filename);
-            $this->proses($filename);
+            //    $this->info('proses download '.$filename);
+            //    $this->proses($filename);
         }
 
 
