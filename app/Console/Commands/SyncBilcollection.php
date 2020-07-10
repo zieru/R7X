@@ -34,34 +34,10 @@ class SyncBilcollection extends Command
         parent::__construct();
     }
 
-    public function file_get_contents_curl( $url ) {
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_URL, $url);
-        $data = curl_exec($ch);
-        curl_close($ch);
-
-        return $data;
-    }
-
     public function guzzleDownload( $imgName, $url, $path ){
         $guzzle = new Client();
         $response = $guzzle->request('GET', $url, ['proxy' => 'http://10.59.82.1:8080']);
         Storage::put($path.$imgName, $response->getBody());
-    }
-    public function downloadFile( $imgName, $url, $path )
-    {
-        #$data = $this->file_get_contents_curl( $url );
-        #file_put_contents( $path.$imgName, $data );
-        #echo "File downloaded!";
-        $contents = file_get_contents($url);
-        $name = substr($url, strpos($url, '/')+1);
-
-        #$tempfile = tempnam(sys_get_temp_dir(), $imgName);
-        #copy($url,$tempfile);
-        return Storage::put($imgName, $contents);
     }
 
     public function proses($filename){
@@ -96,21 +72,6 @@ class SyncBilcollection extends Command
                 $filename[] = sprintf('%s_%s.csv',$date,$area);
             }
         }
-
         $this->proses($filename);
-        if(is_array($filename)){
-            foreach ($filename as $name){
-                //        $this->info('proses download '.$name);
-                //        $this->proses($name);
-            }
-
-        }else{
-            //    $this->info('proses download '.$filename);
-            //    $this->proses($filename);
-        }
-
-
-        //$controller->compactPOC('2020-06-09');
-        //
     }
 }

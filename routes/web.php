@@ -1,5 +1,5 @@
 <?php
-
+use Illuminate\Support\Facades\Route;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -46,5 +46,3 @@ Route::prefix('admin')->namespace('Admin')->middleware(['auth'])->group(function
     /*Route::resource('caserecording','FileController');*/
     Route::resource('file-groups','FileGroupController');
 });
-
-/*Route::post('redirector', action('UsersController@redirector'));*/
