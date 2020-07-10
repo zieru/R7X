@@ -32,7 +32,7 @@ Route::prefix('admin')->namespace('API')->middleware(['auth'])->group(function()
 
 
 Route::prefix('telegram')->group(function(){
-    Route::get('dashboardApiCompare', 'BillingCollectionController@dashboardApiCompare')->name('api.v1.bilco.dashboard.compare');
+    Route::get('dashboardApiCompare', 'BillingCollectionController@dashboardApiCompare');
 });
 Route::apiResource('notifier', 'NotifierController');
 Route::prefix('v1')->middleware(['CheckClientCredentials','auth:api'])->group(function() {
