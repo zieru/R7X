@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Console\Commands;
+use App\Notifier;
 use Carbon\Carbon;
 use App\Http\Controllers\BillingCollectionController;
 use Storage;
@@ -36,7 +37,19 @@ class SyncBilcollection extends Command
 
     public function guzzleDownload( $imgName, $url, $path ){
         $guzzle = new Client();
-        $response = $guzzle->request('GET', $url, ['proxy' => 'http://10.59.82.1:8080']);
+
+            try {
+                $response = $guzzle->request('GET'/*, $url, ['proxy' => 'http://10.59.82.1:8080']*/);
+            }
+            catch (GuzzleHttp\Exception\ClientException $e) {
+                $response =  $e->getMessage();
+            }
+            catch (GuzzleHttp\Exception\RequestException $e)   {
+                $response =  $e->getMessage();
+            }catch (Guzzle\Http\Exception\BadResponseException $e) {
+                $response =  $e->getMessage();
+            }
+            var_dump($response);
         Storage::put($path.$imgName, $response->getBody());
     }
 
@@ -45,11 +58,18 @@ class SyncBilcollection extends Command
         //var_dump($this->option('testing'));
         if(is_array($filename)){
             foreach ($filename as $name){
-                shell_exec(sprintf("cd /home/sabyan/R7S/ && php artisan Syncbilcollection --file=%s >> /home/sabyan/log.log 2>&1",$name));
+                echo shell_exec(sprintf("php artisan Syncbilcollection --file=%s >> log.log",$name));
             }
         }else{
             $this->info('proses download :'.$filename);
-            if($this->option('testing') == "false")$this->guzzleDownload($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/');
+            if($this->option('testing') == "false"){
+
+                $user = Notifier::create([
+                    'type' => 'CollectionImport',
+                    'subject' => 'Collection Import file',
+                    'message' => $this->guzzleDownload($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/'),
+                ]);
+            }
             $this->info('Downloaded :'.$filename);
             $this->info('proses sum '. PHP_EOL);
             if($this->option('testing') == "false")$controller->create($filename,null);
@@ -68,6 +88,11 @@ class SyncBilcollection extends Command
 
         if($filename== null){
             $date = Carbon::now()->subHours(48)->format('Ymd');
+            $user = Notifier::create([
+                'type' => 'CollectionImport',
+                'subject' => 'Collection Import',
+                'message' => 'Importing Collection at '.$date,
+            ]);
             foreach($areas as $area){
                 $filename[] = sprintf('%s_%s.csv',$date,$area);
             }
