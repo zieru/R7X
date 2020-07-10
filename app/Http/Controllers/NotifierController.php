@@ -15,6 +15,10 @@ class NotifierController extends Controller
     public function index()
     {
         //
+        $x = Notifier::orderBy('created_at', 'desc');
+        $response= $x->get();
+        $x->delete();
+        return datatables()->of($response)->toJson();
     }
 
     /**
