@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use App\Http\Controllers\BillingCollectionController;
 use Storage;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\BadResponseException;
 use Illuminate\Console\Command;
 
 class SyncBilcollection extends Command
@@ -39,18 +39,20 @@ class SyncBilcollection extends Command
         $guzzle = new Client();
 
             try {
-                $response = $guzzle->request('GET'/*, $url, ['proxy' => 'http://10.59.82.1:8080']*/);
-            }
-            catch (GuzzleHttp\Exception\ClientException $e) {
+                $response = $guzzle->request('GET', $url /*, ['proxy' => 'http://10.59.82.1:8080']*/);
+                Storage::put($path.$imgName, $response->getBody());
+                $response = sprintf('file %s downloaded, size:%d kb',$imgName, Storage::size($path.$imgName));
+            } catch (\GuzzleHttp\Exception\ConnectException $e) {
+                // This is will catch all connection timeouts
+                // Handle accordinly
                 $response =  $e->getMessage();
-            }
-            catch (GuzzleHttp\Exception\RequestException $e)   {
+            } catch (\GuzzleHttp\Exception\ClientException $e) {
+                // This will catch all 400 level errors.
                 $response =  $e->getMessage();
             }catch (Guzzle\Http\Exception\BadResponseException $e) {
                 $response =  $e->getMessage();
             }
-            var_dump($response);
-        Storage::put($path.$imgName, $response->getBody());
+            return $response;
     }
 
     public function proses($filename){
@@ -67,12 +69,17 @@ class SyncBilcollection extends Command
                 $user = Notifier::create([
                     'type' => 'CollectionImport',
                     'subject' => 'Collection Import file',
-                    'message' => $this->guzzleDownload($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/'),
+                    'message' => substr($this->guzzleDownload($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/'), 0, 128),
                 ]);
             }
             $this->info('Downloaded :'.$filename);
-            $this->info('proses sum '. PHP_EOL);
-            if($this->option('testing') == "false")$controller->create($filename,null);
+            if($this->option('testing') == "false")
+            {
+                $this->info('proses sum '. PHP_EOL);
+                $controller->create($filename,null,1);
+
+            }
+
         };
     }
 
@@ -87,7 +94,7 @@ class SyncBilcollection extends Command
         $filename = $this->option('file');
 
         if($filename== null){
-            $date = Carbon::now()->subHours(48)->format('Ymd');
+            $date = Carbon::now()->subDays(2)->format('Ymd');
             $user = Notifier::create([
                 'type' => 'CollectionImport',
                 'subject' => 'Collection Import',

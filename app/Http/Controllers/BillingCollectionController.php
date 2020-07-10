@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Notifier;
 use DateTime;
 
 use App\BillingCollection;
@@ -1380,7 +1381,7 @@ class BillingCollectionController extends Controller
    *
    * @return \Illuminate\Http\Response
    */
-  public function create($name, Request $request =null)
+  public function create($name, Request $request =null,$notify = 0)
   {
     error_reporting(E_ALL);
     ini_set('display_errors', 'On');
@@ -1510,6 +1511,13 @@ class BillingCollectionController extends Controller
     }
     $importer->status = "Finish";
     $importer->save();
+    if($notify == 1){
+        $user = Notifier::create([
+            'type' => 'CollectionImport',
+            'subject' => 'Collection Import file',
+            'message' => $name . ' has been recorded',
+        ]);
+    }
     die();
     var_dump($arr1);
     var_dump($arr);
