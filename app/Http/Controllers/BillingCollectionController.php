@@ -1,9 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
+use Rap2hpoutre\FastExcel\FastExcel;
+
 use App\Notifier;
 use DateTime;
-
+use Illuminate\Support\Collection;
 use App\BillingCollection;
 use App\BillingCollectionPoc;
 use App\BillingCollectionTarget;
@@ -11,7 +13,7 @@ use App\Importer;
 use DB;
 Use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Rap2hpoutre\FastExcel\FastExcel;
+use Maatwebsite\Excel\Facades\Excel;
 use Goodby\CSV\Import\Standard\Lexer;
 use Goodby\CSV\Import\Standard\Interpreter;
 use Goodby\CSV\Import\Standard\LexerConfig;
@@ -88,78 +90,56 @@ class BillingCollectionController extends Controller
     }
 
     public function dashboardApi(Request $request){
-        $d60h = BillingCollectionPOC::groupBy('periode','regional')
-            ->selectRaw('periode,
-                                regional,
-                                    sum(bill_amount_2) as billing , 
-                                    sum(`bucket_2`) as osbalance,
-                                    sum(`bill_amount_2`) - sum(`bucket_2`) as collection,
-                                    "60h" as kpi,
-                                    (SUM(`bill_amount_2`) - sum(`bucket_2`)) / SUM(`bill_amount_2`) as performansi
-                                    ')
-            ->orderBy('periode')
-            ->orderBy('poc')
-            ->where('periode', '=', $request->get('start'))
-            ->where('customer_type','=','S')
-            ->having('billing','>',0);
-        $d90h = BillingCollectionPoc::groupBy('periode','regional')
-            ->selectRaw('periode,
-                                regional,
-                                    sum(bill_amount_3) as billing , 
-                                    sum(`bucket_3`) as osbalance,
-                                    sum(`bill_amount_3`) - sum(`bucket_3`) as collection,
-                                    "90h" as kpi,
-                                    (SUM(`bill_amount_3`) - sum(`bucket_3`)) / SUM(`bill_amount_3`) as performansi
-                                    ')
-            ->where('periode', '=', $request->get('start'))
-            ->where('customer_type','=','S')
-            ->orderBy('periode')
-            ->orderBy('poc')
-            ->having('billing','>',0)
+        $d60h = BillingCollectionPOC::
+            periode($request->get('start'))
+            ->customerType('S')
+            ->d60hRegional()
+            ->billingNonZero();
+        $d90h = BillingCollectionPoc::
+            periode($request->get('start'))
+            ->customerType('S')
+            ->d90hRegional()
+            ->billingNonZero()
             ->union($d60h);
 
         $bilco = datatables()->of($d90h);
-        //$result = json_decode((string) $bilco, true);
-        $result = $bilco;
-        //return response()->json($result, $this->successStatus);
-        return $bilco->toJson();
+
+        if($request->has('export')){
+            $arr = ($bilco->toArray())['data'];
+            $list = new Collection();
+            $list = collect($arr);
+            return (new FastExcel($list))->download('file.'.$request->get('export'));
+        }else{
+            return $bilco->toJson();
+        }
+        return false;
     }
     public function dashboardApiArea(Request $request){
-        $d60h = BillingCollectionPOC::groupBy('periode','area')
-            ->selectRaw('periode,
-                            area,
-                                    sum(bill_amount_2) as billing, 
-                                    sum(`bucket_2`) as osbalance,
-                                    sum(`bill_amount_2`) - sum(`bucket_2`) as collection,
-                                    "60h" as kpi,
-                                    (SUM(`bill_amount_2`) - sum(`bucket_2`)) / SUM(`bill_amount_2`) as performansi
-                                    ')
-            ->orderBy('periode')
-            ->orderBy('area')
-            ->where('periode', '=', $request->get('start'))
-            ->where('customer_type','=','S')
-            ->having('billing','>',0);
-        $d90h = BillingCollectionPOC::groupBy('periode','area')
-            ->selectRaw('periode,
-                                area,
-                                    sum(bill_amount_3) as billing , 
-                                    sum(`bucket_3`) as osbalance,
-                                    sum(`bill_amount_3`) - sum(`bucket_3`) as collection,
-                                    "90h" as kpi,
-                                    (SUM(`bill_amount_3`) - sum(`bucket_3`)) / SUM(`bill_amount_3`) as performansi
-                                    ')
-            ->orderBy('periode')
-            ->orderBy('area')
-            ->where('periode', '=', $request->get('start'))
-            ->where('customer_type','=','S')
-            ->having('billing','>',0)
+        $d60h = BillingCollectionPOC::periode($request->get('start'))
+            ->customerType('S')
+            ->d60hArea()
+            ->billingNonZero();
+        $d90h = BillingCollectionPOC::
+            periode($request->get('start'))
+            ->customerType('S')
+            ->d90hArea()
+            ->billingNonZero()
             ->union($d60h);
 
         $bilco = datatables()->of($d90h);
         //$result = json_decode((string) $bilco, true);
         $result = $bilco;
         //return response()->json($result, $this->successStatus);
-        return $bilco->toJson();
+
+        if($request->has('export')){
+            $arr = ($bilco->toArray())['data'];
+            $list = new Collection();
+            $list = collect($arr);
+            return (new FastExcel($list))->download('file.'.$request->get('export'));
+        }else{
+            return $bilco->toJson();
+        }
+        return false;
     }
 
   /**
