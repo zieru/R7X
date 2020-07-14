@@ -39,7 +39,7 @@ class SyncBilcollection extends Command
         $guzzle = new Client();
 
             try {
-                $response = $guzzle->request('GET', $url /*, ['proxy' => 'http://10.59.82.1:8080']*/);
+                $response = $guzzle->request('GET', $url , ['proxy' => 'http://10.59.82.1:8080']);
                 Storage::put($path.$imgName, $response->getBody());
                 $response = sprintf('file %s downloaded, size:%d kb',$imgName, Storage::size($path.$imgName));
             } catch (\GuzzleHttp\Exception\ConnectException $e) {
