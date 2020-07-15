@@ -26,9 +26,20 @@ class FormAdjustmentController extends Controller
     }
 
     public function report(){
+        $data = [];
       $f=  FormAdjustment::groupBy('user_eksekutor')
         ->selectRaw('user_eksekutor,count(msisdn) as msisdn,sum(nominal) as nominal');
-      return datatables()->of($f)->toJson();
+       $x= FormAdjustment::selectRaw('user_eksekutor,reason, msisdn, nominal');
+        $loop= 0;
+       foreach ($f->get()->toArray() as $head){
+           $data[$loop] = $head;
+           foreach ($x->get()->toArray() as $child){
+               if($child['user_eksekutor'] === $head['user_eksekutor']) $data[$loop]['children'][] = $child;
+           }
+           $loop++;
+       }
+
+      return datatables()->of($data)->toJson();
     }
     public function reportreason(){
       $f=  FormAdjustment::groupBy('reason')

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\API;
+use App\FormAdjustment;
 use Carbon\Carbon;
 use App\Imports\FormAdjustmentImport;
 use App\Importer;
@@ -21,7 +22,21 @@ class FormRefundController extends Controller
      */
     public function index()
     {
-        //
+        $data = [];
+        $f=  FormRefund::groupBy('user_eksekutor')
+            ->selectRaw('user_eksekutor,count(msisdn) as msisdn,sum(new_balance) as new_balance');
+        $x= FormRefund::selectRaw('user_eksekutor,reason, msisdn, new_balance');
+        $loop= 0;
+        foreach ($f->get()->toArray() as $head){
+            $data[$loop] = $head;
+            foreach ($x->get()->toArray() as $child){
+                if($child['user_eksekutor'] === $head['user_eksekutor']) $data[$loop]['children'][] = $child;
+            }
+            $loop++;
+        }
+
+        //dd($data);
+        return datatables()->of($data)->toJson();
     }
 
     /**

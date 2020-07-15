@@ -37,6 +37,7 @@ Route::prefix('telegram')->group(function(){
 Route::apiResource('notifier', 'NotifierController');
 Route::prefix('v1')->middleware(['CheckClientCredentials','auth:api'])->group(function() {
     Route::apiResource('importer', 'ImporterController');
+    Route::apiResource('config', 'API\ConfigController');
     Route::any('billCo/dashboard/poc', 'BillingCollectionController@dashboardApiPOC')->name('api.v1.bilco.dashboard.poc');
     Route::any('billCo/dashboard', 'BillingCollectionController@dashboardApi')->name('api.v1.bilco.dashboard');
     Route::any('billCo/dashboard/area', 'BillingCollectionController@dashboardApiArea')->name('api.v1.bilco.dashboard.area');

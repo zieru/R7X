@@ -2,6 +2,8 @@
 
 namespace App\Exceptions;
 
+namespace App\Exceptions;
+
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
@@ -52,6 +54,10 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
+        if ($request->is('api/*')) {
+          //  return response()->json($exception);
+        }
+
         return parent::render($request, $exception);
     }
 }
