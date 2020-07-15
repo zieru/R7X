@@ -34,7 +34,7 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')
         //          ->hourly();
         $schedule->command('SyncBilcollection')
-            ->at('09:00')
+            ->at('08:30')
             ->appendOutputTo(storage_path() . "/logs/mail.recent");
 	//$schedule->exec('touch lol.txt')->dailyAt('00:24');
     }
