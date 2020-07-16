@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Auth;
 use GuzzleHttp\Client;
 use App\User;
+use Hash;
 use Illuminate\Support\Facades\Cookie;
 use Laravel\Socialite\Facades\Socialite;
 use Redirect;
@@ -31,7 +32,17 @@ class UsersController extends Controller
 
         $fieldType = filter_var($request->username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
         if (auth()->attempt(array($fieldType => $input['username'], 'password' => $input['password'], 'active' => 1),false,false)){
-            return response()->json(Auth::user(), 200);
+            $user = Auth::user();
+            $user['user_group'] = $user_group = User::with('groups')->find($user->id)->groups->first();
+            $user['user_group_id'] = $user_group->id;
+            switch ($user_group->id){
+                case 1:
+                    $user_perm[] = 'admin';
+                    break;
+                default:
+                    $user_perm[] = 'user';
+            }
+            return response()->json($user, 200);
         }else{
             return response()->json(['error'=>'Unauthorised'], 401);
         }
@@ -39,11 +50,12 @@ class UsersController extends Controller
     }
 
     public function login(Request $request) {
-        if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
+
+        $fieldType = filter_var($request->username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        if (Auth::attempt([$fieldType => request('email'), 'password' => request('password')])) {
             $oClient = OClient::where('password_client', 1)->first();
 
-
-            $x = (array) $this->getTokenAndRefreshToken($oClient, array('email'=>request('email'), 'password' => request('password'), 'type'=>'password'));
+            $x = (array) $this->getTokenAndRefreshToken($oClient, array('email'=>Auth::user()->email, 'password' => request('password'), 'type'=>'password'));
             $x['original']['status'] = 'ok';
             if($request->has('redirect')){
                 $request->session()->flash('token_data', $x['original']);
@@ -135,9 +147,12 @@ class UsersController extends Controller
         echo 'pass';
         $password = $request->password;
         $input = $request->all();
-        $input['password'] = bcrypt($input['password']);
+        $input['password'] = Hash::make($password);
+        var_dump($input);
         $user = User::create($input);
+        $user->password = Hash::make($password);
         $user->groups()->attach($request->post('group'));
+        $user->save();
         return $user;
         //$oClient = OClient::where('password_client', 1)->first();
         //return $this->getTokenAndRefreshToken($oClient, $user->email, $password);
