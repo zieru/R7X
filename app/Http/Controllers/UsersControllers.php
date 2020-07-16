@@ -284,8 +284,8 @@ class UsersController extends Controller
         );
 
         $user['roleId']  = "admin";
-        $user['avatar'] = 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png';
-
+        //$user['avatar'] = 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png';
+	$user['avatar'] = '/avatar2.jpg';
         return response()->json($user, $this->successStatus);
     }
 
