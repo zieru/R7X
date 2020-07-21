@@ -31,18 +31,21 @@ class UsersController extends Controller
         ]);
 
         $fieldType = filter_var($request->username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
-        if (auth()->attempt(array($fieldType => $input['username'], 'password' => $input['password'], 'active' => 1),false,false)){
+
+        if (auth()->attempt(array($fieldType => $input['username'], 'password' => $input['password']),false,false)){
             $user = Auth::user();
-            $user['user_group'] = $user_group = User::with('groups')->find($user->id)->groups->first();
-            $user['user_group_id'] = $user_group->id;
-            switch ($user_group->id){
-                case 1:
-                    $user_perm[] = 'admin';
-                    break;
-                default:
-                    $user_perm[] = 'user';
+            if($user->isActive()) {
+                $user['user_group'] = $user_group = User::with('groups')->find($user->id)->groups->first();
+                $user['user_group_id'] = $user_group->id;
+                switch ($user_group->id) {
+                    case 1:
+                        $user_perm[] = 'admin';
+                        break;
+                    default:
+                        $user_perm[] = 'user';
+                }
+                return response()->json($user, 200);
             }
-            return response()->json($user, 200);
         }else{
             return response()->json(['error'=>'Unauthorised'], 401);
         }
@@ -52,19 +55,20 @@ class UsersController extends Controller
     public function login(Request $request) {
 
         $fieldType = filter_var($request->username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
-        if (Auth::attempt([$fieldType => request('email'), 'password' => request('password')])) {
-            $oClient = OClient::where('password_client', 1)->first();
+        if (Auth::attempt([$fieldType => request('email'), 'password' => request('password'),'active' => 1])) {
+            $user = Auth::user();
+                $oClient = OClient::where('password_client', 1)->first();
 
-            $x = (array) $this->getTokenAndRefreshToken($oClient, array('email'=>Auth::user()->email, 'password' => request('password'), 'type'=>'password'));
-            $x['original']['status'] = 'ok';
-            if($request->has('redirect')){
-                $request->session()->flash('token_data', $x['original']);
-                return redirect($request->get('redirect'));
-            }
+                $x = (array) $this->getTokenAndRefreshToken($oClient, array('email'=>Auth::user()->email, 'password' => request('password'), 'type'=>'password'));
+                $x['original']['status'] = 'ok';
+                if($request->has('redirect')){
+                    $request->session()->flash('token_data', $x['original']);
+                    return redirect($request->get('redirect'));
+                }
             return response()->json($x['original'],200);
         }
         else {
-            return response()->json(['error'=>'Unauthorised'], 401);
+            return response()->json(['error'=>'Unauthorised, Please ask administrator to create your account or activate your account'], 401);
         }
     }
     public function redirectToProvider(Request $request)
@@ -147,10 +151,9 @@ class UsersController extends Controller
         echo 'pass';
         $password = $request->password;
         $input = $request->all();
-        $input['password'] = Hash::make($password);
+        //$input['password'] = Hash::make($password);
         var_dump($input);
         $user = User::create($input);
-        $user->password = Hash::make($password);
         $user->groups()->attach($request->post('group'));
         $user->save();
         return $user;

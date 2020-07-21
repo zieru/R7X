@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 use Carbon\Carbon;
 use App\Imports\FormAdjustmentImport;
 use App\Importer;
+use DateTime;
 use DB;
 
 use App\FormAdjustment;
@@ -25,16 +26,29 @@ class FormAdjustmentController extends Controller
         //
     }
 
-    public function report(){
+    public function report(Request $request){
+        $grup = 'user';
+        $period = DateTime::createFromFormat('Y-m', $request->get('period'));
+        if($request->has('grup')){
+            $grup = $request->get('grup');
+        }
+        switch(strtoupper($grup)){
+            case 'USER':
+                $tbl_grup = 'user_eksekutor';
+            break;
+            case 'REASON':
+                $tbl_grup = 'reason';
+                break;
+        }
         $data = [];
-      $f=  FormAdjustment::groupBy('user_eksekutor')
-        ->selectRaw('user_eksekutor,count(msisdn) as msisdn,sum(nominal) as nominal');
-       $x= FormAdjustment::selectRaw('user_eksekutor,reason, msisdn, nominal');
+
+        $f= FormAdjustment::groupBy($tbl_grup)->selectRaw("$tbl_grup,count(msisdn) as msisdn,sum(nominal) as nominal")->whereBetween('tgl_adj',[$period->format('Y-m-1'),$period->format('Y-m-t')]);
+        $x= FormAdjustment::selectRaw("user_eksekutor,reason, msisdn, nominal")->whereBetween('tgl_adj',[$period->format('Y-m-1'),$period->format('Y-m-t')]);
         $loop= 0;
        foreach ($f->get()->toArray() as $head){
            $data[$loop] = $head;
            foreach ($x->get()->toArray() as $child){
-               if($child['user_eksekutor'] === $head['user_eksekutor']) $data[$loop]['children'][] = $child;
+               if($child[$tbl_grup] === $head[$tbl_grup]) $data[$loop]['children'][] = $child;
            }
            $loop++;
        }
