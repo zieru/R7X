@@ -560,6 +560,7 @@ class BillingCollectionController extends Controller
             ->where('bc.regional', '!=', '**************')
             ->where('bc.area', '=', 'AREA I')
             ->where('bc.customer_type', '=', 'S');
+            $targetArea = BillingCollectionTarget::select('target')->where('periode',$d->format('Y-m-1'))->where('regional','AREA1')->get()->toArray()[0]['target'];
         if($bc){
             if($request->has('bc_val')){
                 $d90h->where('bc.bill_cycle','=',$request->get('bc_val'));
@@ -568,10 +569,16 @@ class BillingCollectionController extends Controller
         $d90harr = $d90h->get()->toArray();
         $temp = array();
         $target = (float)0.974820372699075;
+        $c = array(
+            'comma'=> 2,
+            'billing'=>0,
+            'bucket'=>0,
+            'collection'=>0,
+            'perfomansi_nominal'=> 0
+            );
         $area = array();
         foreach ($d90harr as $row) {
             $target = (float)$row['target'];
-
             $x = array();
             $x['collection_60h'] = $row['billing_2'] - $row['bucket_2'];
             $x['perfomansi_60h'] = $x['collection_60h'] / $row['billing_2'];
@@ -579,23 +586,12 @@ class BillingCollectionController extends Controller
             $x['collection_90h'] = $row['billing_3'] - $row['bucket_3'];
             $x['perfomansi_90h'] = $x['collection_90h'] / $row['billing_3'];
             $x['perfomansi_90h_gap'] = $target - $x['perfomansi_90h'];
-            /*$temp[] = array(
-                'regional' => $row['regional'],
-                'kpi' => '60h',
-                'area' => $row['area'],
-                'bill_cycle' => $row['bill_cycle'],
-                'billing' => (float) $row['billing_2'],
-                'bucket' => (float) $row['bucket_2'],
-                'collection' => $x['collection_60h'],
-                'perfomansi' => $x['perfomansi_60h'],
-                'perfomansi_target' => number_format($target*100,2),
-                'perfomansi_percent' => number_format($x['perfomansi_60h']*100,2),
-                'perfomansi_gap' => number_format($x['perfomansi_60h_gap']*100,2),
-                'perfomansi_nominal' => number_format($x['perfomansi_60h_gap'] * $row['billing_2']),
-                'target' => $target,
-            );*/
-
-
+            $x['perfomansi_nominal'] =$x['perfomansi_90h_gap'] * $row['billing_3'];
+            //number_format($x['perfomansi_90h_gap'] * $row['billing_3'],false,'.', '.');
+            $c['billing'] += (float)$row['billing_3'];
+            $c['bucket'] += (float)$row['bucket_3'];
+            $c['collection'] += (float)$x['collection_90h'];
+            $c['perfomansi_nominal'] += $x['perfomansi_nominal'];
 
             $temp[] = array(
                 'regional' => $row['regional'],
@@ -606,12 +602,13 @@ class BillingCollectionController extends Controller
                 'bucket' => (float)$row['bucket_3'],
                 'collection' => $x['collection_90h'],
                 'perfomansi' => $x['perfomansi_90h'],
-                'perfomansi_target' => number_format($target * 100, 2),
-                'perfomansi_percent' => number_format($x['perfomansi_90h'] * 100, 2),
-                'perfomansi_gap' => number_format($x['perfomansi_90h_gap'] * 100, 2,'.', ''),
-                'perfomansi_nominal' => number_format($x['perfomansi_90h_gap'] * $row['billing_3'],false,'.', '.'),
+                'perfomansi_target' => (float) number_format($target * 100, $c['comma']),
+                'perfomansi_percent' => (float)number_format($x['perfomansi_90h'] * 100, $c['comma']),
+                'perfomansi_gap' => (float)number_format($x['perfomansi_90h_gap'] * 100, $c['comma'],'.', ''),
+                'perfomansi_nominal' => number_format($x['perfomansi_nominal']),
                 'target' => $target,
             );
+
             $area['perfomansi_target'][] = $target;
             $area['perfomansi_percent'][] = $x['perfomansi_90h'];//actual
             $area['perfomansi_gap'][] = $x['perfomansi_90h_gap'];
@@ -623,7 +620,6 @@ class BillingCollectionController extends Controller
         if (isset($temp)) {
             $bill_3 = 0; $bucket_3 = 0;
             if(isset($row)){
-
                 if(array_key_exists('billing_3',$row)){
                     $bill_3 = (float)$row['billing_3'];
                 }
@@ -632,20 +628,24 @@ class BillingCollectionController extends Controller
                 }
             }
 
+            $m['perfomansi_percent'] = $c['collection'] / $c['billing'];
+            $m['perfomansi_target'] = $targetArea;
+            $m['perfomansi_gap'] = $m['perfomansi_target'] - $m['perfomansi_percent'];
+            $m['perfomansi_nominal']= $m['perfomansi_gap'] * $c['billing'];
             $temp[] = array(
                 'regional' => 'AREA I',
                 'kpi' => '90h',
                 'area' => 'AREA I',
                 'bill_cycle' => NULL,
-                'billing' => $bill_3,
-                'bucket' => $bucket_3,
-                'collection' => 0,
+                'billing' => $c['billing'],
+                'bucket' => $c['bucket'],
+                'collection' => $c['collection'],
                 'perfomansi' => 0,
-                'perfomansi_target' => number_format(array_sum($area['perfomansi_target']) / count($area['perfomansi_target']) * 100, 2),
-                'perfomansi_percent' => number_format(array_sum($area['perfomansi_percent']) / count($area['perfomansi_percent']) * 100, 2),
-                'perfomansi_gap' => number_format(array_sum($area['perfomansi_gap']) / count($area['perfomansi_gap']) * 100, 2),
-                'perfomansi_nominal' => number_format(array_sum($area['perfomansi_nominal']),false,'.','.'),
-                'target' => 0,
+                'perfomansi_target' => number_format($m['perfomansi_target'] * 100, $c['comma']),
+                'perfomansi_percent' => number_format(($m['perfomansi_percent'])* 100 , $c['comma']),
+                'perfomansi_gap' => number_format($m['perfomansi_gap'] * 100, $c['comma']),
+                'perfomansi_nominal' => number_format($m['perfomansi_nominal']),
+                'target' => $m['perfomansi_target'],
             );
         }
 
