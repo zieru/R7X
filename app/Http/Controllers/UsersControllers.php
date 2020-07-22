@@ -54,7 +54,8 @@ class UsersController extends Controller
 
     public function login(Request $request) {
 
-        $fieldType = filter_var($request->username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        $fieldType = filter_var(request('email'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
         if (Auth::attempt([$fieldType => request('email'), 'password' => request('password'),'active' => 1])) {
             $user = Auth::user();
                 $oClient = OClient::where('password_client', 1)->first();
