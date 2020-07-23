@@ -10,6 +10,7 @@ use App\FormRefund;
 
 use Auth;
 use App\Http\Controllers\Controller;
+use DateTime;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -20,17 +21,33 @@ class FormRefundController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        $grup = 'user';
+        $period = DateTime::createFromFormat('Y-m', $request->get('period'));
+        if($request->has('grup')){
+            $grup = $request->get('grup');
+        }
+        switch(strtoupper($grup)){
+            case 'USER':
+                $tbl_grup = 'user_eksekutor';
+                break;
+            case 'REASON':
+                $tbl_grup = 'reason';
+                break;
+        }
         $data = [];
-        $f=  FormRefund::groupBy('user_eksekutor')
-            ->selectRaw('user_eksekutor,count(msisdn) as msisdn,format(new_balance - balance,0) as nominal');
-        $x= FormRefund::selectRaw('user_eksekutor,reason, msisdn,format(new_balance - balance,0) as nominal');
+        $f= FormRefund::groupBy($tbl_grup)
+            ->selectRaw("$tbl_grup,count(msisdn) as msisdn,format(new_balance - balance,0) as nominal")
+            ->whereBetween('tanggal_eksekusi',[$period->format('Y-m-1'),$period->format('Y-m-t')]);
+
+        $x= FormRefund::selectRaw('user_eksekutor,reason, msisdn,format(new_balance - balance,0) as nominal')
+            ->whereBetween('tanggal_eksekusi',[$period->format('Y-m-1'),$period->format('Y-m-t')]);
         $loop= 0;
         foreach ($f->get()->toArray() as $head){
             $data[$loop] = $head;
             foreach ($x->get()->toArray() as $child){
-                if($child['user_eksekutor'] === $head['user_eksekutor']) $data[$loop]['children'][] = $child;
+                if($child[$tbl_grup] === $head[$tbl_grup]) $data[$loop]['children'][] = $child;
             }
             $loop++;
         }
