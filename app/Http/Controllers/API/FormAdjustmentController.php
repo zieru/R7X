@@ -42,8 +42,11 @@ class FormAdjustmentController extends Controller
         }
         $data = [];
 
-        $f= FormAdjustment::groupBy($tbl_grup)->selectRaw("$tbl_grup,count(msisdn) as msisdn,sum(nominal) as nominal")->whereBetween('tgl_adj',[$period->format('Y-m-1'),$period->format('Y-m-t')]);
-        $x= FormAdjustment::selectRaw("user_eksekutor,reason, msisdn, nominal")->whereBetween('tgl_adj',[$period->format('Y-m-1'),$period->format('Y-m-t')]);
+        //dd(FormAdjustment::all());
+        $f= FormAdjustment::groupBy($tbl_grup)
+            ->selectRaw("$tbl_grup,count(msisdn) as msisdn,FORMAT(sum(nominal),0) as nominal")
+            ->whereBetween('tgl_adj',[$period->format('Y-m-1'),$period->format('Y-m-t')]);
+        $x= FormAdjustment::selectRaw("user_eksekutor,reason, msisdn, FORMAT(nominal,0) as nominal")->whereBetween('tgl_adj',[$period->format('Y-m-1'),$period->format('Y-m-t')]);
         $loop= 0;
        foreach ($f->get()->toArray() as $head){
            $data[$loop] = $head;

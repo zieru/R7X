@@ -24,8 +24,8 @@ class FormRefundController extends Controller
     {
         $data = [];
         $f=  FormRefund::groupBy('user_eksekutor')
-            ->selectRaw('user_eksekutor,count(msisdn) as msisdn,sum(new_balance) as new_balance');
-        $x= FormRefund::selectRaw('user_eksekutor,reason, msisdn, new_balance');
+            ->selectRaw('user_eksekutor,count(msisdn) as msisdn,format(new_balance - balance,0) as nominal');
+        $x= FormRefund::selectRaw('user_eksekutor,reason, msisdn,format(new_balance - balance,0) as nominal');
         $loop= 0;
         foreach ($f->get()->toArray() as $head){
             $data[$loop] = $head;
