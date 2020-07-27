@@ -65,7 +65,6 @@ class SyncBilcollection extends Command
         }else{
             $this->info('proses download :'.$filename);
             if($this->option('testing') == "false"){
-
                 $user = Notifier::create([
                     'type' => 'CollectionImport',
                     'subject' => 'Collection Import file',
