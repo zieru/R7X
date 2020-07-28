@@ -13,6 +13,7 @@ use App\Http\Controllers\Controller;
 use DateTime;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use Response;
 
 class FormRefundController extends Controller
 {
@@ -75,11 +76,48 @@ class FormRefundController extends Controller
      $excel = Excel::toArray(new FormAdjustmentImport, $request->file('files'));
      foreach ($excel[0] as $row){
          if($row['shop'] != null) {
+             $tgl_eksekusi = $tgl_permintaan = 'empty';
+             $now = Carbon::now('utc')->toDateTimeString();
              $row['import_batch'] = $importer->id;
              $row['author'] = Auth::user()->id;
+             if(!isset($row['tgl_permintaan'])){
+                 header('Access-Control-Allow-Origin: *');
+                 header('Access-Control-Allow-Methods: GET, POST');
+                 header("Access-Control-Allow-Headers: X-Requested-With");
+                 http_response_code(500);
+                 exit('{"message":" Please check column tgl_permintaan format"}');
+             }
+             if(!isset($row['tgl_eksekusi'])){
+                 header('Access-Control-Allow-Origin: *');
+                 header('Access-Control-Allow-Methods: GET, POST');
+                 header("Access-Control-Allow-Headers: X-Requested-With");
+                 http_response_code(500);
+                 exit('{"message":" Please check column tgl_eksekusi format"}');
+             }
+             try {
+                 gmdate("Y-m-d", ($row['tgl_permintaan'] - 25569) * 86400);
+             }
+             catch (Exception $e) {
+                 header('Access-Control-Allow-Origin: *');
+                 header('Access-Control-Allow-Methods: GET, POST');
+                 header("Access-Control-Allow-Headers: X-Requested-With");
+                 http_response_code(500);
+                 exit('{"message":"'.$e->getMessage().' Please check column tgl_permintaan ('.$row['tgl_permintaan'].') format"}');
+             }
+             try{
+                 gmdate("Y-m-d", ($row['tgl_eksekusi'] - 25569) * 86400);
+             }
+             catch (Exception $e) {
+                 header('Access-Control-Allow-Origin: *');
+                 header('Access-Control-Allow-Methods: GET, POST');
+                 header("Access-Control-Allow-Headers: X-Requested-With");
+                 http_response_code(500);
+                 exit('{"message":"'.$e->getMessage().' Please check column tgl_eksekusi ('.$row['tgl_eksekusi'].') format"}');
+             }
              $row['tanggal_permintaan'] = gmdate("Y-m-d", ($row['tgl_permintaan'] - 25569) * 86400);
              $row['tanggal_eksekusi'] = gmdate("Y-m-d", ($row['tgl_eksekusi'] - 25569) * 86400);
-
+             $row['created_at'] = $now;
+             $row['updated_at'] = $now;
              unset($row['tgl_permintaan']);
              unset($row['tgl_eksekusi']);
              $rowx = $row;
@@ -88,8 +126,7 @@ class FormRefundController extends Controller
       FormRefund::insert($rowx);
       $importer->status = "Finish";
       $importer->save();
-      echo 'x';
-        //
+      return Response::json(array('message' => 'Upload Success!'),200);
     }
 
     /**

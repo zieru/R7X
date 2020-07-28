@@ -6,7 +6,8 @@ use App\Imports\FormAdjustmentImport;
 use App\Importer;
 use DateTime;
 use DB;
-
+use Exception;
+use Response;
 use App\FormAdjustment;
 
 use Auth;
@@ -65,6 +66,7 @@ class FormAdjustmentController extends Controller
       return datatables()->of($f)->toJson();
     }
 
+
     /**
      * Store a newly created resource in storage.
      *
@@ -85,10 +87,33 @@ class FormAdjustmentController extends Controller
       $excel = Excel::toArray($FormAdjustmentImport, $request->file('files'));
       $rowx = array();
      foreach ($excel[0] as $row){
-       if($row['shop'] != null){
+         $now = Carbon::now('utc')->toDateTimeString();
+         if($row['shop'] != null){
          $row['import_batch'] = $importer->id;
          $row['author'] = Auth::user()->id;
+         try {
+             gmdate("Y-m-d", ($row['bulan_tagihan'] - 25569) * 86400);
+         }
+         catch (Exception $e) {
+             header('Access-Control-Allow-Origin: *');
+             header('Access-Control-Allow-Methods: GET, POST');
+             header("Access-Control-Allow-Headers: X-Requested-With");
+                http_response_code(500);
+                exit('{"message":"'.$e->getMessage().' Please check column bulan_tagihan ('.$row['bulan_tagihan'].') format"}');
+         }
+         try{
+             gmdate("Y-m-d", ($row['tanggal_adjustment'] - 25569) * 86400);
+         }
+         catch (Exception $e) {
+             header('Access-Control-Allow-Origin: *');
+             header('Access-Control-Allow-Methods: GET, POST');
+             header("Access-Control-Allow-Headers: X-Requested-With");
+             http_response_code(500);
+             exit('{"message":"'.$e->getMessage().' Please check column tanggal_adjustment ('.$row['tanggal_adjustment'].') format"}');
+         }
          $row['bulantagihan'] = gmdate("Y-m-d", ($row['bulan_tagihan'] - 25569) * 86400);
+         $row['created_at'] = $now;
+         $row['updated_at'] = $now;
          $row['tgl_adj'] = gmdate("Y-m-d", ($row['tanggal_adjustment'] - 25569) * 86400);
          $row['nodin_ba'] = $row['nomor_nodinba'];
          unset($row['bulan_tagihan']);unset($row['nomor_nodinba']);unset($row['tanggal_adjustment']);unset($row['']);
@@ -98,6 +123,7 @@ class FormAdjustmentController extends Controller
       FormAdjustment::insert($rowx);
       $importer->status = "Finish";
       $importer->save();
+      return Response::json(array('message' => 'Upload Success!'),200);
     }
 
     /**
