@@ -75,11 +75,27 @@ class FormRefundController extends Controller
         $rowx = array();
      $excel = Excel::toArray(new FormAdjustmentImport, $request->file('files'));
      foreach ($excel[0] as $row){
-         if($row['shop'] != null) {
-             $tgl_eksekusi = $tgl_permintaan = 'empty';
+         if($row['shop'] !== null) {
+             $d = array();
              $now = Carbon::now('utc')->toDateTimeString();
              $row['import_batch'] = $importer->id;
-             $row['author'] = Auth::user()->id;
+             $d['shop'] = $row['shop'];
+             $d['import_batch'] = $row['import_batch'];
+             $d['author'] = $row['author'] = Auth::user()->id;
+             $d['msisdn'] = $row['msisdn'];
+             $d['amount'] = $row['amount'];
+             $d['balance'] = $row['balance'];
+             $d['new_balance'] = $row['new_balance'];
+             $d['reason'] = $row['reason'];
+             $d['nodin_ba'] = $row['nodin_ba'];
+             $d['notes_dsc'] = $row['notes_dsc'];
+             $d['user_eksekutor'] = $row['user_eksekutor'];
+             $tgl_eksekusi = $tgl_permintaan = 'empty';
+
+             $d['created_at'] = $row['created_at'] = $now;
+             $d['updated_at'] = $row['updated_at'] = $now;
+
+
              if(!isset($row['tgl_permintaan'])){
                  header('Access-Control-Allow-Origin: *');
                  header('Access-Control-Allow-Methods: GET, POST');
@@ -114,16 +130,15 @@ class FormRefundController extends Controller
                  http_response_code(500);
                  exit('{"message":"'.$e->getMessage().' Please check column tgl_eksekusi ('.$row['tgl_eksekusi'].') format"}');
              }
-             $row['tanggal_permintaan'] = gmdate("Y-m-d", ($row['tgl_permintaan'] - 25569) * 86400);
-             $row['tanggal_eksekusi'] = gmdate("Y-m-d", ($row['tgl_eksekusi'] - 25569) * 86400);
-             $row['created_at'] = $now;
-             $row['updated_at'] = $now;
+             $d['tanggal_permintaan'] = $row['tanggal_permintaan'] = gmdate("Y-m-d", ($row['tgl_permintaan'] - 25569) * 86400);
+             $d['tanggal_eksekusi'] = $row['tanggal_eksekusi'] = gmdate("Y-m-d", ($row['tgl_eksekusi'] - 25569) * 86400);
+
              unset($row['tgl_permintaan']);
              unset($row['tgl_eksekusi']);
-             $rowx = $row;
+             $rowx[] = $d;
          }
      }
-      FormRefund::insert($rowx);
+      FormRefund::insert($row);
       $importer->status = "Finish";
       $importer->save();
       return Response::json(array('message' => 'Upload Success!'),200);
