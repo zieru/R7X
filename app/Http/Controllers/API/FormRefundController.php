@@ -138,7 +138,8 @@ class FormRefundController extends Controller
              $rowx[] = $d;
          }
      }
-      FormRefund::insert($row);
+      //dd($rowx);
+      FormRefund::insert($rowx);
       $importer->status = "Finish";
       $importer->save();
       return Response::json(array('message' => 'Upload Success!'),200);
