@@ -40,10 +40,10 @@ class FormRefundController extends Controller
         $data = [];
         $f= FormRefund::groupBy($tbl_grup)
             ->selectRaw("$tbl_grup,count(msisdn) as msisdn,format(new_balance - balance,0) as nominal")
-            ->whereBetween('tanggal_eksekusi',[$period->format('Y-m-1'),$period->format('Y-m-t')]);
+            ->whereBetween('tanggal_permintaan',[$period->format('Y-m-1'),$period->format('Y-m-t')]);
 
         $x= FormRefund::selectRaw('user_eksekutor,reason, msisdn,format(new_balance - balance,0) as nominal')
-            ->whereBetween('tanggal_eksekusi',[$period->format('Y-m-1'),$period->format('Y-m-t')]);
+            ->whereBetween('tanggal_permintaan',[$period->format('Y-m-1'),$period->format('Y-m-t')]);
         $loop= 0;
         foreach ($f->get()->toArray() as $head){
             $data[$loop] = $head;
