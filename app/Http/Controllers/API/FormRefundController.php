@@ -39,7 +39,7 @@ class FormRefundController extends Controller
         }
         $data = [];
         $f= FormRefund::groupBy($tbl_grup)
-            ->selectRaw("$tbl_grup,count(msisdn) as msisdn,format(new_balance - balance,0) as nominal")
+            ->selectRaw("$tbl_grup,count(msisdn) as msisdn,format(sum(new_balance) - sum(balance),0) as nominal")
             ->whereBetween('tanggal_permintaan',[$period->format('Y-m-1'),$period->format('Y-m-t')]);
 
         $x= FormRefund::selectRaw('user_eksekutor,reason, msisdn,format(new_balance - balance,0) as nominal')
