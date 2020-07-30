@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App;
 use Auth;
 use GuzzleHttp\Client;
 use App\User;
@@ -266,6 +267,10 @@ class UsersController extends Controller
             case 1:
               $user_perm[] = 'admin';
               break;
+            Case 5;
+                $user_perm[] = 'admin';
+                $user_perm[] = 'itdev';
+                break;
             default:
               $user_perm[] = 'user';
           }
@@ -289,7 +294,8 @@ class UsersController extends Controller
 
         $user['roleId']  = "admin";
         //$user['avatar'] = 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png';
-	$user['avatar'] = '/avatar2.jpg';
+	    $user['avatar'] = '/avatar2.jpg';
+	    $user['version'] = App::VERSION();
         return response()->json($user, $this->successStatus);
     }
 

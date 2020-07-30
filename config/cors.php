@@ -26,7 +26,7 @@ return [
     /*
     * Matches the request method. `[*]` allows all methods.
     */
-    'allowed_methods' => ['*'],
+    'allowed_methods' => ['GET','POST','PUT','PATCH','OPTIONS'],
 
     /*
      * Matches the request origin. `[*]` allows all origins.
@@ -56,5 +56,5 @@ return [
     /*
      * Sets the Access-Control-Allow-Credentials header.
      */
-    'supports_credentials' => false,
+    'supports_credentials' => true,
 ];
