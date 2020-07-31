@@ -29,8 +29,10 @@ class FormAdjustmentController extends Controller
     }
 
     public function report(Request $request){
-        $grup = 'user';
-        $period = DateTime::createFromFormat('Y-m', $request->get('period'));
+        try {Carbon::createFromFormat('Y-m', $request->get('period'));}
+        catch (\Exception $e){AppHelper::sendErrorAndExit('Periode is invalid');}
+
+        $period = Carbon::createFromFormat('Y-m-d', $request->get('period')."-01");
         if($request->has('grup')){
             $grup = $request->get('grup');
         }
