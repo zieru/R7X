@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\API;
+use App\Helpers\AppHelper;
 use Carbon\Carbon;
 use App\Imports\FormAdjustmentImport;
 use App\Importer;
@@ -91,26 +92,12 @@ class FormAdjustmentController extends Controller
          if($row['shop'] != null){
          $row['import_batch'] = $importer->id;
          $row['author'] = Auth::user()->id;
-         try {
-             gmdate("Y-m-d", ($row['bulan_tagihan'] - 25569) * 86400);
-         }
-         catch (Exception $e) {
-             header('Access-Control-Allow-Origin: *');
-             header('Access-Control-Allow-Methods: GET, POST');
-             header("Access-Control-Allow-Headers: X-Requested-With");
-                http_response_code(500);
-                exit('{"message":"'.$e->getMessage().' Please check column bulan_tagihan ('.$row['bulan_tagihan'].') format"}');
-         }
-         try{
-             gmdate("Y-m-d", ($row['tanggal_adjustment'] - 25569) * 86400);
-         }
-         catch (Exception $e) {
-             header('Access-Control-Allow-Origin: *');
-             header('Access-Control-Allow-Methods: GET, POST');
-             header("Access-Control-Allow-Headers: X-Requested-With");
-             http_response_code(500);
-             exit('{"message":"'.$e->getMessage().' Please check column tanggal_adjustment ('.$row['tanggal_adjustment'].') format"}');
-         }
+         try { gmdate("Y-m-d", ($row['bulan_tagihan'] - 25569) * 86400);}
+         catch (Exception $e) { AppHelper::sendErrorAndExit($e->getMessage().' Please check column bulan_tagihan ('.$row['bulan_tagihan'].') format',500);}
+
+         try{ gmdate("Y-m-d", ($row['tanggal_adjustment'] - 25569) * 86400);}
+         catch (Exception $e) { AppHelper::sendErrorAndExit($e->getMessage().' Please check column tanggal_adjustment ('.$row['tanggal_adjustment'].') format',500);}
+
          $row['bulantagihan'] = gmdate("Y-m-d", ($row['bulan_tagihan'] - 25569) * 86400);
          $row['created_at'] = $now;
          $row['updated_at'] = $now;

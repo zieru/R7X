@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\API;
 use App\FormAdjustment;
+use App\Helpers\AppHelper;
 use Carbon\Carbon;
 use App\Imports\FormAdjustmentImport;
 use App\Importer;
-
 use App\FormRefund;
 
 use Auth;
@@ -25,7 +25,11 @@ class FormRefundController extends Controller
     public function index(Request $request)
     {
         $grup = 'user';
-        $period = DateTime::createFromFormat('Y-m', $request->get('period'));
+
+        try {Carbon::createFromFormat('Y-m', $request->get('period'));}
+        catch (\Exception $e){AppHelper::sendErrorAndExit('Periode is invalid');}
+
+        $period = Carbon::createFromFormat('Y-m-d', $request->get('period')."-01");
         if($request->has('grup')){
             $grup = $request->get('grup');
         }
@@ -97,38 +101,22 @@ class FormRefundController extends Controller
 
 
              if(!isset($row['tgl_permintaan'])){
-                 header('Access-Control-Allow-Origin: *');
-                 header('Access-Control-Allow-Methods: GET, POST');
-                 header("Access-Control-Allow-Headers: X-Requested-With");
-                 http_response_code(500);
-                 exit('{"message":" Please check column tgl_permintaan format"}');
+                 AppHelper::sendErrorAndExit('Please check column tgl_permintaan format',500);
              }
              if(!isset($row['tgl_eksekusi'])){
-                 header('Access-Control-Allow-Origin: *');
-                 header('Access-Control-Allow-Methods: GET, POST');
-                 header("Access-Control-Allow-Headers: X-Requested-With");
-                 http_response_code(500);
-                 exit('{"message":" Please check column tgl_eksekusi format"}');
+                 AppHelper::sendErrorAndExit('Please check column tgl_eksekusi format',500);
              }
              try {
                  gmdate("Y-m-d", ($row['tgl_permintaan'] - 25569) * 86400);
              }
              catch (Exception $e) {
-                 header('Access-Control-Allow-Origin: *');
-                 header('Access-Control-Allow-Methods: GET, POST');
-                 header("Access-Control-Allow-Headers: X-Requested-With");
-                 http_response_code(500);
-                 exit('{"message":"'.$e->getMessage().' Please check column tgl_permintaan ('.$row['tgl_permintaan'].') format"}');
+                 AppHelper::sendErrorAndExit($e->getMessage().' Please check column tgl_permintaan ('.$row['tgl_permintaan'].') format',500);
              }
              try{
                  gmdate("Y-m-d", ($row['tgl_eksekusi'] - 25569) * 86400);
              }
              catch (Exception $e) {
-                 header('Access-Control-Allow-Origin: *');
-                 header('Access-Control-Allow-Methods: GET, POST');
-                 header("Access-Control-Allow-Headers: X-Requested-With");
-                 http_response_code(500);
-                 exit('{"message":"'.$e->getMessage().' Please check column tgl_eksekusi ('.$row['tgl_eksekusi'].') format"}');
+                 AppHelper::sendErrorAndExit($e->getMessage().' Please check column tgl_eksekusi ('.$row['tgl_eksekusi'].') format',500);
              }
              $d['tanggal_permintaan'] = $row['tanggal_permintaan'] = gmdate("Y-m-d", ($row['tgl_permintaan'] - 25569) * 86400);
              $d['tanggal_eksekusi'] = $row['tanggal_eksekusi'] = gmdate("Y-m-d", ($row['tgl_eksekusi'] - 25569) * 86400);
