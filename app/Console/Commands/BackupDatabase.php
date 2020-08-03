@@ -17,14 +17,15 @@ class BackupDatabase extends Command
     public function __construct()
     {
         parent::__construct();
-        $x = sprintf('mysqldump --host="%s" -u"%s" -p"%s" %s | gzip > %s',
+        $x = sprintf('mysqldump --host="%s" -u"%s" -p"%s" %s --skip-lock-tables --single-transaction --quick | gzip > %s && rm %s/csv/*',
             config('database.connections.mysql.host'),
             config('database.connections.mysql.username'),
             config('database.connections.mysql.password'),
             config('database.connections.mysql.database'),
-            storage_path('app/backups/backup-' . Carbon::now()->format('Y-m-d') . '.gz')
+            storage_path('app/backups/backup-' . Carbon::now()->format('Y-m-d') . '.gz'),
+	    storage_path('app/bilcollection')
         );
-        $this->process = new Process(array($x));
+        $this->process = Process::fromShellCommandline($x);
     }
 
     public function handle()

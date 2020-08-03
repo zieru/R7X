@@ -68,15 +68,16 @@ class SyncBilcollection extends Command
                 $user = Notifier::create([
                     'type' => 'CollectionImport',
                     'subject' => 'Collection Import file',
-                    'message' => substr($this->guzzleDownload($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/'), 0, 128),
+                    'message' => substr($this->guzzleDownload($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/bilcollection/csv/'), 0, 128),
                 ]);
-            }
+            }else{
+	    	    echo $this->guzzleDownload($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/bilcollection/csv/');
+	    }
             $this->info('Downloaded :'.$filename);
             if($this->option('testing') == "false")
             {
-                $this->info('proses sum '. PHP_EOL);
+                $this->info('proses sum'. PHP_EOL);
                 $controller->create($filename,null,1);
-
             }
 
         };

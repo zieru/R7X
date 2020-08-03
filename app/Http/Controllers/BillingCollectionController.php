@@ -1611,7 +1611,7 @@ class BillingCollectionController extends Controller
         ini_set('xdebug.var_display_max_data', '1024');
 
       ini_set('display_errors', 'on');
-      $file = fopen(Storage::disk()->path($name),'r');
+      $file = fopen(Storage::disk()->path('/bilcollection/csv'.$name),'r');
       $header = null;
       $data = array();
 
