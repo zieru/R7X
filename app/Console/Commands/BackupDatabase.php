@@ -24,7 +24,6 @@ class BackupDatabase extends Command
             config('database.connections.mysql.database'),
             storage_path('app/backups/backup-' . Carbon::now()->format('Y-m-d') . '.gz')
         );
-echo $x;
         $this->process = new Process(array($x));
     }
 
