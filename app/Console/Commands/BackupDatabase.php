@@ -18,13 +18,14 @@ class BackupDatabase extends Command
     {
         parent::__construct();
         $x = sprintf(
-            'mysqldump --host="%s" -u%s -p %s %s > gzip > %s',
+            'mysqldump --host="%s" -u"%s" -p"%s" %s | gzip > %s',
             config('database.connections.mysql.host'),
             config('database.connections.mysql.username'),
             config('database.connections.mysql.password'),
             config('database.connections.mysql.database'),
             storage_path('app/backups/backup-' . Carbon::now()->format('Y-m-d') . '.gz')
         );
+echo $x;
         $this->process = new Process(array($x));
     }
 
@@ -34,7 +35,7 @@ class BackupDatabase extends Command
             $this->process->mustRun();
             $this->info('The backup has been proceed successfully.');
         } catch (ProcessFailedException $exception) {
-            $this->error('The backup process has been failed.');
+            $this->error('The backup process has been failed.'. $exception);
         }
     }
 }
