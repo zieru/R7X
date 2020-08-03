@@ -17,8 +17,7 @@ class BackupDatabase extends Command
     public function __construct()
     {
         parent::__construct();
-        $x = sprintf(
-            'mysqldump --host="%s" -u"%s" -p"%s" %s | gzip > %s',
+        $x = sprintf('mysqldump --host="%s" -u"%s" -p"%s" %s | gzip > %s',
             config('database.connections.mysql.host'),
             config('database.connections.mysql.username'),
             config('database.connections.mysql.password'),
@@ -35,7 +34,8 @@ echo $x;
             $this->process->mustRun();
             $this->info('The backup has been proceed successfully.');
         } catch (ProcessFailedException $exception) {
-            $this->error('The backup process has been failed.'. $exception);
+            echo ($exception);
+            $this->error('The backup process has been failed.');
         }
     }
 }
