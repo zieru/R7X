@@ -415,6 +415,13 @@ class BillingCollectionController extends Controller
                 'regional' => 'Sumbagsel'
             );
         }
+        if($request->has('area1')){
+            $arr[] = array('periode' => $date,
+                'target' => $request->post('area1'),
+                'regional' => 'AREA1'
+            );
+        }
+
 
         foreach($arr as $i){
             var_dump($i);
