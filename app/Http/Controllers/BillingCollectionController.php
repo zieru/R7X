@@ -654,7 +654,7 @@ class BillingCollectionController extends Controller
                 'perfomansi_target' => number_format($m['perfomansi_target'] * 100, $c['comma']),
                 'perfomansi_percent' => number_format(($m['perfomansi_percent'])* 100 , $c['comma']),
                 'perfomansi_gap' => number_format($m['perfomansi_gap'] * 100, $c['comma']),
-                'perfomansi_nominal' => number_format($m['perfomansi_nominal']),
+                'perfomansi_nominal' => number_format(array_sum($area['perfomansi_nominal'])),
                 'target' => $m['perfomansi_target'],
             );
         }
@@ -1477,7 +1477,7 @@ class BillingCollectionController extends Controller
     });
     //$lexer->parse($request->file('file'), $interpreter);
 
-    $lexer->parse(Storage::disk()->path($name), $interpreter);
+    $lexer->parse(Storage::disk()->path('/bilcollection/csv/'.$name), $interpreter);
     if (ob_get_level()) ob_end_clean();
     $finale = array();
     foreach ($arr1 as $periodes => $bcs){

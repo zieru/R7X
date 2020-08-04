@@ -16,7 +16,7 @@ class SyncBilcollection extends Command
      *
      * @var string
      */
-    protected $signature = 'SyncBilcollection {--file=} {--testing=false}';
+    protected $signature = 'SyncBilcollection {--file=} {--testing=false} {--nodownload=false}';
 
     /**
      * The console command description.
@@ -64,7 +64,7 @@ class SyncBilcollection extends Command
             }
         }else{
             $this->info('proses download :'.$filename);
-            if($this->option('testing') == "false"){
+            if($this->option('testing') == "false" OR $this->option('nodownload') == 'true'){
                 $user = Notifier::create([
                     'type' => 'CollectionImport',
                     'subject' => 'Collection Import file',
@@ -90,7 +90,9 @@ class SyncBilcollection extends Command
      */
     public function handle()
     {
-        $areas = array('Bali%20Nusra','Jabotabek','Jawa%20Barat','Jawa%20Tengah','Jawa%20Timur','Kalimantan','Puma','Sulawesi','Sumbagsel','Sumbagteng','Sumbagut','xxxxxxxxxxxxxx');
+        $areas = array('Bali%20Nusra','Jabotabek','Jawa%20Barat','Jawa%20Tengah','Jawa%20Timur','Kalimantan','Puma','Sulawesi','Sumbagsel','Sumbagteng',
+			'Sumbagut',
+			'xxxxxxxxxxxxxx');
         $filename = $this->option('file');
 
         if($filename== null){
