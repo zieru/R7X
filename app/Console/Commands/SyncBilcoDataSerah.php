@@ -42,7 +42,7 @@ class SyncBilcoDataSerah extends Command
         $controller = new BilcoDataSerahController();
         foreach($controller->fetch() as $row){
             $i = array();
-            $i['account_number'] = $row->account_number;
+            $i['account'] = $row->account_number;
             $i['msisdn'] = $row->msisdn;
             $i['bill_cycle'] = $row->bill_cycle;
             $i['region'] = $row->regional;
