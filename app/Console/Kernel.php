@@ -15,6 +15,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         //
+        Commands\SyncBilcoDataSerah::class,
         Commands\SyncBilcollection::class
     ];
 

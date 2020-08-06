@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 use App\Notifier;
+use Artisan;
 use Carbon\Carbon;
 use App\Http\Controllers\BillingCollectionController;
 use Storage;
@@ -61,6 +62,7 @@ class SyncBilcollection extends Command
         if(is_array($filename)){
             foreach ($filename as $name){
                 echo shell_exec(sprintf("php artisan Syncbilcollection --file=%s >> log.log",$name));
+                Artisan::call('db:backup');
             }
         }else{
             $this->info('proses download :'.$filename);
@@ -90,7 +92,16 @@ class SyncBilcollection extends Command
      */
     public function handle()
     {
-        $areas = array('Bali%20Nusra','Jabotabek','Jawa%20Barat','Jawa%20Tengah','Jawa%20Timur','Kalimantan','Puma','Sulawesi','Sumbagsel','Sumbagteng',
+        $areas = array('Bali%20Nusra',
+            'Jabotabek',
+            'Jawa%20Barat',
+            'Jawa%20Tengah',
+            'Jawa%20Timur',
+            'Kalimantan',
+            'Puma',
+            'Sulawesi',
+            'Sumbagsel',
+            'Sumbagteng',
 			'Sumbagut',
 			'xxxxxxxxxxxxxx');
         $filename = $this->option('file');
