@@ -43,6 +43,7 @@ class SyncBilcoDataSerah extends Command
         foreach($controller->fetch() as $row){
             $i = array();
             $i['account'] = $row->account_number;
+            $i['peride'] = $row->account_periode;
             $i['msisdn'] = $row->msisdn;
             $i['bill_cycle'] = $row->bill_cycle;
             $i['region'] = $row->regional;

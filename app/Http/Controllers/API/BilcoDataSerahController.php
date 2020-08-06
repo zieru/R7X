@@ -15,7 +15,7 @@ class BilcoDataSerahController extends Controller
                     $join->on('aging.msisdn', '=', 'bilco.msisdn');
                     $join->on('aging.account','=','bilco.account_number');
                 })
-                ->select('bilco.account_number','bilco.msisdn','bilco.bill_cycle','bilco.regional','bilco.bucket_4','bilco.bucket_3','bilco.bucket_2','bilco.bucket_1')
+                ->select('bilco.account_number','bilco.periode','bilco.msisdn','bilco.bill_cycle','bilco.regional','bilco.bucket_4','bilco.bucket_3','bilco.bucket_2','bilco.bucket_1')
                 ->get();
     }
     /**
