@@ -16,13 +16,16 @@ class BilcoDataSerahController extends Controller
                     $join->on('aging.account','=','bilco.account_number');
                     $join->on('aging.bill_cycle','=','bilco.bill_cycle');
                 })
-                ->join('olala2.cm_active as cmactive', function($join)
+                ->join('olala2.cm_active_unique as cmactive', function($join)
                 {
                     $join->on('cmactive.msisdn', '=', 'bilco.msisdn');
                     $join->on('cmactive.customer_id','=','bilco.account_number');
                     $join->on('cmactive.billcycle','=','bilco.bill_cycle');
                 })
-                ->select('bilco.account_number','bilco.periode','bilco.msisdn','bilco.bill_cycle','bilco.regional','bilco.bucket_4','bilco.bucket_3','bilco.bucket_2','bilco.bucket_1')
+                ->select('aging.account','bilco.periode','aging.msisdn','aging.bill_cycle','bilco.regional','bilco.bucket_4','bilco.bucket_3','bilco.bucket_2','bilco.bucket_1',
+                    'aging.grapari','aging.hlr_city','aging.bbs','aging.bbs_name','aging.bbs_company_name','aging.bbs_first_address','aging.bbs_second_address',
+                    'cmactive.customer_address','bbs_city','cmactive.customer_city','aging.bbs_zip_code','aging.aging_cust_subtype','aging.bbs_pay_type',
+                    'aging.bbs_RT','aging.aging_status_subscribe','aging.blocking_status','aging.note','cmactive.customer_phone')
                 ->get();
     }
     /**

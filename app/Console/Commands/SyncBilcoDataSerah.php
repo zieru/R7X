@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\BilcoDataSerah;
 use App\Http\Controllers\API\BilcoDataSerahController;
 use Illuminate\Console\Command;
+use phpDocumentor\Reflection\DocBlock\Tags\Var_;
 
 class SyncBilcoDataSerah extends Command
 {
@@ -40,9 +41,10 @@ class SyncBilcoDataSerah extends Command
     {
         $x = array();
         $controller = new BilcoDataSerahController();
+        $this->info($controller->fetch());
         foreach($controller->fetch() as $row){
-            $i = array();
-            $i['account'] = $row->account_number;
+            $i =  (array) $row;
+            /*$i['account'] = $row->account_number;
             $i['peride'] = $row->account_periode;
             $i['msisdn'] = $row->msisdn;
             $i['bill_cycle'] = $row->bill_cycle;
@@ -51,6 +53,8 @@ class SyncBilcoDataSerah extends Command
             $i['bucket_3']= $row->bucket_3;
             $i['bucket_2']= $row->bucket_2;
             $i['bucket_1']= $row->bucket_1;
+
+            */
             $i['import_batch']= 99;
             $i['total_outstanding'] = $row->bucket_4 + $row->bucket_3 + $row->bucket_2 + $row->bucket_1;
             $x[] = $i;
