@@ -26,7 +26,6 @@ class BilcoDataSerahController extends Controller
                     'aging.grapari','aging.hlr_city','aging.bbs','aging.bbs_name','aging.bbs_company_name','aging.bbs_first_address','aging.bbs_second_address',
                     'cmactive.customer_address','bbs_city','cmactive.customer_city','aging.bbs_zip_code','aging.aging_cust_subtype','aging.bbs_pay_type',
                     'aging.bbs_RT','aging.aging_status_subscribe','aging.blocking_status','aging.note','cmactive.customer_phone')
-                ->whereIn('bilco.regional', array('Sumbagut','Sumbagsel','Sumbagteng'))
                 ->get();
     }
     /**
