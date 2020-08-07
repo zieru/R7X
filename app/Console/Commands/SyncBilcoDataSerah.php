@@ -46,6 +46,30 @@ class SyncBilcoDataSerah extends Command
         $this->info('Query finished');
         foreach($cx as $row){
             $i =  (array) $row;
+            $i['cek_cp'] = false;
+            $i['cek_halo'] = false;
+
+            if($row->customer_phone){
+                $ret = $row->customer_phone;
+                switch(substr($row->customer_phone, 0, 2)){
+                    case '08' :
+                        $ret = '628'. $ret;
+                        break;
+                    case 62:
+                        $ret = $ret;
+                        break;
+                    default:
+                        $ret = '62'. $ret;
+                }
+            }
+            if($row->customer_phone){
+                $i['cek_cp'] = true;
+
+                if($ret == $row->msisdn){
+                    $i['cek_halo'] = true;
+                }
+            }
+
             /*$i['account'] = $row->account_number;
             $i['peride'] = $row->account_periode;
             $i['msisdn'] = $row->msisdn;

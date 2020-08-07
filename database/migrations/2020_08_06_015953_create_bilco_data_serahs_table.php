@@ -14,6 +14,7 @@ class CreateBilcoDataSerahsTable extends Migration
     public function up()
     {
         Schema::create('bilco_data_serahs', function (Blueprint $table) {
+            $table->date('periode');
             $table->char('account',16);
             $table->char('customer_id',16);
             $table->char('msisdn',16);
