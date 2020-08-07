@@ -41,8 +41,10 @@ class SyncBilcoDataSerah extends Command
     {
         $x = array();
         $controller = new BilcoDataSerahController();
-        $this->info($controller->fetch());
-        foreach($controller->fetch() as $row){
+        echo 'Query started';
+        $cx= $controller->fetch();
+        $this->info('Query finished');
+        foreach($cx as $row){
             $i =  (array) $row;
             /*$i['account'] = $row->account_number;
             $i['peride'] = $row->account_periode;
@@ -59,6 +61,7 @@ class SyncBilcoDataSerah extends Command
             $i['total_outstanding'] = $row->bucket_4 + $row->bucket_3 + $row->bucket_2 + $row->bucket_1;
             $x[] = $i;
         }
+        $this->info('Writing to table serah');
         $arr = collect($x);
         $chunks = $arr->chunk(500);
         foreach ($chunks as $chunk)
@@ -66,6 +69,7 @@ class SyncBilcoDataSerah extends Command
             BilcoDataSerah::insert($chunk->toArray());
         }
 
+        $this->info('Done');
         $this->info($this->argument('periode'));
         return 0;
     }
