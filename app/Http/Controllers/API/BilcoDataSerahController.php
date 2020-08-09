@@ -16,7 +16,7 @@ class BilcoDataSerahController extends Controller
                     $join->on('aging.account','=','bilco.account_number');
                     $join->on('aging.bill_cycle','=','bilco.bill_cycle');
                 })
-                ->join('sabyan_r7s_data.cm_active_unique as cmactive', function($join)
+                ->join('olala2.cm_active_unique as cmactive', function($join)
                 {
                     $join->on('cmactive.msisdn', '=', 'bilco.msisdn');
                     $join->on('cmactive.customer_id','=','bilco.account_number');
