@@ -50,7 +50,7 @@ class FormAdjustmentController extends Controller
         $f= FormAdjustment::groupBy($tbl_grup)
             ->selectRaw("$tbl_grup,count(msisdn) as msisdn,FORMAT(sum(nominal),0) as nominal")
             ->whereBetween('tgl_adj',[$period->format('Y-m-1'),$period->format('Y-m-t')]);
-        $x= FormAdjustment::selectRaw("user_eksekutor,reason, msisdn, FORMAT(nominal,0) as nominal")
+        $x= FormAdjustment::selectRaw("user_eksekutor,reason, msisdn, FORMAT(nominal,0) as nominal, id")
             ->whereBetween('tgl_adj',[$period->format('Y-m-1'),$period->format('Y-m-t')]);
         $loop= 0;
        foreach ($f->get()->toArray() as $head){
@@ -121,8 +121,9 @@ class FormAdjustmentController extends Controller
      * @param  \App\FormAdjustment  $formAdjustment
      * @return \Illuminate\Http\Response
      */
-    public function show(FormAdjustment $formAdjustment)
+    public function show(FormAdjustment $FormAdjustment)
     {
+        return datatables()->of($FormAdjustment)->toJson();
         //
     }
 
