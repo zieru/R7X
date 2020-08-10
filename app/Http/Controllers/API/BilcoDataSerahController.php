@@ -10,8 +10,8 @@ use App\Http\Controllers\Controller;
 class BilcoDataSerahController extends Controller
 {
     public function fetch(){
-        return DB::table('sabyan_r7s_data.20200803_all as bilco')
-                ->join('olala2.aging_20200802 as aging', function($join)
+        return DB::table('sabyan_r7s_data.20200802_all as bilco')
+                ->join('olala2.aging_20200803 as aging', function($join)
                 {
                     //$join->on('aging.msisdn', '=', 'bilco.msisdn');
                     $join->on('aging.account','=','bilco.account_number');
