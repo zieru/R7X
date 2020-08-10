@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\BilcoDataSerah;
+use App\BillingCollectionPoc;
 use DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -12,15 +13,15 @@ class BilcoDataSerahController extends Controller
         return DB::table('sabyan_r7s_data.20200803_all as bilco')
                 ->join('olala2.aging_20200802 as aging', function($join)
                 {
-                    $join->on('aging.msisdn', '=', 'bilco.msisdn');
+                    //$join->on('aging.msisdn', '=', 'bilco.msisdn');
                     $join->on('aging.account','=','bilco.account_number');
-                    $join->on('aging.bill_cycle','=','bilco.bill_cycle');
+                    //$join->on('aging.bill_cycle','=','bilco.bill_cycle');
                 })
                 ->join('olala2.cm_active_unique as cmactive', function($join)
                 {
-                    $join->on('cmactive.msisdn', '=', 'bilco.msisdn');
+                    //$join->on('cmactive.msisdn', '=', 'bilco.msisdn');
                     $join->on('cmactive.customer_id','=','bilco.account_number');
-                    $join->on('cmactive.billcycle','=','bilco.bill_cycle');
+                    //$join->on('cmactive.billcycle','=','bilco.bill_cycle');
                 })
                 ->select('aging.account','aging.customer_id','bilco.periode','aging.msisdn','aging.bill_cycle','bilco.regional','bilco.bucket_4','bilco.bucket_3','bilco.bucket_2','bilco.bucket_1',
                     'aging.grapari','aging.hlr_city','aging.bbs','aging.bbs_name','aging.bbs_company_name','aging.bbs_first_address','aging.bbs_second_address',
@@ -33,9 +34,17 @@ class BilcoDataSerahController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         //
+        $d90h = BilcoDataSerah::selectRaw('count( msisdn ),
+	sum( bucket_1 ),
+	sum( bucket_2 ),
+	sum( bucket_3 ),
+	sum( bucket_4 ),
+	regional,
+	sum(total_outstanding)')->groupBy('regional');
+            return datatables()->of($d90h);
     }
 
     /**
