@@ -25,7 +25,7 @@ class BackupDatabase extends Command
         $this->backupdate = Carbon::now()->subDays(2)->format('Ymd');
         $this->backupname = $this->backupdate.'-bilcocsv';
         $this->backuppass = Str::random(125);
-        DB::connection('mysql2')->statement(sprintf('CREATE TABLE %s_Sumatera LIKE 20200802_all',$this->backupdate));
+        DB::connection('mysql')->statement(sprintf('CREATE TABLE %s_Sumatera LIKE 20200802_all',$this->backupdate));
         $x0 = sprintf('mysqldump --host="%s" -u"%s" -p"%s" %s --skip-lock-tables --single-transaction --quick | gzip > %s',
             config('database.connections.mysql.host'),
             config('database.connections.mysql.username'),
