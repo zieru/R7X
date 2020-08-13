@@ -39,7 +39,8 @@ class BackupDatabase extends Command
             storage_path('app/bilcollection/csv/'.$this->backupdate.'_Sum*.csv'),
             storage_path('app/bilcollection/csv/'.$this->backupdate.'_Sumatra.csv')
         );
-        $x2 = sprintf('mysqlimport --ignore-lines=1 --fields-terminated-by=, --local -u sabyan -p"zierong7" sabyan_r7s_data %s',
+        $x2 = sprintf('mysqlimport --ignore-lines=1 --fields-terminated-by=, --local -u sabyan -p%s sabyan_r7s_data %s',
+            config('database.connections.mysql2.password'),
             storage_path('app/bilcollection/csv/'.$this->backupdate.'_Sumatra.csv')
         );
 
