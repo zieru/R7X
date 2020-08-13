@@ -25,6 +25,9 @@ class DBBackup extends Command
     }
 
     public function backup(){
+        $this->info(env('DB_CONNECTION_SECOND'));
+        echo 'x';
+        die();
         $this->backupdate = Carbon::now()->subDays(2)->format('Ymd');
         $this->backupname = $this->backupdate.'-bilcocsv';
         $this->backuppass = Str::random(125);
