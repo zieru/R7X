@@ -24,21 +24,35 @@ class BackupDatabase extends Command
         $this->backupdate = Carbon::now()->subDays(2)->format('Ymd');
         $this->backupname = $this->backupdate.'-bilcocsv';
         $this->backuppass = Str::random(125);
-        $x = sprintf('mysqldump --host="%s" -u"%s" -p"%s" %s --skip-lock-tables --single-transaction --quick | gzip > %s && rar a -hp%s %s.rar %s  && gupload %s.rar --config default=.gdriveunli.conf && ls %s/csv/*',
+        $x0 = sprintf('mysqldump --host="%s" -u"%s" -p"%s" %s --skip-lock-tables --single-transaction --quick | gzip > %s',
             config('database.connections.mysql.host'),
             config('database.connections.mysql.username'),
             config('database.connections.mysql.password'),
             config('database.connections.mysql.database'),
-            storage_path('app/backups/backup-' . Carbon::now()->format('Y-m-d') . '.gz'),
-	        $this->backuppass,
-            $this->backupname,
-            storage_path('app/bilcollection/csv/'.$this->backupdate.'_*'),
-	    $this->backupname,
-	    storage_path('app/bilcollection')
+            storage_path('app/backups/backup-' . Carbon::now()->format('Y-m-d') . '.gz')
         );
-        echo $x;
+        $x1 = sprintf('head -1 %s > %s; tail -n +2 -q %s >> %s',
+            storage_path('app/bilcollection/csv/'.$this->backupdate.'_xxxxxxxxxxxxxx.csv'),
+            storage_path('app/bilcollection/csv/'.$this->backupdate.'_Sumatra.csv'),
+            storage_path('app/bilcollection/csv/'.$this->backupdate.'_Sum*.csv'),
+            storage_path('app/bilcollection/csv/'.$this->backupdate.'_Sumatra.csv')
+        );
+        $x2 = sprintf('rar a -ep1 -hp%s %s.rar %s ',
+            $this->backuppass,
+            $this->backupname,
+            storage_path('app/bilcollection/csv/'.$this->backupdate.'_*')
+        );
+        $x = sprintf('%s && %s && %s && gupload %s.rar --config default=.gdriveunli.conf && ls %s/csv/* && ls %s',
+            $x0,
+	        $x1,
+	       $x2,
+            $this->backupname,
+            storage_path('app/bilcollection'),
+            $this->backupname,
+        );
 
-        $this->process = Process::fromShellCommandline($x);
+        echo $x;
+//        $this->process = Process::fromShellCommandline($x);
     }
 
     public function handle()
