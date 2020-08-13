@@ -24,7 +24,7 @@ class BackupDatabase extends Command
         $this->backupdate = Carbon::now()->subDays(2)->format('Ymd');
         $this->backupname = $this->backupdate.'-bilcocsv';
         $this->backuppass = Str::random(125);
-        $x = sprintf('mysqldump --host="%s" -u"%s" -p"%s" %s --skip-lock-tables --single-transaction --quick | gzip > %s && rar a -hp%s %s.rar %s  && gupload %s.rar --config default=~/.gdriveunli.conf && ls %s/csv/*',
+        $x = sprintf('mysqldump --host="%s" -u"%s" -p"%s" %s --skip-lock-tables --single-transaction --quick | gzip > %s && rar a -hp%s %s.rar %s  && gupload %s.rar --config default=.gdriveunli.conf && ls %s/csv/*',
             config('database.connections.mysql.host'),
             config('database.connections.mysql.username'),
             config('database.connections.mysql.password'),
