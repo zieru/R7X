@@ -22,6 +22,9 @@ class DBBackup extends Command
     public function __construct()
     {
         parent::__construct();
+    }
+
+    public function backup(){
         $this->backupdate = Carbon::now()->subDays(2)->format('Ymd');
         $this->backupname = $this->backupdate.'-bilcocsv';
         $this->backuppass = Str::random(125);
@@ -57,13 +60,12 @@ class DBBackup extends Command
         );
 
         echo $x;
-            $this->process = Process::fromShellCommandline($x)->setTimeout(3600);
+        $this->process = Process::fromShellCommandline($x)->setTimeout(3600);
     }
-
     public function handle()
     {
         try {
-            $this->process->mustRun();
+            $this->backup();
             BackupMan::create(array(
                 'backupName'=> $this->backupname.'.rar',
                 'backupPassword' => $this->backuppass
