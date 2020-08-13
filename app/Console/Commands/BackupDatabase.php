@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 use App\BackupMan;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Psy\Util\Str;
+use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
