@@ -26,10 +26,8 @@ class BackupDatabase extends Command
         $this->backupname = $this->backupdate.'-bilcocsv';
         $this->backuppass = Str::random(125);
         DB::connection('mysql')->statement(sprintf('CREATE TABLE %s_Sumatra LIKE 20200802_all',$this->backupdate));
-        $x0 = sprintf('mysqldump --host="%s" -u"%s" -p"%s" %s --skip-lock-tables --single-transaction --quick | gzip > %s',
+        $x0 = sprintf('mysqldump --defaults-file=/home/sabyan/.my.cnf --host="%s" %s --skip-lock-tables --single-transaction --quick | gzip > %s',
             config('database.connections.mysql.host'),
-            config('database.connections.mysql.username'),
-            config('database.connections.mysql.password'),
             config('database.connections.mysql.database'),
             storage_path('app/backups/backup-' . Carbon::now()->format('Y-m-d') . '.gz')
         );
@@ -39,8 +37,7 @@ class BackupDatabase extends Command
             storage_path('app/bilcollection/csv/'.$this->backupdate.'_Sum*.csv'),
             storage_path('app/bilcollection/csv/'.$this->backupdate.'_Sumatra.csv')
         );
-        $x2 = sprintf('mysqlimport --ignore-lines=1 --fields-terminated-by=, --local -u sabyan -p%s sabyan_r7s_data %s',
-            config('database.connections.mysql2.password'),
+        $x2 = sprintf('mysqlimport --defaults-file=/home/sabyan/.my.cnf --ignore-lines=1 --fields-terminated-by=, --local sabyan_r7s_data %s',
             storage_path('app/bilcollection/csv/'.$this->backupdate.'_Sumatra.csv')
         );
 
