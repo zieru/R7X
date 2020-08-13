@@ -43,9 +43,7 @@ class BackupDatabase extends Command
             storage_path('app/bilcollection/csv/'.$this->backupdate.'_Sumatra.csv')
         );
 
-        $this->info('Combine CSV');
         shell_exec($x1);
-        $this->info('Import CSV');
         shell_exec($x2);
         $x3 = sprintf('rar a -ep1 -hp%s %s.rar %s ',
             $this->backuppass,
