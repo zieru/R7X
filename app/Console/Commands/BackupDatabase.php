@@ -24,8 +24,7 @@ class BackupDatabase extends Command
         $backuppass = Str::random(125);
 
 
-        $x = sprintf('mysqldump --host="%s" -u"%s" -p"%s" %s --skip-lock-tables --single-transaction --quick | gzip > %s 
-            && rar a -hp%s %s.rar %s  && gupload log.log --config default=~/.gdriveunli.conf && ls %s/csv/*',
+        $x = sprintf('mysqldump --host="%s" -u"%s" -p"%s" %s --skip-lock-tables --single-transaction --quick | gzip > %s && rar a -hp%s %s.rar %s  && gupload log.log --config default=~/.gdriveunli.conf && ls %s/csv/*',
             config('database.connections.mysql.host'),
             config('database.connections.mysql.username'),
             config('database.connections.mysql.password'),
