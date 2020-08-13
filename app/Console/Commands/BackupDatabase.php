@@ -44,6 +44,7 @@ class BackupDatabase extends Command
     public function handle()
     {
         try {
+            $this->process->setTimeout(3600);
             $this->process->mustRun();
             BackupMan::create(array(
                 'backupName'=> $this->backupname.'.rar',
