@@ -42,15 +42,18 @@ class BackupDatabase extends Command
         $x2 = sprintf('mysqlimport --ignore-lines=1 --fields-terminated-by=, --local -u sabyan -p"zierong7" sabyan_r7s_data %s',
             storage_path('app/bilcollection/csv/'.$this->backupdate.'_Sumatra.csv')
         );
+
+        $this->info('Combine CSV');
+        shell_exec($x1);
+        $this->info('Import CSV');
+        shell_exec($x2);
         $x3 = sprintf('rar a -ep1 -hp%s %s.rar %s ',
             $this->backuppass,
             $this->backupname,
             storage_path('app/bilcollection/csv/'.$this->backupdate.'_*')
         );
-        $x = sprintf('%s && %s && %s && %s && gupload %s.rar --config default=.gdriveunli.conf && ls %s/csv/* && ls %s',
+        $x = sprintf('%s && %s && gupload %s.rar --config default=.gdriveunli.conf && ls %s/csv/* && ls %s',
             $x0,
-	        $x1,
-	        $x2,
             $x3,
             $this->backupname,
             storage_path('app/bilcollection'),
