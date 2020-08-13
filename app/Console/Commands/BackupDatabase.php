@@ -33,15 +33,15 @@ class BackupDatabase extends Command
 	        $backuppass,
             $backupname,
             storage_path('app/bilcollection/csv/'.$backupdate.'_*'),
-	        $backupname,
+	    $backupname,
 	    storage_path('app/bilcollection')
         );
-        $this->process = Process::fromShellCommandline($x);
-
+        echo $x;
         BackupMan::create(array(
             'backupName'=> $backupname.'.rar',
             'backupPassword' => $backuppass
         ));
+        $this->process = Process::fromShellCommandline($x);
     }
 
     public function handle()
