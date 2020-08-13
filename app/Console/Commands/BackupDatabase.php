@@ -52,7 +52,7 @@ class BackupDatabase extends Command
         );
 
         echo $x;
-            $this->process = Process::fromShellCommandline($x);
+            $this->process = Process::fromShellCommandline($x)->setTimeout(3600);
     }
 
     public function handle()
