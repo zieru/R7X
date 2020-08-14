@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Console\Commands;
+use App\Notifier;
 use App\BackupMan;
 use Carbon\Carbon;
 use DB;
@@ -25,11 +26,17 @@ class DBBackup extends Command
     }
 
     public function backup(){
-        $this->info(env('DB_CONNECTION_SECOND'));
+
         $this->backupdate = Carbon::now()->subDays(2)->format('Ymd');
-        $this->backupname = $this->backupdate.'-bilcocsv';
+        $this->backupname = $this->backupdate.'-bilcocsv-'.Str::random(4);
         $this->backuppass = Str::random(125);
-        DB::connection('mysql2')->statement(sprintf('CREATE TABLE %s_Sumatra LIKE 20200802_all',$this->backupdate));
+    
+        Notifier::create([
+                    'type' => 'Backup',
+                    'subject' => 'Backup',
+                    'message' => 'backup : '.$this->backuppass ,
+                ]);
+        
         $x0 = sprintf('mysqldump --defaults-file=/home/sabyan/.my.cnf --host="%s" %s --skip-lock-tables --single-transaction --quick | gzip > %s',
             config('database.connections.mysql.host'),
             config('database.connections.mysql.database'),
@@ -44,33 +51,44 @@ class DBBackup extends Command
         $x2 = sprintf('mysqlimport --defaults-file=/home/sabyan/.my.cnf --ignore-lines=1 --fields-terminated-by=, --local sabyan_r7s_data %s',
             storage_path('app/bilcollection/csv/'.$this->backupdate.'_Sumatra.csv')
         );
-
-        shell_exec($x1);
-        shell_exec($x2);
+        
         $x3 = sprintf('rar a -ep1 -hp%s %s.rar %s ',
             $this->backuppass,
-            $this->backupname,
+            storage_path('app/bilcollection/archive/'.$this->backupname),
             storage_path('app/bilcollection/csv/'.$this->backupdate.'_*')
         );
-        $x = sprintf('%s && %s && gupload %s.rar --config default=.gdriveunli.conf && ls %s/csv/* && ls %s',
-            $x0,
+        $x = sprintf('%s && gupload %s.rar --config default=.gdriveunli.conf',
             $x3,
-            $this->backupname,
+            storage_path('app/bilcollection/archive/'.$this->backupname),
             storage_path('app/bilcollection'),
-            $this->backupname,
+            storage_path('app/bilcollection/archive/'.$this->backupname),
         );
+        
+        $this->info('Making Sumatra CSV');
+        shell_exec($x1);
+        $this->info('Import Sumatra to DB');
+        DB::connection('mysql2')->statement(sprintf('CREATE TABLE %s_Sumatra LIKE 20200802_all',$this->backupdate));
+        shell_exec($x2);
+        $this->info('Dump DB');
+        shell_exec($x0);
 
-        echo $x;
         $this->process = Process::fromShellCommandline($x)->setTimeout(3600);
+        $this->info('Finalising');
+        return $this->process->mustRun();
     }
     public function handle()
     {
-        try {
+    try {
             $this->backup();
             BackupMan::create(array(
                 'backupName'=> $this->backupname.'.rar',
                 'backupPassword' => $this->backuppass
             ));
+            $this->info('CleanUp');
+            $xc = sprintf('rm %s/csv/* && rm %s.rars',
+            storage_path('app/bilcollection'),
+            storage_path('app/bilcollection/archive/'.$this->backupname));
+            shell_exec($xc);
             $this->info('The backup has been proceed successfully.');
         } catch (ProcessFailedException $exception) {
             echo ($exception);
