@@ -14,11 +14,11 @@ class BilcoDataSerahController extends Controller
         echo 'x';
         $x= DB::table('olala2.cm_active_unique as cmactive')
             //->table('sabyan_r7s_data.20200802_all as bilco'))
-            ->leftJoin('olala2.aging_20200803 as aging', function($join)
+            ->leftJoin('olala2.aging_20200814 as aging', function($join)
             {
                 $join->on('cmactive.customer_id','=','aging.customer_id');
             })
-            ->leftJoin('sabyan_r7s_data.20200802_all as bilco', function($join)
+            ->leftJoin('sabyan_r7s_data.20200813_all as bilco', function($join)
             {
                 $join->on('aging.account','=','bilco.account_number');
             })
