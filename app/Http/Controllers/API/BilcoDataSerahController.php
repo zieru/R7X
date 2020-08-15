@@ -18,7 +18,7 @@ class BilcoDataSerahController extends Controller
             {
                 $join->on('cmactive.customer_id','=','aging.customer_id');
             })
-            ->leftJoin('sabyan_r7s_data.20200813_all as bilco', function($join)
+            ->leftJoin('sabyan_r7s_data.20200813_Sumatra as bilco', function($join)
             {
                 $join->on('aging.account','=','bilco.account_number');
             })
@@ -38,8 +38,8 @@ class BilcoDataSerahController extends Controller
                 $query->orWhere('aging.bill_cycle', '=', 11);
             })
             ->get();
-        dd(DB::getQueryLog());
-        return null;
+        //dd(DB::getQueryLog());
+        return $x;
     }
     /**
      * Display a listing of the resource.
