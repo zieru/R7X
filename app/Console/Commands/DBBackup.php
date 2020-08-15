@@ -12,7 +12,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class DBBackup extends Command
 {
-    protected $signature = 'backup:db';
+    protected $signature = 'db:backup';
 
     protected $description = 'Backup the database';
 

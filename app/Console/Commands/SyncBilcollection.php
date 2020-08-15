@@ -62,8 +62,9 @@ class SyncBilcollection extends Command
         if(is_array($filename)){
             foreach ($filename as $name){
                 echo shell_exec(sprintf("php artisan Syncbilcollection --file=%s >> log.log",$name));
-                Artisan::call('db:backup');
+
             }
+                Artisan::call('db:backup');
         }else{
             $this->info('proses download :'.$filename);
             if($this->option('testing') == "false" OR $this->option('nodownload') == 'true'){
