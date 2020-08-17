@@ -2,10 +2,13 @@
 
 namespace App\Console\Commands;
 
+use App\Notifier;
 use App\BilcoDataSerah;
 use App\Http\Controllers\API\BilcoDataSerahController;
 use Illuminate\Console\Command;
 use phpDocumentor\Reflection\DocBlock\Tags\Var_;
+use Carbon\Carbon;
+use App\Importer;
 
 class SyncBilcoDataSerah extends Command
 {
@@ -42,8 +45,24 @@ class SyncBilcoDataSerah extends Command
         $x = array();
         $controller = new BilcoDataSerahController();
         echo 'Query started';
-        $cx= $controller->fetch();
+	$date = Carbon::now()->subDays(2);
+	Notifier::create([
+                    'type' => 'DataSerahImport',
+                    'subject' => 'DataSerah Import file',
+                    'message' => 'Import dataserah started',
+                ]);
+        $cx= $controller->fetch($date);
         $this->info('Query finished');
+Notifier::create([
+                    'type' => 'DataSerahImport',
+                    'subject' => 'DataSerah Import processed',
+                    'message' => 'Import dataserah processed'
+                ]);
+Importer::create(array(
+      'importedRow'=>0,
+      'storedRow'=>0,
+      'status' => 'QUEUE'
+    ));
         foreach($cx as $row){
             $i =  (array) $row;
             $i['cek_cp'] = true;
@@ -80,7 +99,7 @@ class SyncBilcoDataSerah extends Command
             $i['bucket_1']= $row->bucket_1;
 
             */
-            $i['import_batch']= 99;
+            $i['import_batch']= $importer->id;
             $i['total_outstanding'] = $row->bucket_4 + $row->bucket_3 + $row->bucket_2 + $row->bucket_1;
             $x[] = $i;
         }
@@ -91,7 +110,13 @@ class SyncBilcoDataSerah extends Command
         {
             BilcoDataSerah::insert($chunk->toArray());
         }
-
+$importer->status = "Finish";
+    $importer->save();
+Notifier::create([
+                    'type' => 'DataSerahImport',
+                    'subject' => 'DataSerah Import finished',
+                    'message' => 'Import dataserah finished'
+                ]);
         $this->info('Done');
         $this->info($this->argument('periode'));
         return 0;
