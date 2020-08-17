@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\BilcoDataSerah;
 use App\BillingCollectionPoc;
+use App\Helpers\AppHelper;
+use Carbon\Carbon;
 use DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -44,14 +46,22 @@ $agingdate = $date->addDays(1);
     public function index(Request $request)
     {
         //
-        $d90h = BilcoDataSerah::selectRaw('count( msisdn ),
-	sum( bucket_1 ),
-	sum( bucket_2 ),
-	sum( bucket_3 ),
-	sum( bucket_4 ),
-	regional,
-	sum(total_outstanding)')->groupBy('regional');
-            return datatables()->of($d90h);
+        $date = null;
+        try {
+            $date = Carbon::createFromFormat('Y-m-d', $request->get('period'))->addDay(-2);
+        }
+        catch (\Exception $e){AppHelper::sendErrorAndExit('Periode is invalid');}
+        $d90h = BilcoDataSerah::selectRaw('count( msisdn) as msisdn,
+	sum( bucket_1 ) as bucket_1,
+	sum( bucket_2 ) as bucket_2,
+	sum( bucket_3 ) as bucket_3,
+	sum( bucket_4 ) as bucket_4,
+        regional,
+	sum(total_outstanding) as total_outstanding')
+            ->groupBy('regional')
+            ->where('periode',$date->format('Y-m-d'))
+            ->whereIn('regional',array('Sumbagut','Sumbagteng','Sumbagsel'));
+            return datatables()->of($d90h)->toJson();
     }
 
     /**
@@ -73,7 +83,8 @@ $agingdate = $date->addDays(1);
      */
     public function show(BilcoDataSerah $bilcoDataSerah)
     {
-        //
+
+        dd($bilcoDataSerah);
     }
 
     /**
