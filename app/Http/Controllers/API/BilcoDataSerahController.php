@@ -52,6 +52,25 @@ echo sprintf('bilco : %s Aging : %s',$bilcodate->format('Ymd'),$agingdate->forma
         //dd($x);
         return $x;
     }
+
+    public function getKpi(Request $request){
+        $date = null;
+        try {
+            $date = Carbon::createFromFormat('Y-m-d', $request->get('period'))->addDay(-2);
+        }
+        catch (\Exception $e){AppHelper::sendErrorAndExit('Periode is invalid');}
+        $d30h = BilcoDataSerah::selectRaw('
+        sum(total_outstanding) as date1,
+        regional')->fromSub(function ($query) use($request) {
+                $query->selectRaw('kpi')->where('kpi','30-90');
+            }, 'sub')
+            ->groupBy('regional')
+            ->where('periode',$date->format('Y-m-d'))
+            ->where('kpi','30-60')
+            ->whereIn('regional',array('Sumbagut','Sumbagteng','Sumbagsel'));
+        dd(datatables()->of($d30h)->toArray()['data']);
+        return datatables()->of($d30h)->toJson();
+    }
     /**
      * Display a listing of the resource.
      *
