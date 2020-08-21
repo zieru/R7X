@@ -17,7 +17,7 @@ class SyncBilcoDataSerah extends Command
      *
      * @var string
      */
-    protected $signature = 'SyncBilcoDataSerah {periode}';
+    protected $signature = 'SyncBilcoDataSerah {date}';
     /**
      * The console command description.
      *
@@ -45,7 +45,9 @@ class SyncBilcoDataSerah extends Command
         $x = array();
         $controller = new BilcoDataSerahController();
         echo 'Query started';
-	$date = Carbon::now()->subDays(2);
+        
+	//$date = Carbon::now()->subDays(2);
+ $date  = Carbon::createFromFormat('Y-m-d', $this->argument('date'));
 	Notifier::create([
                     'type' => 'DataSerahImport',
                     'subject' => 'DataSerah Import file',
@@ -58,17 +60,20 @@ Notifier::create([
                     'subject' => 'DataSerah Import processed',
                     'message' => 'Import dataserah processed'
                 ]);
-Importer::create(array(
+$importer  = Importer::create(array(
       'importedRow'=>0,
       'storedRow'=>0,
       'status' => 'QUEUE'
     ));
-        foreach($cx as $row){
+    $cx->chunk(500000, function($cx) use($x,$importer) {
+    $cx->each(function($row) use ($x,$importer) {
             $i =  (array) $row;
-            $i['cek_cp'] = true;
-            $i['cek_halo'] = 'cek halo';
+            $i['cek_cp'] = false;
+            $i['cek_halo'] = false;
 
-            if($row->customer_phone){
+
+
+            if(strlen(preg_replace('/#^0+|\W#/',null,preg_replace('/^([0-9]|[1-9][0-9])$/', null, preg_replace('/\D/',null,$row->customer_phone)))) >= 6){
                 $ret = $row->customer_phone;
                 switch(substr($row->customer_phone, 0, 2)){
                     case '08' :
@@ -80,36 +85,38 @@ Importer::create(array(
                     default:
                         $ret = '62'. $ret;
                 }
-            }
-            if($row->customer_phone){
-                $i['cek_cp'] = false;
-
+                if($row->customer_phone){
+                $i['cek_cp'] = true;
                 if($ret == $row->msisdn){
-                    $i['cek_halo'] = null;
+                    $i['cek_halo'] = true;
+                }
                 }
             }
-            /*$i['account'] = $row->account_number;
-            $i['peride'] = $row->account_periode;
-            $i['msisdn'] = $row->msisdn;
-            $i['bill_cycle'] = $row->bill_cycle;
-            $i['region'] = $row->regional;
-            $i['bucket_4'] = $row->bucket_4;
-            $i['bucket_3']= $row->bucket_3;
-            $i['bucket_2']= $row->bucket_2;
-            $i['bucket_1']= $row->bucket_1;
-
-            */
+            
+            if($row->bucket_2 > 0 AND $row->bucket_1 > 0){
+              $i['kpi'] = '30-60';
+            }
+            if($row->bucket_3 > 0 && $row->bucket_2 > 0){
+              $i['kpi'] = '60-90';
+            }
+            if($row->bucket_4 > 0 && $row->bucket_3 > 0){
+              $i['kpi'] = '90-120';
+            }
+            
             $i['import_batch']= $importer->id;
             $i['total_outstanding'] = $row->bucket_4 + $row->bucket_3 + $row->bucket_2 + $row->bucket_1;
-            $x[] = $i;
-        }
-        $this->info('Writing to table serah');
-        $arr = collect($x);
-        $chunks = $arr->chunk(500);
-        foreach ($chunks as $chunk)
-        {
-            BilcoDataSerah::insert($chunk->toArray());
-        }
+           $i;
+            BilcoDataSerah::insert($i);
+        });
+});
+/*
+    $this->info('Writing to table serahx');
+    $x = collect($x);    
+    foreach ($x->chunk(10000) as $chunk)
+       {
+           BilcoDataSerah::insert($chunk->toArray());
+       }
+       */
 $importer->status = "Finish";
     $importer->save();
 Notifier::create([
@@ -118,7 +125,6 @@ Notifier::create([
                     'message' => 'Import dataserah finished'
                 ]);
         $this->info('Done');
-        $this->info($this->argument('periode'));
         return 0;
     }
 }

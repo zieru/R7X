@@ -13,9 +13,11 @@ class BilcoDataSerahController extends Controller
 {
     public function fetch($date){
         DB::enableQueryLog();
-$bilcodate = $date;
-$agingdate = $date->addDays(1);
-
+//$agingdate = $bilcodate = $date;
+$bilcodate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2); 
+$agingdate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-1);
+echo sprintf('bilco : %s Aging : %s',$bilcodate->format('Ymd'),$agingdate->format('Ymd'));
+//die();
         $x= DB::table('olala2.cm_active_unique as cmactive')
             ->leftJoin('olala2.aging_'.$agingdate->format('Ymd').' as aging', function($join)
             {
@@ -29,13 +31,25 @@ $agingdate = $date->addDays(1);
                 'cmactive.customer_address as cb_address','bbs_city','cmactive.customer_city AS cb_city','aging.bbs_zip_code','aging.aging_cust_subtype','aging.bbs_pay_type',
                 'aging.bbs_RT','aging.bill_amount_04','aging.bill_amount_03','aging.bill_amount_02','aging.bill_amount_01',
                 'aging.bucket_4','aging.bucket_3','aging.bucket_2','aging.bucket_1','aging.aging_status_subscribe','aging.blocking_status','aging.note','cmactive.customer_phone')
+            ->where('aging.bucket_2','>',12500)
+            ->where('aging.bucket_1','>',0)
+            ->where('aging.bucket_3','<=',0)
+            ->where('aging.bucket_4','<=',0)
+            ->where('aging.total_outstanding','>=',50000)
+            ->where('aging.aging_cust_subtype','=','Consumer Reguler')
             ->where(function($query){
                 $query->orWhere('aging.bill_cycle', '=', 1);
                 $query->orWhere('aging.bill_cycle', '=', 6);
                 $query->orWhere('aging.bill_cycle', '=', 11);
             })
-            ->get();
-        //dd(DB::getQueryLog());
+            ->where(function($query){
+                $query->orWhere('aging.bbs_RT', '=', 'PP');
+                $query->orWhere('aging.bbs_RT', '=', '');
+                $query->orWhereNull('aging.bbs_RT');
+            })
+            ->groupBy('aging.account')
+            ->orderBy('aging.customer_id');
+        //dd($x);
         return $x;
     }
     /**
