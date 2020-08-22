@@ -13,10 +13,19 @@ class BilcoDataSerahController extends Controller
 {
     public function fetch($date){
         DB::enableQueryLog();
+        $bilcoenddate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2)->endOfMonth();
+        $bilcodate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2);
+        $agingdate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-1);
+        $tahap = false;
+        switch ($bilcodate->format('d')){
+            case $bilcoenddate->format('d'):
+                $tahap = 1;
+                    break;
+            default:
+                $tahap = 2;
+        }
 //$agingdate = $bilcodate = $date;
-$bilcodate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2); 
-$agingdate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-1);
-echo sprintf('bilco : %s Aging : %s',$bilcodate->format('Ymd'),$agingdate->format('Ymd'));
+        echo(sprintf('tahap :%s bilco : %s Aging : %s',$tahap,$bilcodate->format('Ymd'),$agingdate->format('Ymd')));
 //die();
         $x= DB::table('olala2.cm_active_unique as cmactive')
             ->leftJoin('olala2.aging_'.$agingdate->format('Ymd').' as aging', function($join)
@@ -30,13 +39,30 @@ echo sprintf('bilco : %s Aging : %s',$bilcodate->format('Ymd'),$agingdate->forma
             ->select('aging.account','aging.customer_id','bilco.periode','aging.msisdn','aging.bill_cycle','aging.regional','aging.grapari','bilco.regional AS hlr_region','aging.hlr_city','aging.bbs','aging.bbs_name','aging.bbs_company_name','aging.bbs_first_address','aging.bbs_second_address',
                 'cmactive.customer_address as cb_address','bbs_city','cmactive.customer_city AS cb_city','aging.bbs_zip_code','aging.aging_cust_subtype','aging.bbs_pay_type',
                 'aging.bbs_RT','aging.bill_amount_04','aging.bill_amount_03','aging.bill_amount_02','aging.bill_amount_01',
-                'aging.bucket_4','aging.bucket_3','aging.bucket_2','aging.bucket_1','aging.aging_status_subscribe','aging.blocking_status','aging.note','cmactive.customer_phone')
-            ->where('aging.bucket_2','>',12500)
-            ->where('aging.bucket_1','>',0)
-            ->where('aging.bucket_3','<=',0)
-            ->where('aging.bucket_4','<=',0)
-            ->where('aging.total_outstanding','>=',50000)
-            ->where('aging.aging_cust_subtype','=','Consumer Reguler')
+                'aging.bucket_4','aging.bucket_3','aging.bucket_2','aging.bucket_1','aging.aging_status_subscribe','aging.blocking_status','aging.note','cmactive.customer_phone');
+            if($tahap == 1){
+                $x->where(function($query){
+                    $query
+                        ->where('aging.bucket_3','>',0)
+                        ->orWhere('aging.bucket_2','>',0);
+                    })
+                    ->orWhere(function($query){
+                        $query
+                            ->where('aging.bucket_2','>',12500)
+                            ->orWhere('aging.bucket_1','>',0);
+                    })
+                    ->where('aging.bucket_5','<=',0)
+                    ->where('aging.bucket_6','<=',0)
+                    ->where('aging.bucket_4','<=',0)
+                    ->where('aging.osbalance','>=',50000);
+            }elseif($tahap == 2){
+                $x-->where('aging.bucket_2','>',12500)
+                    ->where('aging.bucket_1','>',0)
+                    ->where('aging.bucket_3','<=',0)
+                    ->where('aging.bucket_4','<=',0);
+            }
+
+            $x->where('aging.aging_cust_subtype','=','Consumer Reguler')
             ->where(function($query){
                 $query->orWhere('aging.bill_cycle', '=', 1);
                 $query->orWhere('aging.bill_cycle', '=', 6);
@@ -47,8 +73,11 @@ echo sprintf('bilco : %s Aging : %s',$bilcodate->format('Ymd'),$agingdate->forma
                 $query->orWhere('aging.bbs_RT', '=', '');
                 $query->orWhereNull('aging.bbs_RT');
             })
+            
+            ->where('aging.total_outstanding','>=',50000)
             ->groupBy('aging.account')
             ->orderBy('aging.customer_id');
+        //DB::getQueryLog();
         //dd($x);
         return $x;
     }

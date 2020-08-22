@@ -72,8 +72,7 @@ $importer  = Importer::create(array(
             $i['cek_halo'] = false;
 
 
-
-            if(strlen(preg_replace('/#^0+|\W#/',null,preg_replace('/^([0-9]|[1-9][0-9])$/', null, preg_replace('/\D/',null,$row->customer_phone)))) >= 6){
+            if(strlen(preg_replace('/\D/',null,ltrim($row->customer_phone,0 ))) >= 6){
                 $ret = $row->customer_phone;
                 switch(substr($row->customer_phone, 0, 2)){
                     case '08' :

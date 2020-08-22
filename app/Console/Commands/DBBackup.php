@@ -27,6 +27,7 @@ class DBBackup extends Command
 
     public function backup(){
 
+//	$this->backupdate = '20200731';
         $this->backupdate = Carbon::now()->subDays(2)->format('Ymd');
         $this->backupname = $this->backupdate.'-bilcocsv-'.Str::random(4);
         $this->backuppass = Str::random(125);
@@ -69,6 +70,7 @@ class DBBackup extends Command
         $this->info('Import Sumatra to DB');
         DB::connection('mysql2')->statement(sprintf('CREATE TABLE %s_Sumatra LIKE 20200802_all',$this->backupdate));
         shell_exec($x2);
+//    die();
         $this->info('Dump DB');
         shell_exec($x0);
 
