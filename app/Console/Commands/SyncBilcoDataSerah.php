@@ -69,11 +69,12 @@ $importer  = Importer::create(array(
     ));
 $ndataserah['imported'] = 0;
 $ndataserah['stored'] = 0;
-    $cx->chunk(100000, function($cx) use($x,$importer) {
+    $cx->chunk(100000, function($cx) use($x,$importer,$ndataserah) {
     //dd($cx->toArray());
     //$cx->each(function($row) use ($x,$importer) {
 $x = array();
-	    $ndataserah['imported'] += $cx->count();
+	    $importer->importedRow =$ndataserah['imported'] += $cx->count();
+	    $importer->save();
 	    foreach($cx->toArray() as $row){
             $i =  (array) $row;
 	    //$row = $i = $cx->toArray();
@@ -116,7 +117,7 @@ $x = array();
 	    }
         //});
 	    $x = collect($x);
-	    foreach ($x->chunk(5000) as $insert){
+	    foreach ($x->chunk(500) as $insert){
 	    //dd($insert);
 	    $ndataserah['stored'] += count($insert->toArray());
             BilcoDataSerah::insert($insert->toArray());
