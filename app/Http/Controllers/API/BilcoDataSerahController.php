@@ -93,12 +93,14 @@ class BilcoDataSerahController extends Controller
 
     public function getKpi(Request $request){
         $end = $date = null;
+        $start = explode(':',$request->get('periode'))[0];
+        $end = explode(':',$request->get('periode'))[1];
         try {
-            $date = Carbon::createFromFormat('Y-m-d', $request->get('periode').'-01')->addDay(-2);
+            $date = Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-2);
         }
         catch (\Exception $e){AppHelper::sendErrorAndExit('Periode is invalid');}
         try {
-            $end = Carbon::createFromFormat('Y-m', $request->get('periodeend'))->addDay(-2);
+            $end = Carbon::createFromFormat('Y-m', $end)->addDay(-2);
         }
         catch (\Exception $e){AppHelper::sendErrorAndExit('End Periode is invalid');}
         $d30h = BilcoDataSerah::selectRaw('
