@@ -63,15 +63,23 @@ Notifier::create([
 $importer  = Importer::create(array(
       'importedRow'=>0,
       'storedRow'=>0,
-      'status' => 'QUEUE'
+      'status' => 'QUEUE',
+	'tipe' => 'dataserah',
+	'filename' => 'dataserah '.$date->format('Ymd')
     ));
-    $cx->chunk(500000, function($cx) use($x,$importer) {
-    $cx->each(function($row) use ($x,$importer) {
+$ndataserah['imported'] = 0;
+$ndataserah['stored'] = 0;
+    $cx->chunk(100000, function($cx) use($x,$importer) {
+    //dd($cx->toArray());
+    //$cx->each(function($row) use ($x,$importer) {
+$x = array();
+	    $ndataserah['imported'] += $cx->count();
+	    foreach($cx->toArray() as $row){
             $i =  (array) $row;
+	    //$row = $i = $cx->toArray();
+	    //dd($row);
             $i['cek_cp'] = false;
             $i['cek_halo'] = false;
-
-
             if(strlen(preg_replace('/\D/',null,ltrim($row->customer_phone,0 ))) >= 6){
                 $ret = $row->customer_phone;
                 switch(substr($row->customer_phone, 0, 2)){
@@ -104,9 +112,15 @@ $importer  = Importer::create(array(
             
             $i['import_batch']= $importer->id;
             $i['total_outstanding'] = $row->bucket_4 + $row->bucket_3 + $row->bucket_2 + $row->bucket_1;
-           $i;
-            BilcoDataSerah::insert($i);
-        });
+               $x[] = $i;
+	    }
+        //});
+	    $x = collect($x);
+	    foreach ($x->chunk(5000) as $insert){
+	    //dd($insert);
+	    $ndataserah['stored'] += count($insert->toArray());
+            BilcoDataSerah::insert($insert->toArray());
+	    }
 });
 /*
     $this->info('Writing to table serahx');

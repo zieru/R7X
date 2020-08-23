@@ -27,15 +27,23 @@ class BilcoDataSerahController extends Controller
 //$agingdate = $bilcodate = $date;
         echo(sprintf('tahap :%s bilco : %s Aging : %s',$tahap,$bilcodate->format('Ymd'),$agingdate->format('Ymd')));
 //die();
-        $x= DB::table('olala2.cm_active_unique as cmactive')
+        $x= DB::table('sabyan_r7s_data.'.$bilcodate->format('Ymd').'_Sumatra as bilco')
+	    //DB::table('olala2.cm_active_unique as cmactive')
             ->leftJoin('olala2.aging_'.$agingdate->format('Ymd').' as aging', function($join)
             {
-                $join->on('cmactive.customer_id','=','aging.customer_id');
-            })
+                $join->on('bilco.account_number','=','aging.account');
+            },'left outer')
+            ->leftJoin('olala2.cm_active_unique as cmactive', function($join)
+            {
+                $join->on('aging.customer_id','=','cmactive.customer_id');
+		$join->on('aging.msisdn','=','cmactive.msisdn');
+            },'left outer')
+/*
             ->leftJoin('sabyan_r7s_data.'.$bilcodate->format('Ymd').'_Sumatra as bilco', function($join)
             {
                 $join->on('aging.account','=','bilco.account_number');
             })
+*/
             ->select('aging.account','aging.customer_id','bilco.periode','aging.msisdn','aging.bill_cycle','aging.regional','aging.grapari','bilco.regional AS hlr_region','aging.hlr_city','aging.bbs','aging.bbs_name','aging.bbs_company_name','aging.bbs_first_address','aging.bbs_second_address',
                 'cmactive.customer_address as cb_address','bbs_city','cmactive.customer_city AS cb_city','aging.bbs_zip_code','aging.aging_cust_subtype','aging.bbs_pay_type',
                 'aging.bbs_RT','aging.bill_amount_04','aging.bill_amount_03','aging.bill_amount_02','aging.bill_amount_01',
@@ -44,19 +52,19 @@ class BilcoDataSerahController extends Controller
                 $x->where(function($query){
                     $query
                         ->where('aging.bucket_3','>',0)
-                        ->orWhere('aging.bucket_2','>',0);
+                        ->Where('aging.bucket_2','>',0);
                     })
                     ->orWhere(function($query){
                         $query
                             ->where('aging.bucket_2','>',12500)
-                            ->orWhere('aging.bucket_1','>',0);
+                            ->Where('aging.bucket_1','>',0);
                     })
                     ->where('aging.bucket_5','<=',0)
                     ->where('aging.bucket_6','<=',0)
                     ->where('aging.bucket_4','<=',0)
                     ->where('aging.osbalance','>=',50000);
             }elseif($tahap == 2){
-                $x-->where('aging.bucket_2','>',12500)
+                $x->where('aging.bucket_2','>',12500)
                     ->where('aging.bucket_1','>',0)
                     ->where('aging.bucket_3','<=',0)
                     ->where('aging.bucket_4','<=',0);
@@ -76,7 +84,7 @@ class BilcoDataSerahController extends Controller
             
             ->where('aging.total_outstanding','>=',50000)
             ->groupBy('aging.account')
-            ->orderBy('aging.customer_id');
+            ->orderBy('aging.account');
         //DB::getQueryLog();
         //dd($x);
         return $x;
