@@ -105,7 +105,7 @@ class BilcoDataSerahController extends Controller
         catch (\Exception $e){AppHelper::sendErrorAndExit('End Periode is invalid');}
         $d30h = BilcoDataSerah::selectRaw('
         sum(total_outstanding) as total,
-         concat("d_",DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%Y-%m")) as periodes,
+         DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
         kpi,
         regional')
             ->groupBy('periodes','regional','kpi')
@@ -116,7 +116,7 @@ class BilcoDataSerahController extends Controller
         $d30h =$d30h->get()->toArray();
         $d90h = BilcoDataSerah::selectRaw('
         sum(total_outstanding) as total,
-         concat("d_",DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%Y-%m")) as periodes,
+         DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
          kpi as kpis,
         bill_cycle as kpi,
         regional')
@@ -137,6 +137,7 @@ class BilcoDataSerahController extends Controller
         foreach ($dates as $key => $val){
             $period[] = $key;
         }
+        sort($period);
         foreach ($d30h as $row){
             $i = $row;
             $row['total'] = number_format($row['total']);
@@ -162,7 +163,7 @@ class BilcoDataSerahController extends Controller
             }
             $temp[] = $row ;
         }
-        return datatables()->of($temp)->toJson();
+        return datatables()->of($temp)->with('datecolumn',$period)->toJson();
     }
     /**
      * Display a listing of the resource.
