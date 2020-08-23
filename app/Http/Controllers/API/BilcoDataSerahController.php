@@ -6,6 +6,7 @@ use App\BilcoDataSerah;
 use App\BillingCollectionPoc;
 use App\Helpers\AppHelper;
 use Carbon\Carbon;
+use Carbon\Exceptions\InvalidFormatException;
 use DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -91,22 +92,75 @@ class BilcoDataSerahController extends Controller
     }
 
     public function getKpi(Request $request){
-        $date = null;
+        $end = $date = null;
         try {
-            $date = Carbon::createFromFormat('Y-m-d', $request->get('period'))->addDay(-2);
+            $date = Carbon::createFromFormat('Y-m-d', $request->get('periode').'-01')->addDay(-2);
         }
         catch (\Exception $e){AppHelper::sendErrorAndExit('Periode is invalid');}
+        try {
+            $end = Carbon::createFromFormat('Y-m', $request->get('periodeend'))->addDay(-2);
+        }
+        catch (\Exception $e){AppHelper::sendErrorAndExit('End Periode is invalid');}
         $d30h = BilcoDataSerah::selectRaw('
-        sum(total_outstanding) as date1,
-        regional')->fromSub(function ($query) use($request) {
-                $query->selectRaw('kpi')->where('kpi','30-90');
-            }, 'sub')
-            ->groupBy('regional')
-            ->where('periode',$date->format('Y-m-d'))
-            ->where('kpi','30-60')
-            ->whereIn('regional',array('Sumbagut','Sumbagteng','Sumbagsel'));
-        dd(datatables()->of($d30h)->toArray()['data']);
-        return datatables()->of($d30h)->toJson();
+        sum(total_outstanding) as total,
+         concat("d_",DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%Y-%m")) as periodes,
+        kpi,
+        regional')
+            ->groupBy('periodes','regional','kpi')
+            ->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
+            ->whereIn('regional',array('Sumbagut','Sumbagteng','Sumbagsel'))
+            ->orderBy('regional','DESC')
+            ->orderBy('kpi','ASC');
+        $d30h =$d30h->get()->toArray();
+        $d90h = BilcoDataSerah::selectRaw('
+        sum(total_outstanding) as total,
+         concat("d_",DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%Y-%m")) as periodes,
+         kpi as kpis,
+        bill_cycle as kpi,
+        regional')
+            ->groupBy('periodes','regional','kpi','bill_cycle')
+            ->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
+            ->whereIn('regional',array('Sumbagut','Sumbagteng','Sumbagsel'))
+            ->orderBy('regional','DESC')
+            ->orderBy('kpi','ASC')
+            ->orderBy('bill_cycle','ASC');
+        $d90h =$d90h->get()->toArray();
+        //dd($d90h);
+        $temp = array();
+        $dates = array();
+        $period = array();
+        foreach($d30h as $val){
+            $dates[$val['periodes']] = 0;
+        }
+        foreach ($dates as $key => $val){
+            $period[] = $key;
+        }
+        foreach ($d30h as $row){
+            $i = $row;
+            $row['total'] = number_format($row['total']);
+            foreach ($period as $p){
+                if($p === (string) $row['periodes']){
+                    $row[$p] = $row['total'];
+                }else{
+                    $row[$p] = null;
+                }
+            }
+            foreach ($d90h as $child){
+                if($child['periodes'] === $row['periodes'] && $child['kpis'] === $row['kpi'] && $child['regional'] == $row['regional'] ) {
+                    unset($child['kpis']);
+                    foreach ($period as $p){
+                        if($p === (string) $child['periodes']){
+                            $child[$p] = $child['total'];
+                        }else{
+                            $child[$p] = null;
+                        }
+                    }
+                    $row['children'][] = $child;
+                }
+            }
+            $temp[] = $row ;
+        }
+        return datatables()->of($temp)->toJson();
     }
     /**
      * Display a listing of the resource.
