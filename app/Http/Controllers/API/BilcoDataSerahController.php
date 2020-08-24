@@ -10,6 +10,8 @@ use Carbon\Exceptions\InvalidFormatException;
 use DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use phpDocumentor\Reflection\Types\False_;
+
 class BilcoDataSerahController extends Controller
 {
     public function fetch($date){
@@ -108,8 +110,11 @@ class BilcoDataSerahController extends Controller
          DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
         kpi,
         regional')
-            ->groupBy('periodes','regional','kpi')
-            ->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
+            ->groupBy('periodes','regional');
+        if($request->has('outs') === false){
+            $d30h->groupBy('kpi');
+        }
+            $d30h->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
             ->whereIn('regional',array('Sumbagut','Sumbagteng','Sumbagsel'))
             ->orderBy('regional','DESC')
             ->orderBy('kpi','ASC');
@@ -120,8 +125,12 @@ class BilcoDataSerahController extends Controller
          kpi as kpis,
         bill_cycle as kpi,
         regional')
-            ->groupBy('periodes','regional','kpi','bill_cycle')
-            ->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
+            ->groupBy('periodes','regional');
+            if($request->has('outs') === false){
+                $d90h->groupBy('kpi');
+            }
+            $d90h->groupBy('bill_cycle')
+                ->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
             ->whereIn('regional',array('Sumbagut','Sumbagteng','Sumbagsel'))
             ->orderBy('regional','DESC')
             ->orderBy('kpi','ASC')
