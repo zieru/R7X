@@ -11,6 +11,7 @@ use DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use phpDocumentor\Reflection\Types\False_;
+use phpDocumentor\Reflection\Types\True_;
 
 class BilcoDataSerahController extends Controller
 {
@@ -112,7 +113,7 @@ class BilcoDataSerahController extends Controller
         kpi,
         "AREA Sumatra" AS regional')
             ->groupBy('periodes');
-        if($request->has('outs') === false){
+        if($request->has('outs') == false){
             $d30harea->groupBy('kpi');
         }
         $d30harea->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
@@ -182,9 +183,13 @@ class BilcoDataSerahController extends Controller
             $period[] = $key;
         }
         sort($period);
+
+        $l = 0;
         foreach ($d30h as $row){
             $i = $row;
             $row['total'] = number_format($row['total']);
+            $row['id'] = sprintf('%s#%s#%s#%s',$l,$row['regional'],$row['periodes'],$row['kpi']);
+            $l++;
             $row['totalmsisdn'] = number_format($row['totalmsisdn']);
             foreach ($period as $p){
                 if($p === (string) $row['periodes']){
@@ -197,10 +202,13 @@ class BilcoDataSerahController extends Controller
             foreach ($d90h as $child){
                 if($child['periodes'] === $row['periodes'] && $child['kpis'] === $row['kpi'] && $child['regional'] == $row['regional'] ) {
                     unset($child['kpis']);
+                    $lc = 0;
                     foreach ($period as $p){
+                        $lc = $lc+1;
                         $child['totalmsisdn'] = number_format($child['totalmsisdn']);
                         $child['total'] = number_format($child['total']);
                         if($p === (string) $child['periodes']){
+                            $child['id'] = sprintf('sub#%s#%s#%s#%s#%s',$l,$lc,$child['regional'],$child['periodes'],$child['kpi']);
                             $child[$p]['total'] = $child['total'];
                             $child[$p]['totalmsisdn'] = $child['totalmsisdn'];
                         }else{
