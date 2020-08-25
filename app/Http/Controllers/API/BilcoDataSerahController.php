@@ -199,6 +199,7 @@ class BilcoDataSerahController extends Controller
                     unset($child['kpis']);
                     foreach ($period as $p){
                         $child['totalmsisdn'] = number_format($child['totalmsisdn']);
+                        $child['totalmsisdn'] = number_format($child['total']);
                         if($p === (string) $child['periodes']){
                             $child[$p]['total'] = $child['total'];
                             $child[$p]['totalmsisdn'] = $child['totalmsisdn'];
