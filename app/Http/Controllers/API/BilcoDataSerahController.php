@@ -105,6 +105,20 @@ class BilcoDataSerahController extends Controller
             $end = Carbon::createFromFormat('Y-m', $end)->addDay(-2);
         }
         catch (\Exception $e){AppHelper::sendErrorAndExit('End Periode is invalid');}
+        $d30harea = BilcoDataSerah::selectRaw('
+        sum(total_outstanding) as total,
+         DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
+        kpi,
+        "AREA Sumatra" AS regional')
+            ->groupBy('periodes');
+        if($request->has('outs') === false){
+            $d30harea->groupBy('kpi');
+        }
+        $d30harea->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
+            ->whereIn('regional',array('Sumbagut','Sumbagteng','Sumbagsel'))
+            ->orderBy('regional','DESC')
+            ->orderBy('kpi','ASC');
+        $d30harea = $d30harea;
         $d30h = BilcoDataSerah::selectRaw('
         sum(total_outstanding) as total,
          DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
@@ -118,7 +132,24 @@ class BilcoDataSerahController extends Controller
             ->whereIn('regional',array('Sumbagut','Sumbagteng','Sumbagsel'))
             ->orderBy('regional','DESC')
             ->orderBy('kpi','ASC');
-        $d30h =$d30h->get()->toArray();
+        $d30h =$d30h->union($d30harea)->get()->toArray();
+        $d90harea = BilcoDataSerah::selectRaw('
+        sum(total_outstanding) as total,
+         DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
+         kpi as kpis,
+        bill_cycle as kpi,
+        "AREA Sumatra" AS regional')
+            ->groupBy('periodes');
+        if($request->has('outs') === false){
+            $d90harea->groupBy('kpi');
+        }
+        $d90harea->groupBy('bill_cycle')
+            ->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
+            ->whereIn('regional',array('Sumbagut','Sumbagteng','Sumbagsel'))
+            ->orderBy('regional','DESC')
+            ->orderBy('kpi','ASC')
+            ->orderBy('bill_cycle','ASC');
+        $d90harea =$d90harea;
         $d90h = BilcoDataSerah::selectRaw('
         sum(total_outstanding) as total,
          DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
@@ -135,7 +166,7 @@ class BilcoDataSerahController extends Controller
             ->orderBy('regional','DESC')
             ->orderBy('kpi','ASC')
             ->orderBy('bill_cycle','ASC');
-        $d90h =$d90h->get()->toArray();
+        $d90h =$d90h->union($d90harea)->get()->toArray();
         //dd($d90h);
         $temp = array();
         $dates = array();
