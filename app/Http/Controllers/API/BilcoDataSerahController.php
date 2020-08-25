@@ -107,6 +107,7 @@ class BilcoDataSerahController extends Controller
         catch (\Exception $e){AppHelper::sendErrorAndExit('End Periode is invalid');}
         $d30harea = BilcoDataSerah::selectRaw('
         sum(total_outstanding) as total,
+        count(msisdn) as totalmsisdn,
          DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
         kpi,
         "AREA Sumatra" AS regional')
@@ -121,6 +122,7 @@ class BilcoDataSerahController extends Controller
         $d30harea = $d30harea;
         $d30h = BilcoDataSerah::selectRaw('
         sum(total_outstanding) as total,
+        count(msisdn) as totalmsisdn,
          DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
         kpi,
         regional')
@@ -135,6 +137,7 @@ class BilcoDataSerahController extends Controller
         $d30h =$d30h->union($d30harea)->get()->toArray();
         $d90harea = BilcoDataSerah::selectRaw('
         sum(total_outstanding) as total,
+        count(msisdn) as totalmsisdn,
          DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
          kpi as kpis,
         bill_cycle as kpi,
@@ -152,6 +155,7 @@ class BilcoDataSerahController extends Controller
         $d90harea =$d90harea;
         $d90h = BilcoDataSerah::selectRaw('
         sum(total_outstanding) as total,
+        count(msisdn) as totalmsisdn,
          DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
          kpi as kpis,
         bill_cycle as kpi,
@@ -181,9 +185,11 @@ class BilcoDataSerahController extends Controller
         foreach ($d30h as $row){
             $i = $row;
             $row['total'] = number_format($row['total']);
+            $row['totalmsisdn'] = number_format($row['totalmsisdn']);
             foreach ($period as $p){
                 if($p === (string) $row['periodes']){
-                    $row[$p] = $row['total'];
+                    $row[$p]['total'] = $row['total'];
+                    $row[$p]['totalmsisdn'] = $row['totalmsisdn'];
                 }else{
                     $row[$p] = null;
                 }
@@ -192,8 +198,10 @@ class BilcoDataSerahController extends Controller
                 if($child['periodes'] === $row['periodes'] && $child['kpis'] === $row['kpi'] && $child['regional'] == $row['regional'] ) {
                     unset($child['kpis']);
                     foreach ($period as $p){
+                        $child['totalmsisdn'] = number_format($child['totalmsisdn']);
                         if($p === (string) $child['periodes']){
-                            $child[$p] = $child['total'];
+                            $child[$p]['total'] = $child['total'];
+                            $child[$p]['totalmsisdn'] = $child['totalmsisdn'];
                         }else{
                             $child[$p] = null;
                         }
