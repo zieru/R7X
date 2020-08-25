@@ -10,6 +10,7 @@ use Carbon\Exceptions\InvalidFormatException;
 use DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use phpDocumentor\Reflection\DocBlock\Tags\Var_;
 use phpDocumentor\Reflection\Types\False_;
 use phpDocumentor\Reflection\Types\True_;
 
@@ -95,7 +96,7 @@ class BilcoDataSerahController extends Controller
     }
 
     public function getKpi(Request $request){
-        $end = $date = null;
+        $selectbillcycle = $end = $date = null;
         $start = explode(':',$request->get('periode'))[0];
         $end = explode(':',$request->get('periode'))[1];
         try {
@@ -106,12 +107,15 @@ class BilcoDataSerahController extends Controller
             $end = Carbon::createFromFormat('Y-m', $end)->addDay(-2);
         }
         catch (\Exception $e){AppHelper::sendErrorAndExit('End Periode is invalid');}
+        if($request->has('outs') === true){
+            $selectbillcycle = 'bill_cycle as bill_cycles,';
+        }
+
         $d30harea = BilcoDataSerah::selectRaw('
         sum(total_outstanding) as total,
         count(msisdn) as totalmsisdn,
          DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
-         kpi as kpis,
-        kpi,
+         kpi as kpis,'.$selectbillcycle.'kpi,
         "AREA Sumatra" AS regional')
             ->groupBy('periodes');
         if($request->has('outs') == false){
@@ -126,8 +130,7 @@ class BilcoDataSerahController extends Controller
         sum(total_outstanding) as total,
         count(msisdn) as totalmsisdn,
          DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
-         kpi as kpis,
-        kpi,
+         kpi as kpis,'.$selectbillcycle.'kpi,
         regional')
             ->groupBy('periodes','regional');
         if($request->has('outs') === false){
@@ -142,8 +145,9 @@ class BilcoDataSerahController extends Controller
         sum(total_outstanding) as total,
         count(msisdn) as totalmsisdn,
          DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
-         kpi as kpis,
-        bill_cycle as kpi,
+         kpi as kpis,'
+            .$selectbillcycle.
+        'bill_cycle as kpi,
         "AREA Sumatra" AS regional')
             ->groupBy('periodes');
         if($request->has('outs') === false){
@@ -156,11 +160,12 @@ class BilcoDataSerahController extends Controller
             ->orderBy('kpi','ASC')
             ->orderBy('bill_cycle','ASC');
         $d90harea =$d90harea;
+
         $d90h = BilcoDataSerah::selectRaw('
         sum(total_outstanding) as total,
         count(msisdn) as totalmsisdn,
          DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
-         kpi as kpis,
+         kpi as kpis,'.$selectbillcycle.'
         bill_cycle as kpi,
         regional')
             ->groupBy('periodes','regional');
@@ -173,6 +178,7 @@ class BilcoDataSerahController extends Controller
             ->orderBy('regional','DESC')
             ->orderBy('kpi','ASC')
             ->orderBy('bill_cycle','ASC');
+        //dd($d90h->get()->toArray());
         $d90h =$d90h->union($d90harea)->get()->toArray();
         //dd($d90h);
         $temp = array();
@@ -204,8 +210,18 @@ class BilcoDataSerahController extends Controller
                     $row[$p] = null;
                 }
             }
+            //var_dump($row);
             foreach ($d90h as $child){
-                if($child['periodes'] === $row['periodes'] && $child['kpis'] === $row['kpis'] && $child['regional'] == $row['regional'] ) {
+               /// var_dump($child);
+                $cekkpi = false;
+                if($child['kpis'] === $row['kpis']){
+                    $cekkpi = true;
+                }
+                if($request->has('outs') === true){
+                    $cekkpi = true;
+                }
+                if($child['periodes'] === $row['periodes'] && $cekkpi === true && $child['regional'] == $row['regional'] ) {
+                    //var_dump($child);
                     unset($child['kpis']);
                     $lc = 0;
                     foreach ($period as $p){
@@ -226,6 +242,7 @@ class BilcoDataSerahController extends Controller
             unset($row['kpis']);
             $temp[] = $row ;
         }
+
         return datatables()->of($temp)->with('datecolumn',$period)->toJson();
     }
     /**
