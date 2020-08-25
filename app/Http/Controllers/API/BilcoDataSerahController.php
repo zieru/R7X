@@ -253,11 +253,26 @@ class BilcoDataSerahController extends Controller
     public function index(Request $request)
     {
         //
-        $date = null;
+        $end = $date = null;
+        $start = explode(':',$request->get('periode'))[0];
+        $end = explode(':',$request->get('periode'))[1];
         try {
-            $date = Carbon::createFromFormat('Y-m-d', $request->get('period'))->addDay(-2);
+            $date = Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-2);
         }
         catch (\Exception $e){AppHelper::sendErrorAndExit('Periode is invalid');}
+        try {
+            $end = Carbon::createFromFormat('Y-m', $end)->addDay(-2);
+        }
+        catch (\Exception $e){AppHelper::sendErrorAndExit('End Periode is invalid');}
+        $d90harea = BilcoDataSerah::selectRaw('count( msisdn) as msisdn,
+	sum( bucket_1 ) as bucket_1,
+	sum( bucket_2 ) as bucket_2,
+	sum( bucket_3 ) as bucket_3,
+	sum( bucket_4 ) as bucket_4,
+        "Area Sumatera" as regional,
+	sum(total_outstanding) as total_outstanding')
+            ->whereIn('regional',array('Sumbagut','Sumbagteng','Sumbagsel'))
+            ->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')));
         $d90h = BilcoDataSerah::selectRaw('count( msisdn) as msisdn,
 	sum( bucket_1 ) as bucket_1,
 	sum( bucket_2 ) as bucket_2,
@@ -266,9 +281,20 @@ class BilcoDataSerahController extends Controller
         regional,
 	sum(total_outstanding) as total_outstanding')
             ->groupBy('regional')
-            ->where('periode',$date->format('Y-m-d'))
-            ->whereIn('regional',array('Sumbagut','Sumbagteng','Sumbagsel'));
-            return datatables()->of($d90h)->toJson();
+            ->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
+            ->whereIn('regional',array('Sumbagut','Sumbagteng','Sumbagsel'))
+            ->union($d90harea);
+        $temp = array();
+            foreach ($d90h->get()->toArray() as $row)
+            {
+                $row['bucket_1'] = number_format($row['bucket_1']);
+                $row['bucket_2'] = number_format($row['bucket_2']);
+                $row['bucket_3'] = number_format($row['bucket_3']);
+                $row['bucket_4'] = number_format($row['bucket_4']);
+                $row['total_outstanding'] = number_format($row['total_outstanding']);
+                $temp[] = $row;
+            }
+            return datatables()->of($temp)->toJson();
     }
 
     /**
