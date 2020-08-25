@@ -110,6 +110,7 @@ class BilcoDataSerahController extends Controller
         sum(total_outstanding) as total,
         count(msisdn) as totalmsisdn,
          DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
+         kpi as kpis,
         kpi,
         "AREA Sumatra" AS regional')
             ->groupBy('periodes');
@@ -125,6 +126,7 @@ class BilcoDataSerahController extends Controller
         sum(total_outstanding) as total,
         count(msisdn) as totalmsisdn,
          DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
+         kpi as kpis,
         kpi,
         regional')
             ->groupBy('periodes','regional');
@@ -189,6 +191,9 @@ class BilcoDataSerahController extends Controller
             $i = $row;
             $row['total'] = number_format($row['total']);
             $row['id'] = sprintf('%s#%s#%s#%s',$l,$row['regional'],$row['periodes'],$row['kpi']);
+            if($request->has('outs') === true){
+                $row['kpi'] = '*';
+            }
             $l++;
             $row['totalmsisdn'] = number_format($row['totalmsisdn']);
             foreach ($period as $p){
@@ -200,7 +205,7 @@ class BilcoDataSerahController extends Controller
                 }
             }
             foreach ($d90h as $child){
-                if($child['periodes'] === $row['periodes'] && $child['kpis'] === $row['kpi'] && $child['regional'] == $row['regional'] ) {
+                if($child['periodes'] === $row['periodes'] && $child['kpis'] === $row['kpis'] && $child['regional'] == $row['regional'] ) {
                     unset($child['kpis']);
                     $lc = 0;
                     foreach ($period as $p){
@@ -218,6 +223,7 @@ class BilcoDataSerahController extends Controller
                     $row['children'][] = $child;
                 }
             }
+            unset($row['kpis']);
             $temp[] = $row ;
         }
         return datatables()->of($temp)->with('datecolumn',$period)->toJson();
