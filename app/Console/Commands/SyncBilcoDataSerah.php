@@ -112,7 +112,7 @@ $x = array();
             }
 
             $i['kpi'] = '';
-            if($row->bucket_2 > 0 AND $row->bucket_1 > 0 && ($row->bucket_3 <= 0 AND $tahap === 2)){
+            if($row->bucket_2 > 0 AND $row->bucket_1 > 0){
               $i['kpi'] = '30-60';
             }
             if($row->bucket_3 > 0 && $row->bucket_2 > 0){
