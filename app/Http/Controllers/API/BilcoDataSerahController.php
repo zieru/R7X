@@ -80,11 +80,11 @@ class BilcoDataSerahController extends Controller
                 $query->orWhere('aging.bill_cycle', '=', 6);
                 $query->orWhere('aging.bill_cycle', '=', 11);
             })
-            ->where(function($query){
+            /*->where(function($query){
                 $query->orWhere('aging.bbs_RT', '=', 'PP');
                 $query->orWhere('aging.bbs_RT', '=', '');
                 $query->orWhereNull('aging.bbs_RT');
-            })
+            })*/
 
             ->groupBy('aging.account')
             ->orderBy('aging.account');
