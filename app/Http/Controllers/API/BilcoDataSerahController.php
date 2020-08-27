@@ -6,6 +6,7 @@ use App\BilcoDataSerah;
 use App\BillingCollectionPoc;
 use App\Helpers\AppHelper;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Carbon\Exceptions\InvalidFormatException;
 use DB;
 use Illuminate\Http\Request;
@@ -45,7 +46,7 @@ class BilcoDataSerahController extends Controller
             ->select('aging.account','aging.customer_id','bilco.periode','aging.msisdn','aging.bill_cycle','aging.regional','aging.grapari','bilco.regional AS hlr_region','aging.hlr_city','aging.bbs','aging.bbs_name','aging.bbs_company_name','aging.bbs_first_address','aging.bbs_second_address',
                 'cmactive.customer_address as cb_address','bbs_city','cmactive.customer_city AS cb_city','aging.bbs_zip_code','aging.bbs_pay_type',
                 'aging.bbs_RT','aging.bill_amount_04','aging.bill_amount_03','aging.bill_amount_02','aging.bill_amount_01',
-                'aging.bucket_4','aging.bucket_3','aging.bucket_2','aging.bucket_1','aging.aging_status_subscribe','aging.blocking_status','aging.note','cmactive.customer_phone');
+                'aging.bucket_4','aging.bucket_3','aging.bucket_2','aging.bucket_1','aging.blocking_status','aging.note','cmactive.customer_phone');
             if($tahap == 1){
                 $x->where(function($query) {
                         $query->where(function ($query)     {
@@ -88,14 +89,57 @@ class BilcoDataSerahController extends Controller
     }
 
     public function export() {
-        $x= BilcoDataSerah::where('import_batch',1835)->get()->makeHidden(['import_batch']);
+        $x= BilcoDataSerah::where('import_batch',1837)->limit(1)->get()->makeHidden(['import_batch']);
 
         $x = collect($x);
-        return (new FastExcel($x))->download('file.xlsx');
+        return (new FastExcel($x))->download('file.xlsx', function ($row) {
+            return [
+                'tahap' => $row->tahap,
+                'account' => $row->account,
+                'customer_id' => $row->customer_id,
+                'msisdn' => $row->msisdn,
+                'bill_cycle' => $row->bill_cycle,
+                'regional' => $row->regional,
+                'grapari' => $row->grapari,
+                'hlr_region' => $row->hlr_region,
+                'hlr_city' => $row->hlr_city,
+                'bbs' => $row->bbs,
+                'bbs_name' => $row->bbs_name,
+                'bbs_company_name' => $row->bbs_company_name,
+                'bbs_first_address' => $row->bbs_first_address,
+                'bbs_second_address' => $row->bbs_second_address,
+                'cb_address' => $row->cb_address,
+                'cb_city' => $row->cb_city,
+                'bbs_city' => $row->bbs_city,
+                'bbs_zip_code' => $row->bbs_zip_code,
+                'bbs_pay_type' => $row->bbs_pay_type,
+                'bbs_RT' => $row->bbs_RT,
+                'bill_amount_04' => $row->bill_amount_04,
+                'bill_amount_03' => $row->bill_amount_03,
+                'bill_amount_02' => $row->bill_amount_02,
+                'bill_amount_01' => $row->bill_amount_01,
+                'bucket_4' => $row->bucket_4,
+                'bucket_3' => $row->bucket_3,
+                'bucket_2' => $row->bucket_2,
+                'bucket_1' => $row->bucket_1,
+                'total_outstanding' => $row->total_outstanding,
+                'kpi' => $row->kpi,
+                'blocking_status' => $row->blocking_status,
+                'note' => $row->note,
+                'customer_phone' => $row->customer_phone,
+                'cek_halo' => $row->cek_halo,
+                'cek_cp' => $row->cek_cp
+            ];
+        });
     }
 
     public function getKpi(Request $request){
-        $selectbillcycle = $end = $date = null;
+        $bill_cycle= $selectbillcycle = $end = $date = null;
+        $tahap_d = $request->get('tahap');
+
+        if($request->has('bc') and $request->get('bc') > 0){
+            $bill_cycle = $request->get('bc');
+        }
         $start = explode(':',$request->get('periode'))[0];
         $end = explode(':',$request->get('periode'))[1];
         try {
@@ -106,6 +150,20 @@ class BilcoDataSerahController extends Controller
             $end = Carbon::createFromFormat('Y-m', $end)->addDay(-2);
         }
         catch (\Exception $e){AppHelper::sendErrorAndExit('End Periode is invalid');}
+
+        $period = CarbonPeriod::create($start, '1 month', $end);
+        $tahap = [];
+        if($tahap_d > 0){
+            $tahap_dx = 0;
+            if($tahap_d == 1){
+                $tahap_dx = -1;
+            }else{
+                $tahap_dx = 14;
+            }
+            foreach ($period as $dt) {
+                $tahap[] = $dt->addDay($tahap_dx);
+            }
+        }
         if($request->has('outs') === true){
             $selectbillcycle = 'bill_cycle as bill_cycles,';
         }
@@ -117,28 +175,47 @@ class BilcoDataSerahController extends Controller
          kpi as kpis,'.$selectbillcycle.'kpi,
         "AREA Sumatra" AS regional')
             ->groupBy('periodes');
+        if($bill_cycle!=null){
+            $d30harea->where('bill_cycle',$bill_cycle);
+        }
+        if(sizeof($tahap)>0){
+            $d30harea->where(function($query)use($tahap) {
+                foreach ($tahap as $thpd){
+                    $query->orwhere('periode',$thpd->format('Y-m-d'));
+               }
+            });
+        }
         if($request->has('outs') == false){
-            $d30harea->groupBy('kpi');
+            //$d30harea->groupBy('kpi');
         }
         $d30harea->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
-            ->whereIn('regional',array('Sumbagut','Sumbagteng','Sumbagsel'))
-            ->orderBy('regional','DESC')
+            ->orderBy('hlr_region','DESC')
             ->orderBy('kpi','ASC');
+
         $d30harea = $d30harea;
         $d30h = BilcoDataSerah::selectRaw('
         sum(total_outstanding) as total,
         count(msisdn) as totalmsisdn,
          DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
          kpi as kpis,'.$selectbillcycle.'kpi,
-        regional')
-            ->groupBy('periodes','regional');
+        hlr_region as regional')
+            ->groupBy('periodes','hlr_region');
         if($request->has('outs') === false){
-            $d30h->groupBy('kpi');
+            //$d30h->groupBy('kpi');
+        }
+        if($bill_cycle!=null){
+            $d30h->where('bill_cycle',$bill_cycle);
         }
             $d30h->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
-            ->whereIn('regional',array('Sumbagut','Sumbagteng','Sumbagsel'))
-            ->orderBy('regional','DESC')
+            ->orderBy('hlr_region','ASC')
             ->orderBy('kpi','ASC');
+        if(sizeof($tahap)>0){
+            $d30h->where(function($query)use($tahap) {
+                foreach ($tahap as $thpd){
+                    $query->orwhere('periode',$thpd->format('Y-m-d'));
+                }
+            });
+        }
         $d30h =$d30h->union($d30harea)->get()->toArray();
         $d90harea = BilcoDataSerah::selectRaw('
         sum(total_outstanding) as total,
@@ -146,16 +223,28 @@ class BilcoDataSerahController extends Controller
          DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
          kpi as kpis,'
             .$selectbillcycle.
-        'bill_cycle as kpi,
+        'kpi as kpi,
         "AREA Sumatra" AS regional')
             ->groupBy('periodes');
         if($request->has('outs') === false){
             $d90harea->groupBy('kpi');
         }
+        if($bill_cycle!=null){
+            $d90harea->where('bill_cycle',$bill_cycle);
+        }
+        if(sizeof($tahap)>0){
+            $d90harea->where(function($query)use($tahap) {
+                foreach ($tahap as $thpd){
+                    $query->orwhere('periode',$thpd->format('Y-m-d'));
+                }
+            });
+        }
+        if($request->has('outs') === false){
+
+        }
         $d90harea->groupBy('bill_cycle')
             ->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
-            ->whereIn('regional',array('Sumbagut','Sumbagteng','Sumbagsel'))
-            ->orderBy('regional','DESC')
+            ->orderBy('hlr_region','DESC')
             ->orderBy('kpi','ASC')
             ->orderBy('bill_cycle','ASC');
         $d90harea =$d90harea;
@@ -166,18 +255,30 @@ class BilcoDataSerahController extends Controller
          DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
          kpi as kpis,'.$selectbillcycle.'
         bill_cycle as kpi,
-        regional')
-            ->groupBy('periodes','regional');
+        hlr_region as regional')
+            ->groupBy('periodes','hlr_region');
+        if($bill_cycle!=null){
+
+            $d90h->where('bill_cycle',$bill_cycle);
+        }
             if($request->has('outs') === false){
-                $d90h->groupBy('kpi');
+                $d90h->groupBy('kpis');
+            }else{
+                $d90h->groupBy('bill_cycle');
             }
-            $d90h->groupBy('bill_cycle')
-                ->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
-            ->whereIn('regional',array('Sumbagut','Sumbagteng','Sumbagsel'))
-            ->orderBy('regional','DESC')
+
+        $d90h->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
+            ->orderBy('hlr_region','DESC')
             ->orderBy('kpi','ASC')
             ->orderBy('bill_cycle','ASC');
         //dd($d90h->get()->toArray());
+        if(sizeof($tahap)>0){
+            $d90h->where(function($query)use($tahap) {
+                foreach ($tahap as $thpd){
+                    $query->orwhere('periode',$thpd->format('Y-m-d'));
+                }
+            });
+        }
         $d90h =$d90h->union($d90harea)->get()->toArray();
         //dd($d90h);
         $temp = array();
@@ -197,7 +298,10 @@ class BilcoDataSerahController extends Controller
             $row['total'] = number_format($row['total']);
             $row['id'] = sprintf('%s#%s#%s#%s',$l,$row['regional'],$row['periodes'],$row['kpi']);
             if($request->has('outs') === true){
-                $row['kpi'] = '*';
+                $row['kpi'] = 'All BC';
+            }
+            if($request->has('outs') === false){
+                $row['kpi'] = 'All KPI';
             }
             $l++;
             $row['totalmsisdn'] = number_format($row['totalmsisdn']);
@@ -218,7 +322,11 @@ class BilcoDataSerahController extends Controller
                 }
                 if($request->has('outs') === true){
                     $cekkpi = true;
+                }else{
+                    $cekkpi =true;
+                    $child['kpi'] =$child['kpis'];
                 }
+
                 if($child['periodes'] === $row['periodes'] && $cekkpi === true && $child['regional'] == $row['regional'] ) {
                     //var_dump($child);
                     unset($child['kpis']);
