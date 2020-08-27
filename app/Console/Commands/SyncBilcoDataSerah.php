@@ -48,6 +48,16 @@ class SyncBilcoDataSerah extends Command
         
 	//$date = Carbon::now()->subDays(2);
  $date  = Carbon::createFromFormat('Y-m-d', $this->argument('date'));
+$bilcoenddate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2)->endOfMonth();
+$bilcodate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2);
+        $tahap = false;
+        switch ($bilcodate->format('d')){
+            case $bilcoenddate->format('d'):
+                $tahap = 1;
+                break;
+            default:
+                $tahap = 2;
+        }
 	Notifier::create([
                     'type' => 'DataSerahImport',
                     'subject' => 'DataSerah Import file',
@@ -69,7 +79,7 @@ $importer  = Importer::create(array(
     ));
 $ndataserah['imported'] = 0;
 $ndataserah['stored'] = 0;
-    $cx->chunk(100000, function($cx) use($x,$importer,$ndataserah) {
+    $cx->chunk(100000, function($cx) use($tahap,$importer,$ndataserah) {
     //dd($cx->toArray());
     //$cx->each(function($row) use ($x,$importer) {
 $x = array();
@@ -100,8 +110,8 @@ $x = array();
                 }
                 }
             }
-            
-            if($row->bucket_2 > 0 AND $row->bucket_1 > 0){
+
+            if($row->bucket_2 > 0 AND $row->bucket_1 > 0 && ($row->bucket_3 <= 0 AND $tahap === 2)){
               $i['kpi'] = '30-60';
             }
             if($row->bucket_3 > 0 && $row->bucket_2 > 0){
