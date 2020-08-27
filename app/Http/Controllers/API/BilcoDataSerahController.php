@@ -48,7 +48,7 @@ class BilcoDataSerahController extends Controller
                 'aging.bucket_4','aging.bucket_3','aging.bucket_2','aging.bucket_1','aging.aging_status_subscribe','aging.blocking_status','aging.note','cmactive.customer_phone');
             if($tahap == 1){
                 $x->where(function($query) {
-                        $query->where(function ($query) {
+                        $query->where(function ($query)     {
                             $query
                                 ->where('aging.bucket_3', '>', 0)
                                 ->Where('aging.bucket_2', '>', 0);
@@ -74,11 +74,6 @@ class BilcoDataSerahController extends Controller
             }
 
             $x->where('aging.aging_cust_subtype','=','Consumer Reguler')
-            ->where(function($query){
-                $query->orWhere('aging.bill_cycle', '=', 1);
-                $query->orWhere('aging.bill_cycle', '=', 6);
-                $query->orWhere('aging.bill_cycle', '=', 11);
-            })
             /*->where(function($query){
                 $query->orWhere('aging.bbs_RT', '=', 'PP');
                 $query->orWhere('aging.bbs_RT', '=', '');
