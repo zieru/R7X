@@ -79,7 +79,7 @@ $importer  = Importer::create(array(
     ));
 $ndataserah['imported'] = 0;
 $ndataserah['stored'] = 0;
-    $cx->chunk(100000, function($cx) use($tahap,$importer,$ndataserah) {
+    $cx->chunk(100000, function($cx) use($x,$tahap,$importer,$ndataserah) {
     //dd($cx->toArray());
     //$cx->each(function($row) use ($x,$importer) {
 $x = array();
@@ -111,6 +111,7 @@ $x = array();
                 }
             }
 
+            $i['kpi'] = '';
             if($row->bucket_2 > 0 AND $row->bucket_1 > 0 && ($row->bucket_3 <= 0 AND $tahap === 2)){
               $i['kpi'] = '30-60';
             }
