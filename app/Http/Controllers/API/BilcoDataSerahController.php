@@ -89,7 +89,7 @@ class BilcoDataSerahController extends Controller
     }
 
     public function export() {
-        $x= BilcoDataSerah::where('import_batch',1837)->limit(1)->get()->makeHidden(['import_batch']);
+        $x= BilcoDataSerah::all()->get()->makeHidden(['import_batch']);
 
         $x = collect($x);
         return (new FastExcel($x))->download('file.xlsx', function ($row) {
