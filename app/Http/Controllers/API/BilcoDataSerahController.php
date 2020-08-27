@@ -41,7 +41,6 @@ class BilcoDataSerahController extends Controller
             ->leftJoin('olala2.cm_active_unique as cmactive', function($join)
             {
                 $join->on('aging.customer_id','=','cmactive.customer_id');
-		$join->on('aging.msisdn','=','cmactive.msisdn');
             },'left outer')
             ->select('aging.account','aging.customer_id','bilco.periode','aging.msisdn','aging.bill_cycle','aging.regional','aging.grapari','bilco.regional AS hlr_region','aging.hlr_city','aging.bbs','aging.bbs_name','aging.bbs_company_name','aging.bbs_first_address','aging.bbs_second_address',
                 'cmactive.customer_address as cb_address','bbs_city','cmactive.customer_city AS cb_city','aging.bbs_zip_code','aging.aging_cust_subtype','aging.bbs_pay_type',
@@ -94,7 +93,7 @@ class BilcoDataSerahController extends Controller
     }
 
     public function export() {
-        $x= BilcoDataSerah::where('import_batch',1830)->get()->makeHidden(['import_batch']);
+        $x= BilcoDataSerah::where('import_batch',1834)->get()->makeHidden(['import_batch']);
 
         $x = collect($x);
         return (new FastExcel($x))->download('file.xlsx');
