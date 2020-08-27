@@ -43,7 +43,7 @@ class BilcoDataSerahController extends Controller
                 $join->on('aging.customer_id','=','cmactive.customer_id');
             },'left outer')
             ->select('aging.account','aging.customer_id','bilco.periode','aging.msisdn','aging.bill_cycle','aging.regional','aging.grapari','bilco.regional AS hlr_region','aging.hlr_city','aging.bbs','aging.bbs_name','aging.bbs_company_name','aging.bbs_first_address','aging.bbs_second_address',
-                'cmactive.customer_address as cb_address','bbs_city','cmactive.customer_city AS cb_city','aging.bbs_zip_code','aging.aging_cust_subtype','aging.bbs_pay_type',
+                'cmactive.customer_address as cb_address','bbs_city','cmactive.customer_city AS cb_city','aging.bbs_zip_code','aging.bbs_pay_type',
                 'aging.bbs_RT','aging.bill_amount_04','aging.bill_amount_03','aging.bill_amount_02','aging.bill_amount_01',
                 'aging.bucket_4','aging.bucket_3','aging.bucket_2','aging.bucket_1','aging.aging_status_subscribe','aging.blocking_status','aging.note','cmactive.customer_phone');
             if($tahap == 1){
@@ -74,11 +74,11 @@ class BilcoDataSerahController extends Controller
             }
 
             $x->where('aging.aging_cust_subtype','=','Consumer Reguler')
-            /*->where(function($query){
+            ->where(function($query){
                 $query->orWhere('aging.bbs_RT', '=', 'PP');
                 $query->orWhere('aging.bbs_RT', '=', '');
                 $query->orWhereNull('aging.bbs_RT');
-            })*/
+            })
 
             ->groupBy('aging.account')
             ->orderBy('aging.account');
@@ -88,7 +88,7 @@ class BilcoDataSerahController extends Controller
     }
 
     public function export() {
-        $x= BilcoDataSerah::where('import_batch',1834)->get()->makeHidden(['import_batch']);
+        $x= BilcoDataSerah::where('import_batch',1835)->get()->makeHidden(['import_batch']);
 
         $x = collect($x);
         return (new FastExcel($x))->download('file.xlsx');
