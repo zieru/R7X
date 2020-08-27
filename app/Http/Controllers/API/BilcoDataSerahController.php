@@ -13,6 +13,7 @@ use App\Http\Controllers\Controller;
 use phpDocumentor\Reflection\DocBlock\Tags\Var_;
 use phpDocumentor\Reflection\Types\False_;
 use phpDocumentor\Reflection\Types\True_;
+use Rap2hpoutre\FastExcel\FastExcel;
 
 class BilcoDataSerahController extends Controller
 {
@@ -33,7 +34,6 @@ class BilcoDataSerahController extends Controller
         echo(sprintf('tahap :%s bilco : %s Aging : %s',$tahap,$bilcodate->format('Ymd'),$agingdate->format('Ymd')));
 //die();
         $x= DB::table('sabyan_r7s_data.'.$bilcodate->format('Ymd').'_Sumatra as bilco')
-	    //DB::table('olala2.cm_active_unique as cmactive')
             ->leftJoin('olala2.aging_'.$agingdate->format('Ymd').' as aging', function($join)
             {
                 $join->on('bilco.account_number','=','aging.account');
@@ -43,27 +43,25 @@ class BilcoDataSerahController extends Controller
                 $join->on('aging.customer_id','=','cmactive.customer_id');
 		$join->on('aging.msisdn','=','cmactive.msisdn');
             },'left outer')
-/*
-            ->leftJoin('sabyan_r7s_data.'.$bilcodate->format('Ymd').'_Sumatra as bilco', function($join)
-            {
-                $join->on('aging.account','=','bilco.account_number');
-            })
-*/
             ->select('aging.account','aging.customer_id','bilco.periode','aging.msisdn','aging.bill_cycle','aging.regional','aging.grapari','bilco.regional AS hlr_region','aging.hlr_city','aging.bbs','aging.bbs_name','aging.bbs_company_name','aging.bbs_first_address','aging.bbs_second_address',
                 'cmactive.customer_address as cb_address','bbs_city','cmactive.customer_city AS cb_city','aging.bbs_zip_code','aging.aging_cust_subtype','aging.bbs_pay_type',
                 'aging.bbs_RT','aging.bill_amount_04','aging.bill_amount_03','aging.bill_amount_02','aging.bill_amount_01',
                 'aging.bucket_4','aging.bucket_3','aging.bucket_2','aging.bucket_1','aging.aging_status_subscribe','aging.blocking_status','aging.note','cmactive.customer_phone');
             if($tahap == 1){
-                $x->where(function($query){
-                    $query
-                        ->where('aging.bucket_3','>',0)
-                        ->Where('aging.bucket_2','>',0);
-                    })
-                    ->orWhere(function($query){
-                        $query
-                            ->where('aging.bucket_2','>',12500)
-                            ->Where('aging.bucket_1','>',0);
-                    })
+                $x->where(function($query) {
+                        $query->where(function ($query) {
+                            $query
+                                ->where('aging.bucket_3', '>', 0)
+                                ->Where('aging.bucket_2', '>', 0);
+                        });
+                        $query->orWhere(function ($query) {
+                            $query
+                                ->where('aging.bucket_2','>',12500)
+                                ->Where('aging.bucket_1','>',0);
+                        });
+                    });
+
+                    $x
                     ->where('aging.bucket_5','<=',0)
                     ->where('aging.bucket_6','<=',0)
                     ->where('aging.bucket_4','<=',0)
@@ -72,7 +70,8 @@ class BilcoDataSerahController extends Controller
                 $x->where('aging.bucket_2','>',12500)
                     ->where('aging.bucket_1','>',0)
                     ->where('aging.bucket_3','<=',0)
-                    ->where('aging.bucket_4','<=',0);
+                    ->where('aging.bucket_4','<=',0)
+                    ->where('aging.total_outstanding','>=',50000);
             }
 
             $x->where('aging.aging_cust_subtype','=','Consumer Reguler')
@@ -86,13 +85,19 @@ class BilcoDataSerahController extends Controller
                 $query->orWhere('aging.bbs_RT', '=', '');
                 $query->orWhereNull('aging.bbs_RT');
             })
-            
-            ->where('aging.total_outstanding','>=',50000)
+
             ->groupBy('aging.account')
             ->orderBy('aging.account');
         //DB::getQueryLog();
         //dd($x);
         return $x;
+    }
+
+    public function export() {
+        $x= BilcoDataSerah::where('import_batch',1777)->get()->makeHidden(['import_batch']);
+
+        $x = collect($x);
+        return (new FastExcel($x))->download('file.xlsx');
     }
 
     public function getKpi(Request $request){

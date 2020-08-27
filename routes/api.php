@@ -38,6 +38,7 @@ Route::apiResource('notifier', 'NotifierController');
 Route::prefix('v1')->middleware(['CheckClientCredentials','auth:api'])->group(function() {
     Route::apiResource('bilcodataserah', 'API\BilcoDataSerahController');
     Route::get('bilcodataserahkpi', 'API\BilcoDataSerahController@getKpi');
+    Route::get('bilcodataserahexport', 'API\BilcoDataSerahController@export');
     Route::apiResource('importer', 'ImporterController');
     Route::apiResource('config', 'API\ConfigController');
     Route::any('billCo/dashboard/poc', 'BillingCollectionController@dashboardApiPOC')->name('api.v1.bilco.dashboard.poc');
