@@ -18,6 +18,17 @@ use Rap2hpoutre\FastExcel\FastExcel;
 
 class BilcoDataSerahController extends Controller
 {
+    public function chart(){
+        $x = BilcoDataSerah::select(DB::raw('"total_outstanding" as tipe'),DB::raw('sum(total_outstanding) as value'),'hlr_region')->groupBy('hlr_region');
+        $y = BilcoDataSerah::select(DB::raw('"msisdn" as tipe'),DB::raw('count(msisdn) as value'),'hlr_region')->groupBy('hlr_region')->union($x);
+        $ret = [array('tipe'=> 'msisdn','value'=>'0','hlr_region'=>'')];
+        foreach($y->get()->toArray() as $row){
+            if($row['tipe'] == 'total_outstading') $row['value'] = number_format($row['value']);
+            $ret[] = $row;
+        }
+        return datatables()->of($ret)->toJson();
+    }
+
     public function fetch($date){
         DB::enableQueryLog();
         $bilcoenddate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2)->endOfMonth();

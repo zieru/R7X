@@ -38,6 +38,7 @@ Route::apiResource('notifier', 'NotifierController');
 Route::prefix('v1')->middleware(['CheckClientCredentials','auth:api'])->group(function() {
     Route::apiResource('bilcodataserah', 'API\BilcoDataSerahController');
     Route::get('bilcodataserahkpi', 'API\BilcoDataSerahController@getKpi');
+    Route::get('bilcodataserahchart', 'API\BilcoDataSerahController@chart');
     Route::get('bilcodataserahexport', 'API\BilcoDataSerahController@export');
     Route::apiResource('importer', 'ImporterController');
     Route::apiResource('config', 'API\ConfigController');
