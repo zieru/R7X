@@ -293,8 +293,10 @@ class BilcoDataSerahController extends Controller
         sort($period);
 
         $l = 0;
+        $sum = $i  = [];
+
         foreach ($d30h as $row){
-            $i = $row;
+
             $row['total'] = number_format($row['total']);
             $row['id'] = sprintf('%s#%s#%s#%s',$l,$row['regional'],$row['periodes'],$row['kpi']);
             if($request->has('outs') === true){
@@ -305,15 +307,22 @@ class BilcoDataSerahController extends Controller
             }
             $l++;
             $row['totalmsisdn'] = number_format($row['totalmsisdn']);
+            $sum[$row['regional']]['total'] = $row['total'];
+            $sum[$row['regional']]['totalmsisdn'] = $row['totalmsisdn'];
+            $sum[$row['regional']]['periodes'] = $row['periodes'];
+            $sum[$row['regional']]['kpis'] = $row['kpis'];
+            $sum[$row['regional']]['kpi'] = $row['kpi'];
+            $sum[$row['regional']]['regional'] = $row['regional'];
+            $sum[$row['regional']]['id'] = $row['id'];
             foreach ($period as $p){
                 if($p === (string) $row['periodes']){
-                    $row[$p]['total'] = $row['total'];
-                    $row[$p]['totalmsisdn'] = $row['totalmsisdn'];
-                }else{
-                    $row[$p] = null;
+                    $row['x'][$p]['total'] = $row['total'];
+                    $row['x'][$p]['totalmsisdn'] = $row['totalmsisdn'];
+
+                    $sum[$row['regional']]['period'][$p]['totalmsisdn'] = $row['totalmsisdn'];
+                    $sum[$row['regional']]['period'][$p]['total'] = $row['total'];
                 }
             }
-            //var_dump($row);
             foreach ($d90h as $child){
                /// var_dump($child);
                 $cekkpi = false;
@@ -333,24 +342,30 @@ class BilcoDataSerahController extends Controller
                     $lc = 0;
                     foreach ($period as $p){
                         $lc = $lc+1;
-                        $child['totalmsisdn'] = number_format($child['totalmsisdn']);
-                        $child['total'] = number_format($child['total']);
+                        $child['totalmsisdn'] = $child['totalmsisdn'];
+                        $child['total'] = $child['total'];
                         if($p === (string) $child['periodes']){
                             $child['id'] = sprintf('sub#%s#%s#%s#%s#%s',$l,$lc,$child['regional'],$child['periodes'],$child['kpi']);
                             $child[$p]['total'] = $child['total'];
                             $child[$p]['totalmsisdn'] = $child['totalmsisdn'];
+                            $child['period'][$p]['total'] = $child['total'];
+                            $child['period'][$p]['totalmsisdn'] = $child['totalmsisdn'];
+
                         }else{
                             $child[$p] = null;
                         }
                     }
                     $row['children'][] = $child;
+
+                    $sum[$child['regional']]['children'][] = $child;
                 }
             }
             unset($row['kpis']);
+            $i[$row['regional']]=$row;
             $temp[] = $row ;
         }
 
-        return datatables()->of($temp)->with('datecolumn',$period)->toJson();
+        return datatables()->of($sum)->with('datecolumn',$period)->toJson();
     }
     /**
      * Display a listing of the resource.
@@ -361,16 +376,21 @@ class BilcoDataSerahController extends Controller
     {
         //
         $end = $date = null;
+        $tahap_d = $request->get('tahap');
         $start = explode(':',$request->get('periode'))[0];
-        $end = explode(':',$request->get('periode'))[1];
+        $end = null;
         try {
             $date = Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-2);
         }
         catch (\Exception $e){AppHelper::sendErrorAndExit('Periode is invalid');}
-        try {
-            $end = Carbon::createFromFormat('Y-m', $end)->addDay(-2);
+        $tahap = null;
+        if($tahap_d > 0){
+            if($tahap_d == 1){
+                $tahap = Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-1);
+            }else{
+                $tahap = Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(14);
+            }
         }
-        catch (\Exception $e){AppHelper::sendErrorAndExit('End Periode is invalid');}
         $d90harea = BilcoDataSerah::selectRaw('count( msisdn) as msisdn,
 	sum( bucket_1 ) as bucket_1,
 	sum( bucket_2 ) as bucket_2,
@@ -378,19 +398,20 @@ class BilcoDataSerahController extends Controller
 	sum( bucket_4 ) as bucket_4,
         "Area Sumatera" as regional,
 	sum(total_outstanding) as total_outstanding')
-            ->whereIn('regional',array('Sumbagut','Sumbagteng','Sumbagsel'))
-            ->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')));
+            ->whereIn('hlr_region',array('Sumbagut','Sumbagteng','Sumbagsel'));
+        if($tahap != null)$d90harea->where('periode',$tahap->format('Y-m-d'));
+
         $d90h = BilcoDataSerah::selectRaw('count( msisdn) as msisdn,
 	sum( bucket_1 ) as bucket_1,
 	sum( bucket_2 ) as bucket_2,
 	sum( bucket_3 ) as bucket_3,
 	sum( bucket_4 ) as bucket_4,
-        regional,
+        hlr_region as regional,
 	sum(total_outstanding) as total_outstanding')
-            ->groupBy('regional')
-            ->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
-            ->whereIn('regional',array('Sumbagut','Sumbagteng','Sumbagsel'))
-            ->union($d90harea);
+            ->groupBy('hlr_region')
+            ->whereIn('hlr_region',array('Sumbagut','Sumbagteng','Sumbagsel'));
+        if($tahap != null)$d90h->where('periode',$tahap->format('Y-m-d'));
+        $d90h->union($d90harea);
         $temp = array();
             foreach ($d90h->get()->toArray() as $row)
             {
