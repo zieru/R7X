@@ -14,18 +14,52 @@ use App\Http\Controllers\Controller;
 use phpDocumentor\Reflection\DocBlock\Tags\Var_;
 use phpDocumentor\Reflection\Types\False_;
 use phpDocumentor\Reflection\Types\True_;
+use Ramsey\Uuid\Type\Decimal;
 use Rap2hpoutre\FastExcel\FastExcel;
 
 class BilcoDataSerahController extends Controller
 {
-    public function chart(){
-        $x = BilcoDataSerah::select(DB::raw('"total_outstanding" as tipe'),DB::raw('sum(total_outstanding) as value'),'hlr_region')->groupBy('hlr_region');
-        $y = BilcoDataSerah::select(DB::raw('"msisdn" as tipe'),DB::raw('count(msisdn) as value'),'hlr_region')->groupBy('hlr_region')->union($x);
-        $ret = [array('tipe'=> 'msisdn','value'=>'0','hlr_region'=>'')];
+    public function chart(Request $req){
+        if($req->get('tipe') == 'outstanding'){
+            $y = BilcoDataSerah::select(DB::raw('sum(total_outstanding) as value'),'hlr_region')->groupBy('hlr_region');
+        }
+        if($req->get('tipe') == 'msisdn'){
+            $y = BilcoDataSerah::select(DB::raw('count(msisdn) as value'),'hlr_region')->groupBy('hlr_region');
+        }
+        if($req->get('tipe') == 'msisdn2'){
+            $y = BilcoDataSerah::select('periode', DB::raw('count(msisdn) as value'),'hlr_region')->groupBy('hlr_region','periode');
+        }
+        if($req->get('tipe') == 'outs2'){
+            $y = BilcoDataSerah::select('periode',DB::raw('sum(total_outstanding) as value'),'hlr_region')->groupBy('hlr_region','periode');
+        }
+
+        $ret = [];
         foreach($y->get()->toArray() as $row){
-            if($row['tipe'] == 'total_outstading') $row['value'] = number_format($row['value']);
+            $row['value'] = number_format($row['value']);
             $ret[] = $row;
         }
+        if($req->get('tipe') == 'msisdn2' OR $req->get('tipe') == 'outs2'){
+            $ret = [];
+            foreach($y->get()->toArray() as $row){
+               // $row['value'] = number_format($row['value']);
+                $periode = Carbon::createFromFormat('Y-m-d', $row['periode']);
+                if(in_array($periode->format('d'),array(28,29,30,31))){
+                    $periode->addDay(1);
+                }
+                $ret[$periode->format('Y-m')]['periode'] = $periode->format('Y-m');
+                if(!isset($ret[$periode->format('Y-m')]['Sumbagut'])){
+                    $ret[$periode->format('Y-m')]['Sumbagut'] = 0;
+                }
+                if(!isset($ret[$periode->format('Y-m')]['Sumbagsel'])){
+                    $ret[$periode->format('Y-m')]['Sumbagsel'] = 0;
+                }
+                if(!isset($ret[$periode->format('Y-m')]['Sumbagteng'])){
+                    $ret[$periode->format('Y-m')]['Sumbagteng'] = 0;
+                }
+                $ret[$periode->format('Y-m')][$row['hlr_region']] = (float) $row['value'];
+            }
+        }
+        sort($ret);
         return datatables()->of($ret)->toJson();
     }
 
