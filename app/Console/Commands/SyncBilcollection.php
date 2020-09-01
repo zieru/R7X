@@ -56,14 +56,18 @@ class SyncBilcollection extends Command
             return $response;
     }
 
-    public function proses($filename){
+    public function proses($filename, $date = null){
         $controller = new BillingCollectionController();
         //var_dump($this->option('testing'));
-        if(is_array($filename)){
-            foreach ($filename as $name){
-                echo shell_exec(sprintf("php artisan Syncbilcollection --file=%s >> log.log",$name));
+        if(is_array($filename)) {
+            foreach ($filename as $name) {
+                echo shell_exec(sprintf("php artisan Syncbilcollection --file=%s >> log.log", $name));
 
             }
+            if (in_array(Carbon::now()->format('d'), array(2, 15))){
+                Artisan::call('SyncbilcoDataserah '.Carbon::now()->format('Y-m'));
+            }
+
                 Artisan::call('db:backup');
         }else{
             $this->info('proses download :'.$filename);
@@ -118,6 +122,6 @@ class SyncBilcollection extends Command
                 $filename[] = sprintf('%s_%s.csv',$date,$area);
             }
         }
-        $this->proses($filename);
+        $this->proses($filename,$date);
     }
 }
