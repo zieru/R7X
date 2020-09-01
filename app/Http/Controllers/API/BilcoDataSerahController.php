@@ -20,12 +20,7 @@ use Rap2hpoutre\FastExcel\FastExcel;
 class BilcoDataSerahController extends Controller
 {
     public function chart(Request $req){
-        if($req->get('tipe') == 'outstanding'){
-            $y = BilcoDataSerah::select(DB::raw('sum(total_outstanding) as value'),'hlr_region')->groupBy('hlr_region');
-        }
-        if($req->get('tipe') == 'msisdn'){
-            $y = BilcoDataSerah::select(DB::raw('count(msisdn) as value'),'hlr_region')->groupBy('hlr_region');
-        }
+        $x = BilcoDataSerah::select('periode', DB::raw('count(msisdn) as value'),)->groupBy('periode');
         if($req->get('tipe') == 'msisdn2'){
             $y = BilcoDataSerah::select('periode', DB::raw('count(msisdn) as value'),'hlr_region')->groupBy('hlr_region','periode');
         }
@@ -395,14 +390,16 @@ class BilcoDataSerahController extends Controller
                             $child[$p]['totalmsisdn'] = $child['totalmsisdn'];
                             $child['period'][$p]['total'] = $child['total'];
                             $child['period'][$p]['totalmsisdn'] = $child['totalmsisdn'];
-
                         }else{
                             $child[$p] = null;
                         }
                     }
                     $row['children'][] = $child;
-
-                    $sum[$child['regional']]['children'][] = $child;
+                    $region = $child['regional'];
+                    if($request->has('outs') === false){
+                        $child['regional'] = '';
+                    }
+                    $sum[$region]['children'][] = $child;
                 }
             }
             unset($row['kpis']);
