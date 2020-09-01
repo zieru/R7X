@@ -151,7 +151,7 @@ class BilcoDataSerahController extends Controller
             ->get()->makeHidden(['import_batch']);
 
         $x = collect($x);
-        return (new FastExcel($x))->download('DATASERAH-'.$regional.'_'.$periode.'xlsx', function ($row) {
+        return (new FastExcel($x))->download('DATASERAH-'.$regional.'_'.$start.'xlsx', function ($row) {
             return [
                 'tahap' => $row->tahap,
                 'account' => $row->account,
