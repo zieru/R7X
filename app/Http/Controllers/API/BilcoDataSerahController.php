@@ -481,7 +481,7 @@ class BilcoDataSerahController extends Controller
                 $row['bucket_3'] = number_format($row['bucket_3']);
                 $row['bucket_4'] = number_format($row['bucket_4']);
                 $row['total_outstanding'] = number_format($row['total_outstanding']);
-                $row['download'] = sprintf('%s/export?tahap=%s&start=%s&regional=%s',URL::to('/external/bilcodataserahexport'),$tahap_d,$start,$row['regional']);
+                $row['download'] = sprintf('%s?tahap=%s&start=%s&regional=%s',URL::to('/external/bilcodataserahexport'),$tahap_d,$start,$row['regional']);
                 $temp[] = $row;
             }
             return datatables()->of($temp)->toJson();
