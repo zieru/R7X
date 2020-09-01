@@ -438,7 +438,7 @@ class BilcoDataSerahController extends Controller
         //
         $end = $date = null;
         $tahap_d = $request->get('tahap');
-        $start = explode(':',$request->get('periode'))[0];
+        $start = $request->get('periode');
         $end = null;
         try {
             $date = Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-2);
@@ -452,6 +452,14 @@ class BilcoDataSerahController extends Controller
                 $tahap = Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(12);
             }
         }
+        $periode = array(Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-1)->format('Y-m-d'),Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(12)->format('Y-m-d'));
+        if($tahap_d > 0){
+            if($tahap_d == 1){
+                $periode = array(Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-1)->format('Y-m-d'),Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-1)->format('Y-m-d'));
+            }else{
+                $periode = array(Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(12)->format('Y-m-d'),Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(12)->format('Y-m-d'));
+            }
+        }
         $d90harea = BilcoDataSerah::selectRaw('count( msisdn) as msisdn,
 	sum( bucket_1 ) as bucket_1,
 	sum( bucket_2 ) as bucket_2,
@@ -459,9 +467,9 @@ class BilcoDataSerahController extends Controller
 	sum( bucket_4 ) as bucket_4,
         "Area Sumatera" as regional,
 	sum(total_outstanding) as total_outstanding')
-            ->whereIn('hlr_region',array('Sumbagut','Sumbagteng','Sumbagsel'));
+            ->whereIn('hlr_region',array('Sumbagut','Sumbagteng','Sumbagsel'))
+            ->whereBetween('periode',$periode);
         if($tahap != null)$d90harea->where('periode',$tahap->format('Y-m-d'));
-
         $d90h = BilcoDataSerah::selectRaw('count( msisdn) as msisdn,
 	sum( bucket_1 ) as bucket_1,
 	sum( bucket_2 ) as bucket_2,
@@ -470,7 +478,8 @@ class BilcoDataSerahController extends Controller
         hlr_region as regional,
 	sum(total_outstanding) as total_outstanding')
             ->groupBy('hlr_region')
-            ->whereIn('hlr_region',array('Sumbagut','Sumbagteng','Sumbagsel'));
+            ->whereIn('hlr_region',array('Sumbagut','Sumbagteng','Sumbagsel'))
+            ->whereBetween('periode',$periode);
         if($tahap != null)$d90h->where('periode',$tahap->format('Y-m-d'));
         $d90h->union($d90harea);
         $temp = array();
