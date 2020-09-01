@@ -407,8 +407,8 @@ class BilcoDataSerahController extends Controller
                             $child['id'] = sprintf('sub#%s#%s#%s#%s#%s',$l,$lc,$child['regional'],$child['periodes'],$child['kpi']);
                             $child[$p]['total'] = $child['total'];
                             $child[$p]['totalmsisdn'] = $child['totalmsisdn'];
-                            $child['period'][$p]['total'] = $child['total'];
-                            $child['period'][$p]['totalmsisdn'] = $child['totalmsisdn'];
+                            $child['period'][$p]['total'] = number_format($child['total']);
+                            $child['period'][$p]['totalmsisdn'] = number_format($child['totalmsisdn']);
                         }else{
                             $child[$p] = null;
                         }
@@ -449,7 +449,7 @@ class BilcoDataSerahController extends Controller
             if($tahap_d == 1){
                 $tahap = Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-1);
             }else{
-                $tahap = Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(14);
+                $tahap = Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(12);
             }
         }
         $d90harea = BilcoDataSerah::selectRaw('count( msisdn) as msisdn,
