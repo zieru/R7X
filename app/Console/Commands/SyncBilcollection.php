@@ -65,7 +65,7 @@ class SyncBilcollection extends Command
 
             }
             if (in_array(Carbon::now()->format('d'), array(2, 15))){
-                Artisan::call('SyncbilcoDataserah '.Carbon::now()->format('Y-m'));
+                Artisan::call('SyncbilcoDataserah '.Carbon::now()->format('Y-m-d'));
             }
 
                 Artisan::call('db:backup');
