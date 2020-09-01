@@ -151,7 +151,7 @@ class BilcoDataSerahController extends Controller
             ->get()->makeHidden(['import_batch']);
 
         $x = collect($x);
-        return (new FastExcel($x))->download('file.xlsx', function ($row) {
+        return (new FastExcel($x))->download('DATASERAH-'.$regional.'_'.$periode.'xlsx', function ($row) {
             return [
                 'tahap' => $row->tahap,
                 'account' => $row->account,
@@ -299,9 +299,11 @@ class BilcoDataSerahController extends Controller
             });
         }
         if($request->has('outs') === false){
-
+            $d90harea->groupBy('kpi');
+        }else{
+            $d90harea->groupBy('bill_cycle');
         }
-        $d90harea->groupBy('bill_cycle')
+        $d90harea //->groupBy('bill_cycle')
             ->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
             ->orderBy('hlr_region','DESC')
             ->orderBy('kpi','ASC')
@@ -392,7 +394,7 @@ class BilcoDataSerahController extends Controller
                     $cekkpi = true;
                 }else{
                     $cekkpi =true;
-                    $child['kpi'] =$child['kpis'];
+                    $child['kpi'] = $child['kpis'];
                 }
 
                 if($child['periodes'] === $row['periodes'] && $cekkpi === true && $child['regional'] == $row['regional'] ) {
@@ -413,10 +415,12 @@ class BilcoDataSerahController extends Controller
                             $child[$p] = null;
                         }
                     }
-                    $row['children'][] = $child;
+                    $row['children'][$row['kpi']][] = $child;
                     $region = $child['regional'];
                     if($request->has('outs') === false){
                         $child['regional'] = '';
+                    }else{
+                        $child['kpi'] = $child['bill_cycles'];
                     }
                     $sum[$region]['children'][] = $child;
                 }
