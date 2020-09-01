@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+Route::get('external/bilcodataserahexport', 'API\BilcoDataSerahController@export');
 Route::get('/','Front\HomeController@index')->name('front.home');
 Route::any('import', 'BillingCollectionController@create')->name('front.BillingImport');
 Route::resource('bilco','BillingCollectionController');

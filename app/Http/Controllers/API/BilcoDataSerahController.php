@@ -16,16 +16,19 @@ use phpDocumentor\Reflection\Types\False_;
 use phpDocumentor\Reflection\Types\True_;
 use Ramsey\Uuid\Type\Decimal;
 use Rap2hpoutre\FastExcel\FastExcel;
+use URL;
 
 class BilcoDataSerahController extends Controller
 {
     public function chart(Request $req){
-        $x = BilcoDataSerah::select('periode', DB::raw('count(msisdn) as value'),)->groupBy('periode');
+
         if($req->get('tipe') == 'msisdn2'){
-            $y = BilcoDataSerah::select('periode', DB::raw('count(msisdn) as value'),'hlr_region')->groupBy('hlr_region','periode');
+            $x = BilcoDataSerah::select('periode', DB::raw('count(msisdn) as value'),DB::raw('"AREA I" as hlr_region'))->groupBy('periode');
+            $y = BilcoDataSerah::select('periode', DB::raw('count(msisdn) as value'),'hlr_region')->groupBy('hlr_region','periode')->union($x);
         }
         if($req->get('tipe') == 'outs2'){
-            $y = BilcoDataSerah::select('periode',DB::raw('sum(total_outstanding) as value'),'hlr_region')->groupBy('hlr_region','periode');
+            $x = BilcoDataSerah::select('periode', DB::raw('sum(total_outstanding) as value'),DB::raw('"AREA I" as hlr_region'))->groupBy('periode');
+            $y = BilcoDataSerah::select('periode',DB::raw('sum(total_outstanding) as value'),'hlr_region')->groupBy('hlr_region','periode')->union($x);
         }
 
         $ret = [];
@@ -51,7 +54,7 @@ class BilcoDataSerahController extends Controller
                 if(!isset($ret[$periode->format('Y-m')]['Sumbagteng'])){
                     $ret[$periode->format('Y-m')]['Sumbagteng'] = 0;
                 }
-                $ret[$periode->format('Y-m')][$row['hlr_region']] = (float) $row['value'];
+                $ret[$periode->format('Y-m')][$row['hlr_region']] = number_format($row['value']);
             }
         }
         sort($ret);
@@ -128,8 +131,24 @@ class BilcoDataSerahController extends Controller
         return $x;
     }
 
-    public function export() {
-        $x= BilcoDataSerah::get()->makeHidden(['import_batch']);
+    public function export(Request $req) {
+        $tahap = $req->get('tahap');
+        $start = $req->get('amp;start');
+        $end = null;
+        $periode = array(Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-1)->format('Y-m-d'),Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(12)->format('Y-m-d'));
+        switch($tahap){
+            case '1':
+                $periode = array(Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-1)->format('Y-m-d'),Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-1)->format('Y-m-d'));
+                break;
+            case '2':
+                $periode = array(Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(14)->format('Y-m-d'),Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(14)->format('Y-m-d'));
+                break;
+        }
+        $regional = $req->get('amp;regional');
+        $x= BilcoDataSerah::
+        where('hlr_region',$regional)
+            ->where('periode',$periode)
+            ->get()->makeHidden(['import_batch']);
 
         $x = collect($x);
         return (new FastExcel($x))->download('file.xlsx', function ($row) {
@@ -462,6 +481,7 @@ class BilcoDataSerahController extends Controller
                 $row['bucket_3'] = number_format($row['bucket_3']);
                 $row['bucket_4'] = number_format($row['bucket_4']);
                 $row['total_outstanding'] = number_format($row['total_outstanding']);
+                $row['download'] = sprintf('%s/export?tahap=%s&start=%s&regional=%s',URL::to('/external/bilcodataserahexport'),$tahap_d,$start,$row['regional']);
                 $temp[] = $row;
             }
             return datatables()->of($temp)->toJson();
