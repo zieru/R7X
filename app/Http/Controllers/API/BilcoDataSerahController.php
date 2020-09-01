@@ -147,7 +147,7 @@ class BilcoDataSerahController extends Controller
         $regional = $req->get('amp;regional');
         $x= BilcoDataSerah::
         where('hlr_region',$regional)
-            ->where('periode',$periode)
+            ->whereBetween('periode',$periode)
             ->get()->makeHidden(['import_batch']);
 
         $x = collect($x);
