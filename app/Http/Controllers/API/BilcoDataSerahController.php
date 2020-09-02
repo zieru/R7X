@@ -148,7 +148,7 @@ class BilcoDataSerahController extends Controller
         $x= BilcoDataSerah::
             whereBetween('periode',$periode);
 
-        if(in_array($regional,['Sumbagut','Sumbagsel','Sumbagteng'])){
+        if(!($regional == 'Area Sumatera')){
             $x->where('hlr_region',$regional);
         }
 
