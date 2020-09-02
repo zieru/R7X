@@ -39,29 +39,29 @@ class SyncBilcollection extends Command
     public function guzzleDownload( $imgName, $url, $path ){
         $guzzle = new Client();
 
-            try {
-                $response = $guzzle->request('GET', $url , ['proxy' => 'http://10.59.82.1:8080']);
-                Storage::put($path.$imgName, $response->getBody());
-                $response = sprintf('file %s downloaded, size:%d kb',$imgName, Storage::size($path.$imgName));
-            } catch (\GuzzleHttp\Exception\ConnectException $e) {
-                // This is will catch all connection timeouts
-                // Handle accordinly
-                $response =  $e->getMessage();
-            } catch (\GuzzleHttp\Exception\ClientException $e) {
-                // This will catch all 400 level errors.
-                $response =  $e->getMessage();
-            }catch (Guzzle\Http\Exception\BadResponseException $e) {
-                $response =  $e->getMessage();
-            }
-            return $response;
+        try {
+            $response = $guzzle->request('GET', $url , ['proxy' => 'http://10.59.82.1:8080']);
+            Storage::put($path.$imgName, $response->getBody());
+            $response = sprintf('file %s downloaded, size:%d kb',$imgName, Storage::size($path.$imgName));
+        } catch (\GuzzleHttp\Exception\ConnectException $e) {
+            // This is will catch all connection timeouts
+            // Handle accordinly
+            $response =  $e->getMessage();
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            // This will catch all 400 level errors.
+            $response =  $e->getMessage();
+        }catch (Guzzle\Http\Exception\BadResponseException $e) {
+            $response =  $e->getMessage();
+        }
+        return $response;
     }
 
-    public function proses($filename, $date = null){
+    public function proses($filename){
         $controller = new BillingCollectionController();
         //var_dump($this->option('testing'));
-        if(is_array($filename)) {
-            foreach ($filename as $name) {
-                echo shell_exec(sprintf("php artisan Syncbilcollection --file=%s >> log.log", $name));
+        if(is_array($filename)){
+            foreach ($filename as $name){
+                echo shell_exec(sprintf("php artisan Syncbilcollection --file=%s >> log.log",$name));
 
             }
             Artisan::call('db:backup');
@@ -74,8 +74,8 @@ class SyncBilcollection extends Command
                     'message' => substr($this->guzzleDownload($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/bilcollection/csv/'), 0, 128),
                 ]);
             }else{
-	    	    echo $this->guzzleDownload($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/bilcollection/csv/');
-	    }
+                echo $this->guzzleDownload($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/bilcollection/csv/');
+            }
             $this->info('Downloaded :'.$filename);
             if($this->option('testing') == "false")
             {
@@ -103,8 +103,8 @@ class SyncBilcollection extends Command
             'Sulawesi',
             'Sumbagsel',
             'Sumbagteng',
-			'Sumbagut',
-			'xxxxxxxxxxxxxx');
+            'Sumbagut',
+            'xxxxxxxxxxxxxx');
         $filename = $this->option('file');
 
         if($filename== null){
@@ -118,6 +118,6 @@ class SyncBilcollection extends Command
                 $filename[] = sprintf('%s_%s.csv',$date,$area);
             }
         }
-        $this->proses($filename,$date);
+        $this->proses($filename);
     }
 }
