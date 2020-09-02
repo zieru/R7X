@@ -147,10 +147,9 @@ class BilcoDataSerahController extends Controller
         $regional = $req->get('amp;regional');
         $x= BilcoDataSerah::
             whereBetween('periode',$periode);
-
-        if(!($regional == 'Area Sumatera')){
-            $x->where('hlr_region',$regional);
-        }
+            if($regional != 'Area Sumatera'){
+                $x->where('hlr_region',$regional);
+            }
 
             $x->get()->makeHidden(['import_batch']);
 
