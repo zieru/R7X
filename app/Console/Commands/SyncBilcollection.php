@@ -64,11 +64,7 @@ class SyncBilcollection extends Command
                 echo shell_exec(sprintf("php artisan Syncbilcollection --file=%s >> log.log", $name));
 
             }
-            if (in_array(Carbon::now()->format('d'), array(2, 15))){
-                Artisan::call('SyncbilcoDataserah '.Carbon::now()->format('Y-m-d'));
-            }
-
-                Artisan::call('db:backup');
+            Artisan::call('db:backup');
         }else{
             $this->info('proses download :'.$filename);
             if($this->option('testing') == "false" OR $this->option('nodownload') == 'true'){
