@@ -146,9 +146,13 @@ class BilcoDataSerahController extends Controller
         }
         $regional = $req->get('amp;regional');
         $x= BilcoDataSerah::
-        where('hlr_region',$regional)
-            ->whereBetween('periode',$periode)
-            ->get()->makeHidden(['import_batch']);
+            whereBetween('periode',$periode);
+
+        if(in_array($regional,['Sumbagut','Sumbagsel','Sumbagteng'])){
+            $x->where('hlr_region',$regional);
+        }
+
+            $x->get()->makeHidden(['import_batch']);
 
         $x = collect($x);
         return (new FastExcel($x))->download('DATASERAH-'.$regional.'_'.$start.'.xlsx', function ($row) {
