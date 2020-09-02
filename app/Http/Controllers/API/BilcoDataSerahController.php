@@ -144,14 +144,24 @@ class BilcoDataSerahController extends Controller
                 $periode = array(Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(14)->format('Y-m-d'),Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(14)->format('Y-m-d'));
                 break;
         }
-        $regional = $req->get('amp;regional');
-        $x= BilcoDataSerah::
-        where('hlr_region',$regional)
-            ->whereBetween('periode',$periode)
+
+        $regional_title = $regional = $req->get('amp;regional');
+if($regional == 'Area Sumatera'){
+$regional=array('Sumbagut','Sumbagteng','Sumbagsel');
+$regional_title = 'Area Sumatera';
+    }else{
+$regional = array($regional);
+}
+
+        $x = BilcoDataSerah::
+	whereBetween('periode',$periode)
+        
+	->wherein('hlr_region',$regional)
+            
             ->get()->makeHidden(['import_batch']);
 
         $x = collect($x);
-        return (new FastExcel($x))->download('DATASERAH-'.$regional.'_'.$start.'.xlsx', function ($row) {
+        return (new FastExcel($x))->download('DATASERAH-'.$regional_title.'_'.$start.'.xlsx', function ($row) {
             return [
                 'tahap' => $row->tahap,
                 'account' => $row->account,
