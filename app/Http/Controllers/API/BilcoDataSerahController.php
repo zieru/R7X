@@ -33,7 +33,7 @@ class BilcoDataSerahController extends Controller
 
         $ret = [];
         foreach($y->get()->toArray() as $row){
-            $row['value'] = number_format($row['value']);
+            $row['value'] = (int) $row['value'];
             $ret[] = $row;
         }
         if($req->get('tipe') == 'msisdn2' OR $req->get('tipe') == 'outs2'){
@@ -54,7 +54,7 @@ class BilcoDataSerahController extends Controller
                 if(!isset($ret[$periode->format('Y-m')]['Sumbagteng'])){
                     $ret[$periode->format('Y-m')]['Sumbagteng'] = 0;
                 }
-                $ret[$periode->format('Y-m')][$row['hlr_region']] = number_format($row['value']);
+                $ret[$periode->format('Y-m')][$row['hlr_region']] = (int) $row['value'];
             }
         }
         sort($ret);
