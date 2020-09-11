@@ -32,7 +32,7 @@ return [
      * Matches the request origin. `[*]` allows all origins.
      */
     //'allowed_origins' => ['http://10.23.4.133:7000'],
-        'allowed_origins' => ['http://10.23.4.133:7000','http://10.23.4.133:8000'],
+        'allowed_origins' => ['http://10.23.4.133:7000','http://localhost:8000','http://10.23.4.133:8000'],
     /*
      * Matches the request origin with, similar to `Request::is()`
      */
@@ -56,5 +56,5 @@ return [
     /*
      * Sets the Access-Control-Allow-Credentials header.
      */
-    'supports_credentials' => true,
+    'supports_credentials' => false,
 ];
