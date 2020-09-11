@@ -40,7 +40,7 @@ class SyncBilcollection extends Command
         $guzzle = new Client();
 
         try {
-            $response = $guzzle->request('GET', $url , ['proxy' => 'http://10.59.82.1:8080']);
+            $response = $guzzle->request('GET', $url , [/*'proxy' => 'http://10.59.82.1:8080'*/]);
             Storage::put($path.$imgName, $response->getBody());
             $response = sprintf('file %s downloaded, size:%d kb',$imgName, Storage::size($path.$imgName));
         } catch (\GuzzleHttp\Exception\ConnectException $e) {
@@ -60,6 +60,7 @@ class SyncBilcollection extends Command
         $controller = new BillingCollectionController();
         //var_dump($this->option('testing'));
         if(is_array($filename)){
+echo 'batch';
             foreach ($filename as $name){
                 echo shell_exec(sprintf("php artisan Syncbilcollection --file=%s >> log.log",$name));
 
@@ -76,6 +77,7 @@ class SyncBilcollection extends Command
             }else{
                 echo $this->guzzleDownload($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/bilcollection/csv/');
             }
+                echo $this->guzzleDownload($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/bilcollection/csv/');
             $this->info('Downloaded :'.$filename);
             if($this->option('testing') == "false")
             {
