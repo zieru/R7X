@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http;
+use Laravel\Passport\Http\Middleware\CheckClientCredentials;
 
 use App\Http\Middleware\Demo;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
@@ -72,6 +73,6 @@ class Kernel extends HttpKernel
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'demo' => Demo::class,
-        'CheckClientCredentials' => \App\Http\Middleware\CheckClientCredentials::class #changed
+        'CheckClientCredentials' => CheckClientCredentials::class #changed
     ];
 }
