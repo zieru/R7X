@@ -431,7 +431,7 @@ class BillingCollectionController extends Controller
             }
 
             try{$m['perfomansi_percent'] = $c['collection'] / $c['billing'];}
-            catch (\Exception $e){AppHelper::sendErrorAndExit('Data target not available for date: '. $request->get('end'),500);}
+            catch (\Exception $e){AppHelper::sendErrorAndExit('Data target not available for date: '. $request->get('end'));}
             $m['perfomansi_percent'] = $c['collection'] / $c['billing'];
             $m['perfomansi_target'] = $targetArea;
             $m['perfomansi_gap'] = $m['perfomansi_target'] - $m['perfomansi_percent'];

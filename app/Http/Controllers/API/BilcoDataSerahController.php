@@ -21,19 +21,33 @@ use URL;
 class BilcoDataSerahController extends Controller
 {
     public function chart(Request $req){
+        $periode = null;
+        if($req->has('periode')){
+            $periodetemp = $periode = explode(':',$req->get('periode'));
+
+            $periode = [
+                Carbon::createFromFormat('Y-m-d', $periode[0].'-01')->addDays(-1)->format('Y-m-d'),
+                Carbon::createFromFormat('Y-m-d', $periode[1].'-01')->addDays(14)->format('Y-m-d')
+            ];
+        }
 
         if($req->get('tipe') == 'msisdn2'){
             $x = BilcoDataSerah::select('periode', DB::raw('count(msisdn) as value'),DB::raw('"AREA I" as hlr_region'))->groupBy('periode');
-            $y = BilcoDataSerah::select('periode', DB::raw('count(msisdn) as value'),'hlr_region')->groupBy('hlr_region','periode')->union($x);
+            $y = BilcoDataSerah::select('periode', DB::raw('count(msisdn) as value'),'hlr_region')->groupBy('hlr_region','periode');
         }
         if($req->get('tipe') == 'outs2'){
             $x = BilcoDataSerah::select('periode', DB::raw('sum(total_outstanding) as value'),DB::raw('"AREA I" as hlr_region'))->groupBy('periode');
-            $y = BilcoDataSerah::select('periode',DB::raw('sum(total_outstanding) as value'),'hlr_region')->groupBy('hlr_region','periode')->union($x);
+            $y = BilcoDataSerah::select('periode',DB::raw('sum(total_outstanding) as value'),'hlr_region')->groupBy('hlr_region','periode');
         }
+        if($periode != null){
+            $x->whereBetween('periode',$periode);
+            $y->whereBetween('periode',$periode);
+        }
+            $y->union($x);
 
         $ret = [];
         foreach($y->get()->toArray() as $row){
-            $row['value'] = number_format($row['value']);
+            $row['value'] = (int) $row['value'];
             $ret[] = $row;
         }
         if($req->get('tipe') == 'msisdn2' OR $req->get('tipe') == 'outs2'){
@@ -54,7 +68,7 @@ class BilcoDataSerahController extends Controller
                 if(!isset($ret[$periode->format('Y-m')]['Sumbagteng'])){
                     $ret[$periode->format('Y-m')]['Sumbagteng'] = 0;
                 }
-                $ret[$periode->format('Y-m')][$row['hlr_region']] = number_format($row['value']);
+                $ret[$periode->format('Y-m')][$row['hlr_region']] = (int) $row['value'];
             }
         }
         sort($ret);

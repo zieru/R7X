@@ -101,10 +101,10 @@ class FormRefundController extends Controller
 
 
              if(!isset($row['tgl_permintaan'])){
-                 AppHelper::sendErrorAndExit('Please check column tgl_permintaan format',500);
+                 AppHelper::sendErrorAndExit('Please check column tgl_permintaan format');
              }
              if(!isset($row['tgl_eksekusi'])){
-                 AppHelper::sendErrorAndExit('Please check column tgl_eksekusi format',500);
+                 AppHelper::sendErrorAndExit('Please check column tgl_eksekusi format');
              }
              try {
                  gmdate("Y-m-d", ($row['tgl_permintaan'] - 25569) * 86400);
