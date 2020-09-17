@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Console\Commands;
+use App\Helpers\AppHelper;
 use App\Notifier;
 use App\BackupMan;
 use Carbon\Carbon;
@@ -12,7 +13,7 @@ use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class DBBackup extends Command
 {
-    protected $signature = 'db:backup';
+    protected $signature = 'db:backup {--date= : format dd-mm-YYYY} {--onlybackup=false} {--onlymergecollection=false} {--onlyimportcollection=false}';
 
     protected $description = 'Backup the database';
 
@@ -24,14 +25,51 @@ class DBBackup extends Command
     {
         parent::__construct();
     }
+    public function importCollectionToDB(){
+        $x2 = sprintf('mysqlimport --defaults-file=/home/sabyan/.my.cnf --ignore-lines=1 --fields-terminated-by=, --local sabyan_r7s_data %s',
+            storage_path('app/bilcollection/csv/'.$this->backupdate.'_Sumatra.csv')
+        );
+
+        $this->info('Import Sumatra to DB');
+        DB::connection('mysql2')->statement(sprintf('CREATE TABLE %s_Sumatra LIKE 20200802_all',$this->backupdate));
+        return shell_exec($x2);
+    }
+
+    public function mergeCollectionCSV(){
+        $this->info('Making Sumatra CSV');
+        $x1 = sprintf('head -1 %s > %s; tail -n +2 -q %s >> %s',
+            storage_path('app/bilcollection/csv/'.$this->backupdate.'_xxxxxxxxxxxxxx.csv'),
+            storage_path('app/bilcollection/csv/'.$this->backupdate.'_Sumatra.csv'),
+            storage_path('app/bilcollection/csv/'.$this->backupdate.'_Sum*.csv'),
+            storage_path('app/bilcollection/csv/'.$this->backupdate.'_Sumatra.csv')
+        );
+        return shell_exec($x1);
+    }
 
     public function backup(){
+        if($this->option('date')){
+            try {
+                $this->backupdate = Carbon::createFromFormat('d-m-Y', $this->option('date'))->format('Ymd');
+            }
+            catch (\Exception $e){
+                $this->error('date is invalid');
+            }
+        }else{
+            $this->backupdate = Carbon::now()->subDays(2)->format('Ymd');
+        }
 
-//	$this->backupdate = '20200731';
-        $this->backupdate = Carbon::now()->subDays(2)->format('Ymd');
+
         $this->backupname = $this->backupdate.'-bilcocsv-'.Str::random(4);
         $this->backuppass = Str::random(125);
-    
+
+        if($this->option('onlymergecollection') != "false"){
+            $this->mergeCollectionCSV();
+            exit();
+        }
+        if($this->option('onlyimportcollection') != "false"){
+            $this->importCollectionToDB();
+            exit();
+        }
         Notifier::create([
                     'type' => 'Backup',
                     'subject' => 'Backup',
@@ -43,16 +81,8 @@ class DBBackup extends Command
             config('database.connections.mysql.database'),
             storage_path('app/backups/backup-' . Carbon::now()->format('Y-m-d') . '.gz')
         );
-        $x1 = sprintf('head -1 %s > %s; tail -n +2 -q %s >> %s',
-            storage_path('app/bilcollection/csv/'.$this->backupdate.'_xxxxxxxxxxxxxx.csv'),
-            storage_path('app/bilcollection/csv/'.$this->backupdate.'_Sumatra.csv'),
-            storage_path('app/bilcollection/csv/'.$this->backupdate.'_Sum*.csv'),
-            storage_path('app/bilcollection/csv/'.$this->backupdate.'_Sumatra.csv')
-        );
-        $x2 = sprintf('mysqlimport --defaults-file=/home/sabyan/.my.cnf --ignore-lines=1 --fields-terminated-by=, --local sabyan_r7s_data %s',
-            storage_path('app/bilcollection/csv/'.$this->backupdate.'_Sumatra.csv')
-        );
-        
+
+
         $x3 = sprintf('rar a -ep1 -hp%s %s.rar %s ',
             $this->backuppass,
             storage_path('app/bilcollection/archive/'.$this->backupname),
@@ -65,11 +95,10 @@ class DBBackup extends Command
             storage_path('app/bilcollection/archive/'.$this->backupname),
         );
         
-        $this->info('Making Sumatra CSV');
-        shell_exec($x1);
-        $this->info('Import Sumatra to DB');
-        DB::connection('mysql2')->statement(sprintf('CREATE TABLE %s_Sumatra LIKE 20200802_all',$this->backupdate));
-        shell_exec($x2);
+
+        $this->mergeCollectionCSV();
+        $this->importCollectionToDB();
+
 //    die();
         $this->info('Dump DB');
         shell_exec($x0);
