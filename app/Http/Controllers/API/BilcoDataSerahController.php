@@ -192,6 +192,7 @@ $regional = array($regional);
                 'bbs_second_address' => $row->bbs_second_address,
                 'cb_address' => $row->cb_address,
                 'bbs_city' => $row->bbs_city,
+                'cb_name' => $row->cb_name,
                 'cb_city' => $row->cb_city,
                 'bbs_zip_code' => $row->bbs_zip_code,
                 'bbs_pay_type' => $row->bbs_pay_type,
