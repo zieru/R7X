@@ -42,6 +42,7 @@ class SyncBilcoDataserahCekBayar extends Command
     {
         $controller = new BilcodataserahCekBayarController();
         $x = $controller->fetch();
+        $date = Carbon::now();
         $bilcoenddate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2)->endOfMonth();
         $bilcodate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2);
         $tahap = 0;
