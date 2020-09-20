@@ -81,6 +81,7 @@ class SyncBilcoDataserahCekBayar extends Command
             $row['total_outstanding'] = $row['a120'] + $row['a90'] + $row['a60'] + $row['a30'];
             $row['import_batch'] = 0;
             BilcodataserahCekBayar::insert($row);
+            dd($row);
         }
         return 0;
     }

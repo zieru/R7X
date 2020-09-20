@@ -30,7 +30,9 @@ class BilcodataserahCekBayarController extends Controller
                     'b.bucket_2 as b30',
                     'b.bucket_3 as b60',
                     'b.bucket_4 as b90',
-                    'b.bucket_5 as b120'
+                    'b.bucket_5 as b120',
+                    'a.bill_cycle as bill_cycle',
+                    'a.hlr_region as hlr_region'
             )
             ->Join('sabyan_r7s_data.'.$bdate->format('Ymd').'_Sumatra as b', function($join)
             {
@@ -49,7 +51,6 @@ class BilcodataserahCekBayarController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request){
-        DB::enableQueryLog();
         $bill_cycle= $selectbillcycle = $end = $date = null;
         $tahap_d = $request->get('tahap');
 
@@ -80,38 +81,18 @@ class BilcodataserahCekBayarController extends Controller
             }
         }
         if($request->has('outs') === true){
-            $selectbillcycle = 'bilco_data_serahs.bill_cycle as bill_cycles,';
+            $selectbillcycle = 'bill_cycle as bill_cycles,';
         }
 
         $d30harea = BilcodataserahCekBayar::selectRaw('
-        sum(bilco_data_serahs.total_outstanding) as total,
-        count(bilco_data_serahs.msisdn) as totalmsisdn,
-         DATE_FORMAT(DATE_ADD(bilco_data_serahs.periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
-         bilco_data_serahs.kpi as kpis,'.$selectbillcycle.'kpi,
+        sum(total_outstanding) as total,
+        count(account) as totalmsisdn,
+         DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
+         kpi as kpis,'.$selectbillcycle.'kpi,
         "AREA Sumatra" AS regional')
-            ->Join('bilco_data_serahs as bilco_data_serahs', function($join)
-            {
-                $join->on('bilcodataserah_cek_bayars.account', '=', 'bilco_data_serahs.account');
-                $join->on('bilcodataserah_cek_bayars.periode', '=', 'bilco_data_serahs.periode');
-            })->limit(1);
-        $d30harea->get();
-        dd(DB::getQueryLog());
-        dd($d30harea->get()->toArray());
-        if($bill_cycle!=null){
-            $d30harea->where('bill_cycle',$bill_cycle);
-        }
-        if(sizeof($tahap)>0){
-            $d30harea->where(function($query)use($tahap) {
-                foreach ($tahap as $thpd){
-                    $query->orwhere('bilco_data_serahs.periode',$thpd->format('Y-m-d'));
-                }
-            });
-        }
-        $d30harea->whereBetween('bilco_data_serahs.periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
-            ->orderBy('bilco_data_serahs.hlr_region','DESC')
-            ->orderBy('bilco_data_serahs.kpi','ASC');
+            ->groupBy('periodes');
 
-        $d30harea = $d30harea;
+        dd($d30harea->get()->toArray());
         $d30h = BilcoDataSerah::selectRaw('
         sum(total_outstanding) as total,
         count(msisdn) as totalmsisdn,
