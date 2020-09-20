@@ -46,7 +46,7 @@ class SyncBilcoDataserahCekBayar extends Command
         foreach ($x->get()->toArray() as $row){
 
             $row = (array) $row;
-            $date = $row['periode'];
+            $date = Carbon::createFromFormat('Y-m-d', $row['periode']);
             $bilcoenddate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2)->endOfMonth();
             $bilcodate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2);
             $tahap = 0;
@@ -58,6 +58,7 @@ class SyncBilcoDataserahCekBayar extends Command
                     $tahap = 2;
             }
             $row['kpi'] = '';
+            $row['tahap'] = $tahap;
             if($row['a60'] > 0 AND $row['a30'] > 0){
                 $row['kpi'] = '30-60';
                 if($tahap === 1){
@@ -79,7 +80,6 @@ class SyncBilcoDataserahCekBayar extends Command
             }
             $row['total_outstanding'] = $row['a120'] + $row['a90'] + $row['a60'] + $row['a30'];
             $row['import_batch'] = 0;
-
             BilcodataserahCekBayar::insert($row);
         }
         return 0;
