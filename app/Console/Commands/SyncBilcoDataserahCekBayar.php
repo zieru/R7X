@@ -42,19 +42,21 @@ class SyncBilcoDataserahCekBayar extends Command
     {
         $controller = new BilcodataserahCekBayarController();
         $x = $controller->fetch();
-        $date = Carbon::now();
-        $bilcoenddate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2)->endOfMonth();
-        $bilcodate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2);
-        $tahap = 0;
-        switch ($bilcodate->format('d')){
-            case $bilcoenddate->format('d'):
-                $tahap = 1;
-                break;
-            default:
-                $tahap = 2;
-        }
+
         foreach ($x->get()->toArray() as $row){
+
             $row = (array) $row;
+            $date = $row['periode'];
+            $bilcoenddate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2)->endOfMonth();
+            $bilcodate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2);
+            $tahap = 0;
+            switch ($bilcodate->format('d')){
+                case $bilcoenddate->format('d'):
+                    $tahap = 1;
+                    break;
+                default:
+                    $tahap = 2;
+            }
             $row['kpi'] = '';
             if($row['a60'] > 0 AND $row['a30'] > 0){
                 $row['kpi'] = '30-60';
