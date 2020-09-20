@@ -128,13 +128,12 @@ $x = array();
               }
 
             }
-
             if($row->bucket_4 > 0 && $row->bucket_3 > 0){
               $i['kpi'] = '90-120';
             }
-            
-            $i['import_batch']= $importer->id;
             $i['total_outstanding'] = $row->bucket_4 + $row->bucket_3 + $row->bucket_2 + $row->bucket_1;
+            $i['import_batch']= $importer->id;
+
                $x[] = $i;
 	    }
         //});
