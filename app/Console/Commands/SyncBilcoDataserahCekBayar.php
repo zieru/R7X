@@ -55,29 +55,29 @@ class SyncBilcoDataserahCekBayar extends Command
         }
         foreach ($x->get()->toArray() as $row){
             $row = (array) $row;
-
             $row['kpi'] = '';
-            if($row->a60 > 0 AND $row->a30 > 0){
+            if($row['a60'] > 0 AND $row['a30'] > 0){
                 $row['kpi'] = '30-60';
                 if($tahap === 1){
                     $row['kpi'] = '60-90';
                 }
             }
-            if($row->a90 > 0 && $row->a60 > 0){
+            if($row['a90'] > 0 && $row['a60'] > 0){
                 $row['kpi'] = '60-90';
                 if($tahap === 1){
                     $row['kpi'] = '90-120';
-                    if($row->a90 <= 12500 && $tahap === 1){
+                    if($row['a90'] <= 12500 && $tahap === 1){
                         $row['kpi'] = '60-90';
                     }
                 }
 
             }
-            if($row->a120 > 0 && $row->a90 > 0){
+            if($row['a120'] > 0 && $row['a90'] > 0){
                 $row['kpi'] = '90-120';
             }
-            $row['total_outstanding'] = $row->a120 + $row->a90 + $row->a60 + $row->a30;
+            $row['total_outstanding'] = $row['a120'] + $row['a90'] + $row['a60'] + $row['a30'];
             $row['import_batch'] = 0;
+
             BilcodataserahCekBayar::insert($row);
         }
         return 0;
