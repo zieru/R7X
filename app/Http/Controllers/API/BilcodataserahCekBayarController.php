@@ -85,19 +85,36 @@ class BilcodataserahCekBayarController extends Controller
         }
 
         $d30harea = BilcodataserahCekBayar::selectRaw('
+        a30,a60,a90,a120,b30,b60,b90,b120,
         sum(total_outstanding) as total,
         count(account) as totalmsisdn,
-         DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
+         kpi as periodes,
          kpi as kpis,'.$selectbillcycle.'kpi,
         "AREA Sumatra" AS regional')
             ->groupBy('periodes');
+        if($bill_cycle!=null){
+            $d30harea->where('bill_cycle',$bill_cycle);
+        }
+        if(sizeof($tahap)>0){
+            $d30harea->where(function($query)use($tahap) {
+                foreach ($tahap as $thpd){
+                    $query->orwhere('periode',$thpd->format('Y-m-d'));
+                }
+            });
+        }
+        if($request->has('outs') == false){
+            //$d30harea->groupBy('kpi');
+        }
+        $d30harea->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
+            ->orderBy('hlr_region','DESC')
+            ->orderBy('kpi','ASC');
 
-        dd($d30harea->get()->toArray());
-        $d30h = BilcoDataSerah::selectRaw('
+        $d30h = BilcodataserahCekBayar::selectRaw('
+        a30,a60,a90,a120,b30,b60,b90,b120,
         sum(total_outstanding) as total,
-        count(msisdn) as totalmsisdn,
-         DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
-         kpi as kpis,'.$selectbillcycle.'kpi,
+        count(account) as totalmsisdn,
+        kpi as periodes,
+        kpi as kpis,'.$selectbillcycle.'kpi,
         hlr_region as regional')
             ->groupBy('periodes','hlr_region');
         if($request->has('outs') === false){
@@ -117,10 +134,11 @@ class BilcodataserahCekBayarController extends Controller
             });
         }
         $d30h =$d30h->union($d30harea)->get()->toArray();
-        $d90harea = BilcoDataSerah::selectRaw('
+        $d90harea = BilcodataserahCekBayar::selectRaw('
+        a30,a60,a90,a120,b30,b60,b90,b120,
         sum(total_outstanding) as total,
-        count(msisdn) as totalmsisdn,
-         DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
+        count(account) as totalmsisdn,
+         kpi as periodes,
          kpi as kpis,'
             .$selectbillcycle.
             'kpi as kpi,
@@ -151,10 +169,11 @@ class BilcodataserahCekBayarController extends Controller
             ->orderBy('bill_cycle','ASC');
         $d90harea =$d90harea;
 
-        $d90h = BilcoDataSerah::selectRaw('
+        $d90h = BilcodataserahCekBayar::selectRaw('
+        a30,a60,a90,a120,b30,b60,b90,b120,
         sum(total_outstanding) as total,
-        count(msisdn) as totalmsisdn,
-         DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
+        count(account) as totalmsisdn,
+         kpi as periodes,
          kpi as kpis,'.$selectbillcycle.'
         bill_cycle as kpi,
         hlr_region as regional')
@@ -199,8 +218,12 @@ class BilcodataserahCekBayarController extends Controller
 
         foreach ($d30h as $row){
 
-            $row['total'] = number_format($row['total']);
             $row['id'] = sprintf('%s#%s#%s#%s',$l,$row['regional'],$row['periodes'],$row['kpi']);
+            $row['raw_total'] = $row['total'];
+            $row['total_outstanding'] = $row['total'];
+            $sum[$row['regional']]['uncollected'] = $row['total_outstanding'] - ($row['b30'] + $row['b60'] + $row['b90'] + $row['b120']);
+            $sum[$row['regional']]['pcollection'] = number_format(($sum[$row['regional']]['uncollected']/$row['total_outstanding'])*100,2);
+            $row['total'] = number_format($row['total']);
             if($request->has('outs') === true){
                 $row['kpi'] = 'All BC';
             }
@@ -211,6 +234,8 @@ class BilcodataserahCekBayarController extends Controller
             $row['totalmsisdn'] = number_format($row['totalmsisdn']);
             $sum[$row['regional']]['total'] = $row['total'];
             $sum[$row['regional']]['totalmsisdn'] = $row['totalmsisdn'];
+            $sum[$row['regional']]['collection'] = $row['total_outstanding'];
+
             $sum[$row['regional']]['periodes'] = $row['periodes'];
             $sum[$row['regional']]['kpis'] = $row['kpis'];
             $sum[$row['regional']]['kpi'] = $row['kpi'];
@@ -220,7 +245,10 @@ class BilcodataserahCekBayarController extends Controller
                 if($p === (string) $row['periodes']){
                     $row['x'][$p]['total'] = $row['total'];
                     $row['x'][$p]['totalmsisdn'] = $row['totalmsisdn'];
-
+                    $uncollected = $row['total_outstanding'] - ($row['b30'] + $row['b60'] + $row['b90'] + $row['b120']);
+                    $sum[$row['regional']]['period'][$p]['uncollected'] = $uncollected;
+                    $sum[$row['regional']]['period'][$p]['pcollection'] = number_format(($sum[$row['regional']]['period'][$p]['uncollected']/$row['total_outstanding'])*100,2);
+                    $sum[$row['regional']]['period'][$p]['collection'] = number_format($row['total_outstanding']);
                     $sum[$row['regional']]['period'][$p]['totalmsisdn'] = $row['totalmsisdn'];
                     $sum[$row['regional']]['period'][$p]['total'] = $row['total'];
                 }
