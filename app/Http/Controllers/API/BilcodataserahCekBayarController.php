@@ -100,6 +100,8 @@ class BilcodataserahCekBayarController extends Controller
         $d30harea = BilcodataserahCekBayar::selectRaw('
         sum(a30) as a30,sum(a60) as a60,sum(a90) as a90,sum(a120) as a120,sum(b30) as b30,sum(b60) as b60,sum(b90) as b90,sum(b120) as b120,sum(h30) as h30,sum(h60) as h60,sum(h90) as h90,sum(h120) as h120,
         count(a30) as c30,count(a60) as c60,count(a90) as c90,count(a120) as c120,
+        sum(ab30) as ab30,sum(ab60) as ab60,sum(ab90) as ab90,sum(ab120) as ab120,
+        sum(bb30) as bb30,sum(bb60) as bb60,sum(bb90) as bb90,sum(bb120) as bb120,
         sum(total_outstanding) as total,
         count(account) as totalmsisdn,
          kpi as periodes,
@@ -125,6 +127,8 @@ class BilcodataserahCekBayarController extends Controller
         $d30h = BilcodataserahCekBayar::selectRaw('
         sum(a30) as a30,sum(a60) as a60,sum(a90) as a90,sum(a120) as a120,sum(b30) as b30,sum(b60) as b60,sum(b90) as b90,sum(b120) as b120,sum(h30) as h30,sum(h60) as h60,sum(h90) as h90,sum(h120) as h120,
         count(a30) as c30,count(a60) as c60,count(a90) as c90,count(a120) as c120,
+        sum(ab30) as ab30,sum(ab60) as ab60,sum(ab90) as ab90,sum(ab120) as ab120,
+        sum(bb30) as bb30,sum(bb60) as bb60,sum(bb90) as bb90,sum(bb120) as bb120,
         sum(total_outstanding) as total,
         count(account) as totalmsisdn,
         kpi as periodes,
@@ -153,6 +157,8 @@ class BilcodataserahCekBayarController extends Controller
         $d90harea = BilcodataserahCekBayar::selectRaw('
         sum(a30) as a30,sum(a60) as a60,sum(a90) as a90,sum(a120) as a120,sum(b30) as b30,sum(b60) as b60,sum(b90) as b90,sum(b120) as b120,sum(h30) as h30,sum(h60) as h60,sum(h90) as h90,sum(h120) as h120,
         count(a30) as c30,count(a60) as c60,count(a90) as c90,count(a120) as c120,
+        sum(ab30) as ab30,sum(ab60) as ab60,sum(ab90) as ab90,sum(ab120) as ab120,
+        sum(bb30) as bb30,sum(bb60) as bb60,sum(bb90) as bb90,sum(bb120) as bb120,
         sum(total_outstanding) as total,
         count(account) as totalmsisdn,
          kpi as periodes,
@@ -188,6 +194,8 @@ class BilcodataserahCekBayarController extends Controller
         $d90h = BilcodataserahCekBayar::selectRaw('
         sum(a30) as a30,sum(a60) as a60,sum(a90) as a90,sum(a120) as a120,sum(b30) as b30,sum(b60) as b60,sum(b90) as b90,sum(b120) as b120,sum(h30) as h30,sum(h60) as h60,sum(h90) as h90,sum(h120) as h120,
         count(a30) as c30,count(a60) as c60,count(a90) as c90,count(a120) as c120,
+        sum(ab30) as ab30,sum(ab60) as ab60,sum(ab90) as ab90,sum(ab120) as ab120,
+        sum(bb30) as bb30,sum(bb60) as bb60,sum(bb90) as bb90,sum(bb120) as bb120,
         sum(total_outstanding) as total,
         count(account) as totalmsisdn,
          kpi as periodes,
@@ -267,65 +275,41 @@ class BilcodataserahCekBayarController extends Controller
             foreach ($kpis as $p){
                     switch($p){
                         case 30:
-                        $row['x'][$p]['total'] =  $row['a30'];
-                        $row['x'][$p]['totalmsisdn'] = $row['c30'];
-                        $collection = $row['b30'];
-                            $total  = $row['a30'];
-                        $uncollected = $row['h30'];
-                            $pcollection = 0;
-                        if($total > 0){
-                            $pcollection = ($collection/$total);
-                        }
+                        $dataserah = $row['ab30'];
+                        $collection = $row['a30'] - $row['b30'];
+                        $total  = $row['a30'];
                         break;
                         case 60:
-                            $row['x'][$p]['total'] =  $row['a60'];
-                            $row['x'][$p]['totalmsisdn'] = $row['c60'];
-                            $collection = $row['b60'];
-                            $uncollected = $row['h60'];
+                            $dataserah = $row['ab60'];
+                            $collection = $row['a60'] - $row['b60'];
                             $total  = $row['a60'];
-                            $pcollection = 0;
-                            if($total > 0){
-                                $pcollection = ($collection/$total);
-                            }
                             break;
                         case 90:
-                            $row['x'][$p]['total'] =  $row['a90'];
-                            $row['x'][$p]['totalmsisdn'] = $row['c90'];
-                            $collection = $row['b90'];
-                            $uncollected = $row['h90'];
+                            $dataserah = $row['ab90'];
+                            $collection = $row['a90'] - $row['b90'];
                             $total  = $row['a90'];
-                            $pcollection = 0;
-                            if($total > 0){
-                                $pcollection = ($collection/$total);
-                            }
                             break;
                         case 120:
-                            $row['x'][$p]['total'] =  $row['a120'];
-                            $row['x'][$p]['totalmsisdn'] = $row['c120'];
-                            $collection = $row['b120'];
-                            $uncollected = $row['h120'];
+                            $dataserah = $row['ab120'];
+                            $collection = $row['a120'] - $row['b120'];
                             $total  = $row['a120'];
-                            $pcollection = 0;
-                            if($total > 0){
-                                $pcollection = ($collection/$total);
-                            }
                             break;
                         default:
-                            $row['x'][$p]['total'] = 0;
-                            $row['x'][$p]['totalmsisdn'] = 0;
-                            $total  = 0;
+                            $dataserah = 0;
                             $collection = 0;
-                            $uncollected = 0;
-                            $pcollection = 0;
-                            if($total > 0){
-                                $pcollection = ($collection/$total);
-                            }
+                            $total  = 0;
                     }
 
+
+                    $uncollected = $total - $collection;
+                    $pcollection = 0;
+                    if($total > 0){
+                        $pcollection = ($collection/$dataserah);
+                    }
                     $sum[$row['regional']]['period'][$p]['uncollected'] = number_format($uncollected);
                     $sum[$row['regional']]['period'][$p]['pcollection'] = number_format(($pcollection)*100,2).'%';
                     $sum[$row['regional']]['period'][$p]['collection'] = number_format($collection);
-                    $sum[$row['regional']]['period'][$p]['totalmsisdn'] = $row['totalmsisdn'];
+                    $sum[$row['regional']]['period'][$p]['totalmsisdn'] = number_format($dataserah);
                     $sum[$row['regional']]['period'][$p]['total'] = $row['total'];
             }
             foreach ($d90h as $child){
@@ -349,60 +333,42 @@ class BilcodataserahCekBayarController extends Controller
 ;                        $lc = $lc+1;
                         switch($p){
                             case 30:
-                                $child['total'] =  $child['a30'];
-                                $child['totalmsisdn'] = $child['c30'];
-                                $collection = $child['b30'];
-                                $uncollected = $child['h30'];
+                                $dataserah = $child['ab30'];
+                                $collection = $child['a30'] - $child['b30'];
                                 $total  = $child['a30'];
-                                $pcollection = 0;
-                                if($total > 0)$pcollection = ($collection/$total);
                                 break;
                             case 60:
-                                $child['total'] =  $child['a60'];
-                                $child['totalmsisdn'] = $child['c60'];
-                                $collection = $child['b60'];
-                                $uncollected = $child['h60'];
+                                $dataserah = $child['ab60'];
+                                $collection = $child['a60'] - $child['b60'];
                                 $total  = $child['a60'];
-                                $pcollection = 0;
-                                if($total > 0)$pcollection = ($collection/$total);
                                 break;
                             case 90:
-                                $child['total'] =  $child['a90'];
-                                $child['totalmsisdn'] = $child['c90'];
-                                $collection = $child['b90'];
-                                $uncollected = $child['h90'];
+                                $dataserah = $child['ab90'];
+                                $collection = $child['a90'] - $child['b90'];
                                 $total  = $child['a90'];
-                                $pcollection = 0;
-                                if($total > 0)$pcollection = ($collection/$total);
                                 break;
                             case 120:
-                                $child['total'] =  $child['a120'];
-                                $child['totalmsisdn'] = $child['c120'];
-                                $collection = $child['b120'];
-                                $uncollected = $child['h120'];
+                                $dataserah = $child['ab120'];
+                                $collection = $child['a120'] - $child['b120'];
                                 $total  = $child['a120'];
-                                $pcollection = 0;
-                                if($total > 0)$pcollection = ($collection/$total);
                                 break;
                             default:
-                                $row['x'][$p]['total'] = $row['total'];
-                                $row['x'][$p]['totalmsisdn'] = $row['c120'];
-                                $total  = $row['a90'];
-                                $collection = $row['b90'];
-                                $uncollected = $row['total_outstanding'] - ($row['h30'] + $row['h60'] + $row['h90'] + $row['h120']);
-                                $pcollection = 0;
-                                if($total > 0){
-                                    $pcollection = ($collection/$total);
-                                }
+                                $dataserah = 0;
+                                $collection = 0;
+                                $total  = 0;
                         }
+                            $uncollected = $total - $collection;
+                            $pcollection = 0;
+                            if($total > 0){
+                                $pcollection = ($collection/$dataserah);
+                            }
                             $child['id'] = sprintf('sub#%s#%s#%s#%s#%s',$l,$lc,$child['regional'],$child['periodes'],$child['kpi']);
-                            $child[$p]['total'] = $child['total'];
-                            $child[$p]['totalmsisdn'] = $child['totalmsisdn'];
-                            $child['period'][$p]['total'] = number_format($child['total']);
-                            $child['period'][$p]['totalmsisdn'] = number_format($child['totalmsisdn']);
+                            $child['period'][$p]['total'] = number_format($total);
                             $child['period'][$p]['uncollected'] = number_format($uncollected);
                             $child['period'][$p]['pcollection'] = number_format(($pcollection)*100,2).'%';
                             $child['period'][$p]['collection'] = number_format($collection);
+                            $child['period'][$p]['totalmsisdn'] = number_format($dataserah);
+                            $child['period'][$p]['total'] = $row['total'];
                     }
                     $row['children'][$row['kpi']][] = $child;
                     $region = $child['regional'];
