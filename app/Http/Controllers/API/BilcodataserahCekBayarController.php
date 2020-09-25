@@ -243,7 +243,7 @@ class BilcodataserahCekBayarController extends Controller
 
         $l = 0;
         $sum = $i  = [];
-        $kpis = [30,60,90,120];
+        $kpis = [30,60,90,120,0];
         $kpis = array_reverse($kpis);
 
         //dd($d30h);
@@ -274,6 +274,11 @@ class BilcodataserahCekBayarController extends Controller
             $sum[$row['regional']]['id'] = $row['id'];
             foreach ($kpis as $p){
                     switch($p){
+                        case 0:
+                            $dataserah = $row['ab30'] + $row['ab60'] + $row['ab90'] + $row['ab120'];
+                            $collection = $row['a30'] + $row['a60'] + $row['a90'] + $row['a120'] - $row['b30'] - $row['b60'] - $row['b90'] - $row['b120'];
+                            $total  = $row['a30'] + $row['a60'] + $row['a90'] + $row['a120'] ;
+                            break;
                         case 30:
                         $dataserah = $row['ab30'];
                         $collection = $row['a30'] - $row['b30'];
