@@ -16,7 +16,7 @@ class BilcodataserahCekBayarController extends Controller
 {
     public function fetch(){
         DB::enableQueryLog();
-        $date = '20200913';
+        $date = '20200813';
         $adate = Carbon::createFromFormat('Ymd', $date);
         $bdate = Carbon::createFromFormat('Ymd', $date)->addDay(1);
         $x= DB::table('sabyan_r7s.bilco_data_serahs AS a')
