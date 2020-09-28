@@ -163,9 +163,6 @@ class BilcodataserahCekBayarController extends Controller
             .$selectbillcycle.
             'kpi as kpi,
         "AREA Sumatra" AS regional');
-        if($request->has('outs') === false){
-            $d90harea->groupBy('kpi');
-        }
         if($bill_cycle!=null){
             $d90harea->where('bill_cycle',$bill_cycle);
         }
@@ -176,17 +173,13 @@ class BilcodataserahCekBayarController extends Controller
         }else{
             $d90harea->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')));
         }
-        if($request->has('outs') === false){
-            $d90harea->groupBy('kpi');
-        }else{
-            $d90harea->groupBy('bill_cycle');
-        }
-        $d90harea //->groupBy('bill_cycle')
-            ->orderBy('hlr_region','DESC')
+
+        $d90harea->groupBy('bill_cycle')
             ->orderBy('bill_cycle','ASC')
             ->orderBy('kpi','ASC');
         $d90harea =$d90harea;
 
+        //dd($d90harea->get()->toarray());
         $d90h = BilcodataserahCekBayar::selectRaw('
         sum(a30) as a30,sum(a60) as a60,sum(a90) as a90,sum(a120) as a120,sum(b30) as b30,sum(b60) as b60,sum(b90) as b90,sum(b120) as b120,sum(h30) as h30,sum(h60) as h60,sum(h90) as h90,sum(h120) as h120,
         count(a30) as c30,count(a60) as c60,count(a90) as c90,count(a120) as c120,
@@ -200,7 +193,6 @@ class BilcodataserahCekBayarController extends Controller
         hlr_region as regional')
             ->groupBy('hlr_region');
         if($bill_cycle!=null){
-
             $d90h->where('bill_cycle',$bill_cycle);
         }
         if($request->has('outs') === false){
@@ -327,7 +319,7 @@ class BilcodataserahCekBayarController extends Controller
                         $child['kpi'] = $child['kpis'];
                     }
 
-                    if($child['periodes'] === $row['periodes'] && $cekkpi === true && $child['regional'] == $row['regional'] ) {
+                    if( $child['regional'] == $row['regional'] ) {
                         //var_dump($child);
                         unset($child['kpis']);
                         $lc = 0;
@@ -371,6 +363,9 @@ class BilcodataserahCekBayarController extends Controller
                             $child['period'][$p]['collection'] = number_format($collection);
                             $child['period'][$p]['totalmsisdn'] = number_format($dataserah);
                             $child['period'][$p]['total'] = $row['total'];
+                            if(strtolower($child['regional']) == 'area sumatra'){
+                                //var_dump($child);
+                            }
                         }
                         $row['children'][$row['kpi']][] = $child;
                         $region = $child['regional'];
@@ -384,6 +379,7 @@ class BilcodataserahCekBayarController extends Controller
                             unset($child[$childdel]);
                         }
                         $sum[$region]['children'][] = $child;
+
                     }
                 }
                 unset($row['kpis']);
@@ -396,6 +392,7 @@ class BilcodataserahCekBayarController extends Controller
             if($bcx === 10)dd($row);
             $bcx +=1;
         }
+
         return datatables()->of($sum)->with('datecolumn',$kpis)->toJson();
     }
 
