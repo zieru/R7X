@@ -326,6 +326,12 @@ class BilcodataserahCekBayarController extends Controller
                         foreach ($kpis as $p){
                             ;                        $lc = $lc+1;
                             switch($p){
+
+                                case 0:
+                                    $dataserah = $child['ab30'] + $child['ab60'] + $child['ab90'] + $child['ab120'];
+                                    $collection = $child['a30'] + $child['a60'] + $child['a90'] + $child['a120'] - $child['b30'] - $child['b60'] - $child['b90'] - $row['b120'];
+                                    $total  = $child['a30'] + $child['a60'] + $child['a90'] + $child['a120'] ;
+                                    break;
                                 case 30:
                                     $dataserah = $child['ab30'];
                                     $collection = $child['a30'] - $child['b30'];
