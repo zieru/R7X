@@ -14,7 +14,7 @@ class SyncBilcoDataserahCekBayar extends Command
      *
      * @var string
      */
-    protected $signature = 'SyncBilcoDataserah:CekBayar';
+    protected $signature = 'SyncBilcoDataserah:CekBayar {date} {tahap} {--update}';
 
     /**
      * The console command description.
@@ -40,47 +40,57 @@ class SyncBilcoDataserahCekBayar extends Command
      */
     public function handle()
     {
+        $update = $this->option('update');
         $controller = new BilcodataserahCekBayarController();
-        $x = $controller->fetch();
-
-        foreach ($x->get()->toArray() as $row){
-
-            $row = (array) $row;
-            $date = Carbon::createFromFormat('Y-m-d', $row['periode']);
-            $bilcoenddate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2)->endOfMonth();
-            $bilcodate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2);
-            $tahap = 0;
-            switch ($bilcodate->format('d')){
-                case $bilcoenddate->format('d'):
-                    $tahap = 1;
-                    break;
-                default:
-                    $tahap = 2;
+        $datex = $this->argument('date');
+        $tahap = (int) $this->argument('tahap');
+        $date = Carbon::createFromFormat('Y-m-d',$datex.'-01');
+        if($update != true){
+            if($tahap == 1){
+                $date = $date->addDay(-1);
             }
-            $row['kpi'] = '';
-            $row['tahap'] = $tahap;
-            if($row['a60'] > 0 AND $row['a30'] > 0){
-                $row['kpi'] = '30-60';
-                if($tahap === 1){
-                    $row['kpi'] = '60-90';
+            $x = $controller->fetch($date);
+            foreach ($x->get()->toArray() as $row){
+
+                $row = (array) $row;
+                $date = Carbon::createFromFormat('Y-m-d', $row['periode']);
+                $bilcoenddate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2)->endOfMonth();
+                $bilcodate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2);
+                $tahap = 0;
+                switch ($bilcodate->format('d')){
+                    case $bilcoenddate->format('d'):
+                        $tahap = 1;
+                        break;
+                    default:
+                        $tahap = 2;
                 }
-            }
-            if($row['a90'] > 0 && $row['a60'] > 0){
-                $row['kpi'] = '60-90';
-                if($tahap === 1){
-                    $row['kpi'] = '90-120';
-                    if($row['a90'] <= 12500 && $tahap === 1){
+                $row['kpi'] = '';
+                $row['tahap'] = $tahap;
+                if($row['a60'] > 0 AND $row['a30'] > 0){
+                    $row['kpi'] = '30-60';
+                    if($tahap === 1){
                         $row['kpi'] = '60-90';
                     }
                 }
+                if($row['a90'] > 0 && $row['a60'] > 0){
+                    $row['kpi'] = '60-90';
+                    if($tahap === 1){
+                        $row['kpi'] = '90-120';
+                        if($row['a90'] <= 12500 && $tahap === 1){
+                            $row['kpi'] = '60-90';
+                        }
+                    }
 
+                }
+                if($row['a120'] > 0 && $row['a90'] > 0){
+                    $row['kpi'] = '90-120';
+                }
+                $row['total_outstanding'] = $row['a120'] + $row['a90'] + $row['a60'] + $row['a30'];
+                $row['import_batch'] = 0;
+                BilcodataserahCekBayar::insert($row);
             }
-            if($row['a120'] > 0 && $row['a90'] > 0){
-                $row['kpi'] = '90-120';
-            }
-            $row['total_outstanding'] = $row['a120'] + $row['a90'] + $row['a60'] + $row['a30'];
-            $row['import_batch'] = 0;
-            BilcodataserahCekBayar::insert($row);
+        }else{
+
         }
         return 0;
     }
