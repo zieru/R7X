@@ -695,7 +695,7 @@ class BilcodataserahCekBayarController extends Controller
                                     $child['period'][$p]['total'] = $row['total'];
                                     $ncperiod[$loop]['period'][$px] = array(
                                         'total' => number_format($newc[$row['regional']][$bc][$px]['total']),
-                                        'uncollected' =>
+                                        'uncollected' => null,
                                         'totalmsisdn' => number_format($newc[$row['regional']][$bc][$px]['totalmsisdn']));
                                 }
                             }
