@@ -308,6 +308,7 @@ class BilcodataserahCekBayarController extends Controller
                     $sum[$row['regional']]['period'][$p]['total'] = $row['total'];
                 }
                 foreach ($d90h as $child){
+
                     /// var_dump($child);
                     $cekkpi = false;
                     if($child['kpis'] === $row['kpis']){
@@ -402,7 +403,362 @@ class BilcodataserahCekBayarController extends Controller
 
         return datatables()->of($sum)->with('datecolumn',$kpis)->toJson();
     }
+    public function mom(Request $request){
+        $bill_cycle= $selectbillcycle = $end = $date = null;
+        $tahap_d = $request->get('tahap');
 
+        if($request->has('bc') and $request->get('bc') > 0){
+            $bill_cycle = $request->get('bc');
+        }
+        $start = explode(':',$request->get('periode'))[0];
+        $end = explode(':',$request->get('periode'))[1];
+        try {
+            $date = Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-2);
+        }
+        catch (\Exception $e){AppHelper::sendErrorAndExit('Periode is invalid');}
+        try {
+            $end = Carbon::createFromFormat('Y-m', $end)->addDay(-2);
+        }
+        catch (\Exception $e){AppHelper::sendErrorAndExit('End Periode is invalid');}
+
+        $period = CarbonPeriod::create($start, '1 month', $end);
+        $tahap = [];
+        if($tahap_d > 0){
+            $tahap_dx = 0;
+            if($tahap_d == 1){
+                $tahap_dx = -1;
+            }else{
+                $tahap_dx = 14;
+            }
+            foreach ($period as $dt) {
+                $tahap[] = $dt->addDay($tahap_dx);
+            }
+        }
+        if($request->has('outs') === true){
+            $selectbillcycle = 'bill_cycle as bill_cycles,';
+        }
+
+        $d30harea = BilcodataserahCekBayar::selectRaw('
+        sum(a30) as a30,sum(a60) as a60,sum(a90) as a90,sum(a120) as a120,sum(b30) as b30,sum(b60) as b60,sum(b90) as b90,sum(b120) as b120,sum(h30) as h30,sum(h60) as h60,sum(h90) as h90,sum(h120) as h120,
+        count(a30) as c30,count(a60) as c60,count(a90) as c90,count(a120) as c120,
+        sum(ab30) as ab30,sum(ab60) as ab60,sum(ab90) as ab90,sum(ab120) as ab120,
+        sum(bb30) as bb30,sum(bb60) as bb60,sum(bb90) as bb90,sum(bb120) as bb120,
+        sum(total_outstanding) as total,
+        count(account) as totalmsisdn,
+         DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
+         kpi as kpis,'.$selectbillcycle.'kpi,
+        "AREA Sumatra" AS regional')
+            ->groupBy('periodes');
+        if($bill_cycle!=null){
+            $d30harea->where('bill_cycle',$bill_cycle);
+        }
+        if(sizeof($tahap)>0){
+            $d30harea->where(function($query)use($tahap) {
+                foreach ($tahap as $thpd){
+                    $query->orwhere('periode',$thpd->format('Y-m-d'));
+                }
+            });
+        }
+        if($request->has('outs') == false){
+            //$d30harea->groupBy('kpi');
+        }
+        $d30harea->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
+            ->orderBy('hlr_region','DESC')
+            ->orderBy('kpi','ASC');
+
+        $d30harea = $d30harea;
+        $d30h = BilcodataserahCekBayar::selectRaw('
+        sum(a30) as a30,sum(a60) as a60,sum(a90) as a90,sum(a120) as a120,sum(b30) as b30,sum(b60) as b60,sum(b90) as b90,sum(b120) as b120,sum(h30) as h30,sum(h60) as h60,sum(h90) as h90,sum(h120) as h120,
+        count(a30) as c30,count(a60) as c60,count(a90) as c90,count(a120) as c120,
+        sum(ab30) as ab30,sum(ab60) as ab60,sum(ab90) as ab90,sum(ab120) as ab120,
+        sum(bb30) as bb30,sum(bb60) as bb60,sum(bb90) as bb90,sum(bb120) as bb120,
+        sum(total_outstanding) as total,
+        count(account) as totalmsisdn,
+         DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
+         kpi as kpis,'.$selectbillcycle.'kpi,
+        hlr_region as regional')
+            ->groupBy('periodes','hlr_region');
+        if($request->has('outs') === false){
+            //$d30h->groupBy('kpi');
+        }
+        if($bill_cycle!=null){
+            $d30h->where('bill_cycle',$bill_cycle);
+        }
+        $d30h->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
+            ->orderBy('hlr_region','ASC')
+            ->orderBy('kpi','ASC');
+        if(sizeof($tahap)>0){
+            $d30h->where(function($query)use($tahap) {
+                foreach ($tahap as $thpd){
+                    $query->orwhere('periode',$thpd->format('Y-m-d'));
+                }
+            });
+        }
+        $d30h =$d30h->union($d30harea)->get()->toArray();
+        $d90harea = BilcodataserahCekBayar::selectRaw('
+        sum(a30) as a30,sum(a60) as a60,sum(a90) as a90,sum(a120) as a120,sum(b30) as b30,sum(b60) as b60,sum(b90) as b90,sum(b120) as b120,sum(h30) as h30,sum(h60) as h60,sum(h90) as h90,sum(h120) as h120,
+        count(a30) as c30,count(a60) as c60,count(a90) as c90,count(a120) as c120,
+        sum(ab30) as ab30,sum(ab60) as ab60,sum(ab90) as ab90,sum(ab120) as ab120,
+        sum(bb30) as bb30,sum(bb60) as bb60,sum(bb90) as bb90,sum(bb120) as bb120,
+        sum(total_outstanding) as total,
+        count(account) as totalmsisdn,
+         DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
+         kpi as kpis,'
+            .$selectbillcycle.
+            'bill_cycle as kpi,
+        "AREA Sumatra" AS regional')
+            ->groupBy('periodes');
+        if($bill_cycle!=null){
+            $d90harea->where('bill_cycle',$bill_cycle);
+        }
+        if(sizeof($tahap)>0){
+            $d90harea->where(function($query)use($tahap) {
+                foreach ($tahap as $thpd){
+                    $query->orwhere('periode',$thpd->format('Y-m-d'));
+                }
+            });
+        }
+        if($request->has('outs') === false){
+            $d90harea->groupBy('kpi');
+        }else{
+            $d90harea->groupBy('bill_cycle');
+        }
+        $d90harea //->groupBy('bill_cycle')
+        ->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
+            ->orderBy('hlr_region','DESC')
+            ->orderBy('kpi','ASC')
+            ->orderBy('bill_cycle','ASC');
+        $d90harea =$d90harea;
+        $helper['selectbillcycle'] = $selectbillcycle;
+        $d90h2 = BilcoDataSerah::selectRaw('*')
+            ->fromSub(function ($query) use($request,$helper) {
+                $query->selectRaw('sum(total_outstanding) as total,
+                         DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
+                         count(msisdn) as msidsn1,
+                         '.$helper['selectbillcycle'].'
+                        bill_cycle as kpi,
+                        hlr_region as regional')->from('bilco_data_serahs');
+                if($request->has('outs') === false){
+                    $query->groupBy('kpis');
+                }else{
+                    $query->groupBy('bill_cycle');
+                }
+                $query->groupBy('periodes','hlr_region');
+            },'sub')
+        ;
+
+        $d90h = BilcodataserahCekBayar::selectRaw('
+        sum(a30) as a30,sum(a60) as a60,sum(a90) as a90,sum(a120) as a120,sum(b30) as b30,sum(b60) as b60,sum(b90) as b90,sum(b120) as b120,sum(h30) as h30,sum(h60) as h60,sum(h90) as h90,sum(h120) as h120,
+        count(a30) as c30,count(a60) as c60,count(a90) as c90,count(a120) as c120,
+        sum(ab30) as ab30,sum(ab60) as ab60,sum(ab90) as ab90,sum(ab120) as ab120,
+        sum(bb30) as bb30,sum(bb60) as bb60,sum(bb90) as bb90,sum(bb120) as bb120,
+        sum(total_outstanding) as total,
+        count(account) as totalmsisdn,
+         DATE_FORMAT(DATE_ADD(periode, INTERVAL 2 DAY),"%m-%Y") as periodes,
+         kpi as kpis,'.$selectbillcycle.'
+        bill_cycle as kpi,
+        hlr_region as regional')
+            ->groupBy('periodes','hlr_region');
+        if($bill_cycle!=null){
+
+            $d90h->where('bill_cycle',$bill_cycle);
+        }
+        if($request->has('outs') === false){
+            $d90h->groupBy('kpis');
+        }else{
+            $d90h->groupBy('bill_cycle');
+        }
+
+        $d90h->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
+            ->orderBy('hlr_region','DESC')
+            ->orderBy('kpi','ASC')
+            ->orderBy('bill_cycle','ASC');
+        //dd($d90h->get()->toArray());
+        if(sizeof($tahap)>0){
+            $d90h->where(function($query)use($tahap) {
+                foreach ($tahap as $thpd){
+                    $query->orwhere('periode',$thpd->format('Y-m-d'));
+                }
+            });
+        }
+        //dd($d90h->union($d90harea)->get()->toArray());
+        $d90h =$d90h->union($d90harea)->get()->toArray();
+        //dd($d90h);
+        $temp = array();
+        $dates = array();
+        $period = array();
+        $newc = [];
+        //dd($d90h);
+        foreach ($d90h as $d90h_newc){
+            if($request->get('outs') === 'true') {
+                $newc[$d90h_newc['regional']][$d90h_newc['bill_cycles']][$d90h_newc['periodes']] = $d90h_newc;
+            }else{
+                $newc[$d90h_newc['regional']][$d90h_newc['kpis']][$d90h_newc['periodes']] = $d90h_newc;
+            }
+        }
+
+        //dd($newc);
+        foreach($d30h as $val){
+            $dates[$val['periodes']] = 0;
+        }
+        foreach ($dates as $key => $val){
+            $period[] = $key;
+        }
+        sort($period);
+
+        //$kpis = [30,60,90,120,0];
+        $kpis = [0];
+        $l = 0;
+        $sum = $i  = [];
+
+        foreach ($d30h as $row){
+            $ncperiod = [];
+            $row['total'] = number_format($row['total']);
+            $row['id'] = sprintf('%s#%s#%s#%s',$l,$row['regional'],$row['periodes'],$row['kpi']);
+            $param = [];
+            if($request->has('outs') === true or $request->get('outs') === 'true'){
+                $row['kpi'] = 'All BC';
+                $param = array(1,6,11,16,20);
+            }
+            if($request->has('outs') === false OR $request->get('outs') === 'false'){
+                $row['kpi'] = 'All KPI';
+                $param = array('30-60','60-90','90-120','120-140');
+            }
+            $l++;
+            $row['totalmsisdn'] = number_format($row['totalmsisdn']);
+            $sum[$row['regional']]['total'] = $row['total'];
+            $sum[$row['regional']]['totalmsisdn'] = $row['totalmsisdn'];
+            $sum[$row['regional']]['periodes'] = $row['periodes'];
+            $sum[$row['regional']]['kpis'] = $row['kpis'];
+            $sum[$row['regional']]['kpi'] = $row['kpi'];
+            $sum[$row['regional']]['regional'] = $row['regional'];
+            $sum[$row['regional']]['id'] = $row['id'];
+
+            //dd($newc);
+            //dd($newc['Sumbagsel'][1]['08-2020']['total']);
+            foreach ($period as $p){
+                if($p === (string) $row['periodes']){
+                    $dataserah = $row['ab30'] + $row['ab60'] + $row['ab90'] + $row['ab120'];
+                    $collection = $row['a30'] + $row['a60'] + $row['a90'] + $row['a120'] - $row['b30'] - $row['b60'] - $row['b90'] - $row['b120'];
+                    $total  = $row['a30'] + $row['a60'] + $row['a90'] + $row['a120'] ;
+
+                        $uncollected = $total - $collection;
+                        $pcollection = 0;
+                        if($total > 0){
+                            $pcollection = ($collection/$dataserah);
+                        }
+                        $sum[$row['regional']]['period'][$p]['uncollected'] = number_format($uncollected);
+                        $sum[$row['regional']]['period'][$p]['pcollection'] = number_format(($pcollection)*100,2).'%';
+                        $sum[$row['regional']]['period'][$p]['collection'] = number_format($collection);
+                        $sum[$row['regional']]['period'][$p]['totalmsisdn'] = number_format($dataserah);
+                        $sum[$row['regional']]['period'][$p]['total'] = $row['total'];
+                    }
+                    $row['x'][$p]['total'] = $row['total'];
+                    $row['x'][$p]['totalmsisdn'] = $row['totalmsisdn'];
+                    $loop = 0;
+                    foreach ($param as $bc){
+                        //dd($newc);
+                        //var_dump($row);
+                        //echo $newc[$row['AREA Sumatra']][$bc][$p]['kpi'];
+                        //          dd(sprintf('$newc[%s][%s][%s][total]',$row['regional'],$bc,$p));
+                        //echo sprintf('$newc[%s][%s][%s][total]',$row['regional'],$bc,$p);
+                        if(isset($newc[$row['regional']][$bc])){
+                            if($request->has('outs') === false OR $request->get('outs') === 'false'){
+                                $ncperiod[$loop]= array(
+                                    'kpi' => $bc,
+                                    'id' => sprintf('sub%s/%s#%s#%s#%s',$l,$loop,$row['regional'],$row['periodes'],$row['kpi']),
+                                    'regional' => ''
+                                );
+                            }else{
+                                $ncperiod[$loop]= array(
+                                    'kpi' => $bc,
+                                    'id' => sprintf('sub%s/%s#%s#%s#%s',$l,$loop,$row['regional'],$row['periodes'],$row['kpi']),
+                                    'regional' => $row['regional']
+                                );
+                            }
+
+                            foreach ($period as $px) {
+                                if(isset($newc[$row['regional']][$bc][$px])){
+                                    $dataserah = $child['ab30'] + $child['ab60'] + $child['ab90'] + $child['ab120'];
+                                    $collection = $child['a30'] + $child['a60'] + $child['a90'] + $child['a120'] - $child['b30'] - $child['b60'] - $child['b90'] - $row['b120'];
+                                    $total  = $child['a30'] + $child['a60'] + $child['a90'] + $child['a120'] ;
+                                    $uncollected = $total - $collection;
+                                    $pcollection = 0;
+                                    if($total > 0){
+                                        $pcollection = ($collection/$dataserah);
+                                    }
+                                    $child['period'][$p]['total'] = number_format($total);
+                                    $child['period'][$p]['uncollected'] = number_format($uncollected);
+                                    $child['period'][$p]['pcollection'] = number_format(($pcollection)*100,2).'%';
+                                    $child['period'][$p]['collection'] = number_format($collection);
+                                    $child['period'][$p]['totalmsisdn'] = number_format($dataserah);
+                                    $child['period'][$p]['total'] = $row['total'];
+                                    $ncperiod[$loop]['period'][$px] = array(
+                                        'total' => number_format($newc[$row['regional']][$bc][$px]['total']),
+                                        'uncollected' =>
+                                        'totalmsisdn' => number_format($newc[$row['regional']][$bc][$px]['totalmsisdn']));
+                                }
+                            }
+                            $loop++;
+                        }
+
+                    }
+                    $sum[$row['regional']]['period'][$p]['totalmsisdn'] = $row['totalmsisdn'];
+                    $sum[$row['regional']]['period'][$p]['total'] = $row['total'];
+            }
+            //dd($ncperiod);
+            $ncx = [];
+            //dd($newc);
+
+            $sum[$row['regional']]['children'] = $ncperiod;
+            //dd($sum);
+            /*foreach ($d90h as $child){
+               /// var_dump($child);
+                $cekkpi = false;
+                if($child['kpis'] === $row['kpis']){
+                    $cekkpi = true;
+                }
+                if($request->has('outs') === true){
+                    $cekkpi = true;
+                }else{
+                    $cekkpi =true;
+                    $child['kpi'] = $child['kpis'];
+                }
+                if($child['periodes'] === $row['periodes'] && $cekkpi === true && $child['regional'] == $row['regional'] ) {
+                    //var_dump($child);
+                    unset($child['kpis']);
+                    $lc = 0;
+                    foreach ($period as $p){
+                        $lc = $lc+1;
+                        $child['totalmsisdn'] = $child['totalmsisdn'];
+                        $child['total'] = $child['total'];
+                        if($p === (string) $child['periodes']){
+                            $child['id'] = sprintf('sub#%s#%s#%s#%s#%s',$l,$lc,$child['regional'],$child['periodes'],$child['kpi']);
+                            $child['idchild'] = sprintf('sub#%s#%s#%s#%s#%s',$l,$lc,$child['regional'],$child['periodes'],$child['kpi']);
+                            $child[$p]['total'] = $child['total'];
+                            $child[$p]['totalmsisdn'] = $child['totalmsisdn'];
+                            $child['period'][$p]['total'] = number_format($child['total']);
+                            $child['period'][$p]['totalmsisdn'] = number_format($child['totalmsisdn']);
+                        }
+                    }
+                    $row['children'][$row['kpi']][] = $child;
+                    $region = $child['regional'];
+                    if($request->has('outs') === false){
+                        $child['regional'] = '';
+                    }else{
+                        $child['kpi'] = $child['bill_cycles'];
+                    }
+                    //sdd($child);
+                    $sum[$region]['children'][] = $child;
+                }
+            }*/
+            unset($row['kpis']);
+            $i[$row['regional']]=$row;
+            $temp[] = $row ;
+        }
+
+        return datatables()->of($sum)->with('datecolumn',$period)->toJson();
+    }
     /**
      * Show the form for creating a new resource.
      *
