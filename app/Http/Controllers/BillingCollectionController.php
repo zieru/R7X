@@ -857,7 +857,7 @@ class BillingCollectionController extends Controller
       'storedRow'=>null,
       'status' => 'QUEUE',
         'tipe' => 'bilcollection:import',
-        'filaname' => $name
+        'filename' => $name
     ));
 
     /* if($request->has('judul')){
