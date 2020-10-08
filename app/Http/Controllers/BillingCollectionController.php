@@ -853,8 +853,8 @@ class BillingCollectionController extends Controller
 
 
     $importer = Importer::create(array(
-      'importedRow'=>null,
-      'storedRow'=>null,
+      'importedRow'=>0,
+      'storedRow'=>0,
       'status' => 'QUEUE',
         'tipe' => 'bilcollection:import',
         'filename' => $name
