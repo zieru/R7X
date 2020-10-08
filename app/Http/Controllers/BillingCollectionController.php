@@ -853,9 +853,11 @@ class BillingCollectionController extends Controller
 
 
     $importer = Importer::create(array(
-      'importedRow'=>0,
-      'storedRow'=>0,
-      'status' => 'QUEUE'
+      'importedRow'=>null,
+      'storedRow'=>null,
+      'status' => 'QUEUE',
+        'tipe' => 'bilcollection:import',
+        'filaname' => $name
     ));
 
     /* if($request->has('judul')){
@@ -970,6 +972,8 @@ class BillingCollectionController extends Controller
     {
       BillingCollectionPoc::insert($chunk->toArray());
     }
+    $importer->importedRow = $finale->count();
+    $importer->storedRow = $finale->count();
     $importer->status = "Finish";
     $importer->save();
     if($notify == 1){
