@@ -976,7 +976,7 @@ $custom =null;
     $chunks =$finale->chunk(500);
     foreach ($chunks as $chunk)
     {
-        $chunk = (array)$chunk;
+        $chunk = (array)$chunk->toArray();
         $chunk['custom'] = $custom;
       BillingCollectionPoc::insert($chunk);
     }
