@@ -48,6 +48,8 @@ class SyncBilcoDataSerah extends Command
         
 	//$date = Carbon::now()->subDays(2);
  $date  = Carbon::createFromFormat('Y-m-d', $this->argument('date'));
+ $custom = array('2020-10','2020-11');
+
 $bilcoenddate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2)->endOfMonth();
 $bilcodate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2);
         $tahap = false;
@@ -57,6 +59,11 @@ $bilcodate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2);
                 break;
             default:
                 $tahap = 2;
+        }
+        if($tahap == 1){
+            if(in_array($date->format('Y-m'),$custom)){
+                $tahap = 2;
+            }
         }
 	Notifier::create([
                     'type' => 'DataSerahImport',
@@ -87,10 +94,6 @@ $x = array();
 	    $importer->save();
 	    foreach($cx->toArray() as $row){
             $i =  (array) $row;
-
-            if($i['tahap'] != null){
-                $tahap = $i['tahap'];
-            }
 	    //$row = $i = $cx->toArray();
 	    //dd($row);
             $i['cek_cp'] = false;
