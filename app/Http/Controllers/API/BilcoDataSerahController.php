@@ -171,13 +171,11 @@ class BilcoDataSerahController extends Controller
         DB::enableQueryLog();
         $x = BilcoDataSerah::whereBetween('periode',$periode)
             ->wherein('hlr_region',$regional)
-            ->limit(10)
             ->get()->makeHidden(['import_batch']);
             if($tahap > 0) {
                 $x = BilcoDataSerah::whereBetween('periode',$periode)
                     ->wherein('hlr_region',$regional)
                     ->where('tahap_periode',$tahap)
-                    ->limit(10)
                     ->get()->makeHidden(['import_batch']);
             }
         //dd(DB::getQueryLog());
