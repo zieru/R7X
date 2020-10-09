@@ -855,7 +855,7 @@ $custom =null;
     $filenamedate = Carbon::createFromFormat('Ymd', $name_extract);
     $between = array('2020-10-07','2020-12-31');
     if($filenamedate->between($between[0],$between[1]) === true){
-        $custom = true;
+        $custom = 'tahap3_2020';
     }
 
     $importer = Importer::create(array(
