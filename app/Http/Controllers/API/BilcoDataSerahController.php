@@ -150,14 +150,16 @@ class BilcoDataSerahController extends Controller
         $start = $req->get('amp;start');
         $end = null;
         $periode = array(Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-1)->format('Y-m-d'),Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(12)->format('Y-m-d'));
-        switch($tahap){
+        $periode = array(Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-1)->format('Y-m-d'),Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(14)->format('Y-m-d'));
+        /*switch($tahap){
             case '1':
-                $periode = array(Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-1)->format('Y-m-d'),Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-1)->format('Y-m-d'));
+                $periode = array(Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-1)->format('Y-m-d'),Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(14)->format('Y-m-d'));
                 break;
             case '2':
-                $periode = array(Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(10)->format('Y-m-d'),Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(14)->format('Y-m-d'));
+                $periode = array(Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-1)->format('Y-m-d'),Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(14)->format('Y-m-d'));
                 break;
-        }
+        }*/
+
 
         $regional_title = $regional = $req->get('amp;regional');
         if($regional == 'Area Sumatera'){
@@ -170,9 +172,10 @@ class BilcoDataSerahController extends Controller
         $x = BilcoDataSerah::
         whereBetween('periode',$periode)
 
-            ->wherein('hlr_region',$regional)
+            ->wherein('hlr_region',$regional);
+        if($tahap != null)$x->where('tahap_periode',$tahap);
 
-            ->get()->makeHidden(['import_batch']);
+            $x->get()->makeHidden(['import_batch']);
         $x = collect($x);
         return (new FastExcel($x))->download('DATASERAH-'.$regional_title.'_'.$start.'.xlsx', function ($row) {
             return [
@@ -550,12 +553,20 @@ class BilcoDataSerahController extends Controller
             }
         }
         $periode = array(Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-1)->format('Y-m-d'),Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(12)->format('Y-m-d'));
+
         if($tahap_d > 0){
-            if($tahap_d == 1){
-                $periode = array(Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-1)->format('Y-m-d'),Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-1)->format('Y-m-d'));
+            if(in_array($start,array('2020-10','2020-11','2020-12'))){
+                //dd()
+                $periode = array(Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-1)->format('Y-m-d'),Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(12)->format('Y-m-d'));
+
             }else{
-                $periode = array(Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(12)->format('Y-m-d'),Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(12)->format('Y-m-d'));
+                if($tahap_d == 1){
+                    $periode = array(Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-1)->format('Y-m-d'),Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-1)->format('Y-m-d'));
+                }else{
+                    $periode = array(Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(12)->format('Y-m-d'),Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(12)->format('Y-m-d'));
+                }
             }
+            $tahap = $tahap_d;
         }
         $d90harea = BilcoDataSerah::selectRaw('count( msisdn) as msisdn,
 	sum( bucket_1 ) as bucket_1,
@@ -566,7 +577,7 @@ class BilcoDataSerahController extends Controller
 	sum(total_outstanding) as total_outstanding')
             ->whereIn('hlr_region',array('Sumbagut','Sumbagteng','Sumbagsel'))
             ->whereBetween('periode',$periode);
-        if($tahap != null)$d90harea->where('periode',$tahap->format('Y-m-d'));
+        if($tahap != null)$d90harea->where('tahap_periode',$tahap);
         $d90h = BilcoDataSerah::selectRaw('count( msisdn) as msisdn,
 	sum( bucket_1 ) as bucket_1,
 	sum( bucket_2 ) as bucket_2,
@@ -577,7 +588,7 @@ class BilcoDataSerahController extends Controller
             ->groupBy('hlr_region')
             ->whereIn('hlr_region',array('Sumbagut','Sumbagteng','Sumbagsel'))
             ->whereBetween('periode',$periode);
-        if($tahap != null)$d90h->where('periode',$tahap->format('Y-m-d'));
+        if($tahap != null)$d90h->where('tahap_periode',$tahap);
         $d90h->union($d90harea);
         $temp = array();
         foreach ($d90h->get()->toArray() as $row)
