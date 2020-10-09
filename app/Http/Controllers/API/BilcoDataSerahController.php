@@ -169,16 +169,22 @@ class BilcoDataSerahController extends Controller
             $regional = array($regional);
         }
 
-        $x = BilcoDataSerah::
-        whereBetween('periode',$periode)
-            ->wherein('hlr_region',$regional);
-            if($tahap > 0) $x->where('tahap_periode',$tahap);
-            $x->get()->makeHidden(['import_batch']);
+        $x = BilcoDataSerah::whereBetween('periode',$periode)
+            ->where('tahap_periode',1)
+            ->wherein('hlr_region',$regional)
+            ->get()->makeHidden(['import_batch']);
+            if($tahap > 0) {
+                $x = BilcoDataSerah::whereBetween('periode',$periode)
+                    ->where('tahap_periode',1)
+                    ->wherein('hlr_region',$regional)
+                    ->where('tahap_periode',$tahap)
+                    ->get()->makeHidden(['import_batch']);
+            }
+
         $x = collect($x);
         return (new FastExcel($x))->download('DATASERAH-'.$regional_title.'_'.$start.'.xlsx', function ($row) {
-           // dd($row);
+           dd($row);
             return [
-                'tahap' => $row->tahap_periode,
                 'account' => $row->account,
                 'customer_id' => $row->customer_id,
                 'msisdn' => $row->msisdn,

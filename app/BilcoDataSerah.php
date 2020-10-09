@@ -10,7 +10,7 @@ class BilcoDataSerah extends Model
     //
     public $timestamps = false;
     protected $guarded = [];
-    protected $appends = ['tahap'];
+    //protected $appends = ['tahap'];
 
 
     public function getTahapAttribute()
