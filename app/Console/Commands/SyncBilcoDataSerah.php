@@ -86,6 +86,9 @@ $x = array();
 	    $importer->importedRow =$ndataserah['imported'] += $cx->count();
 	    $importer->save();
 	    foreach($cx->toArray() as $row){
+	        if($row['tahap'] != null){
+	            $tahap = $row['tahap'];
+            }
             $i =  (array) $row;
 	    //$row = $i = $cx->toArray();
 	    //dd($row);
