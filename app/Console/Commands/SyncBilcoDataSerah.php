@@ -95,7 +95,7 @@ $x = array();
 	    foreach($cx->toArray() as $row){
 
             $i =  (array) $row;
-            dd($i);
+            //dd($i);
 	    //$row = $i = $cx->toArray();
 	    //dd($row);
             $i['cek_cp'] = false;
