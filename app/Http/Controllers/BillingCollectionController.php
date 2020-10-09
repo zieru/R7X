@@ -929,6 +929,7 @@ $custom =null;
       $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['area'] =$row[3];
       $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['periode'] =$periode;
       $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['import_batch'] = $importer->id;
+      $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['custom'] = $custom;
       $bill_amount_n_v = array();
       /*for ($l = 1; $l <= 12; $l++) {
           $bill_amount_n_v['bill_amount_' . $l] = $arr1[$periode][$bill_cycle][$poc][$row[7]][$row[8]]['bill_amount_' . $l] + (int)$row[10 - 1 - 1];
@@ -976,9 +977,9 @@ $custom =null;
     $chunks =$finale->chunk(500);
     foreach ($chunks as $chunk)
     {
-        $chunk = (array)$chunk->toArray();
-        $chunk['custom'] = $custom;
-      BillingCollectionPoc::insert($chunk);
+        //$chunk = (array)$chunk->toArray();
+        //$chunk['custom'] = $custom;
+      BillingCollectionPoc::insert($chunk->toArray());
     }
     $importer->importedRow = $finale->count();
     $importer->storedRow = $finale->count();
