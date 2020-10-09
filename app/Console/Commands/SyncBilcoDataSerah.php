@@ -86,10 +86,11 @@ $x = array();
 	    $importer->importedRow =$ndataserah['imported'] += $cx->count();
 	    $importer->save();
 	    foreach($cx->toArray() as $row){
-	        if($row['tahap'] != null){
-	            $tahap = $row['tahap'];
-            }
             $i =  (array) $row;
+
+            if($i['tahap'] != null){
+                $tahap = $i['tahap'];
+            }
 	    //$row = $i = $cx->toArray();
 	    //dd($row);
             $i['cek_cp'] = false;
