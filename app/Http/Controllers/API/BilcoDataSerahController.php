@@ -180,9 +180,9 @@ class BilcoDataSerahController extends Controller
                     ->limit(10)
                     ->get()->makeHidden(['import_batch']);
             }
-        dd(DB::getQueryLog());
+        //dd(DB::getQueryLog());
         $x = collect($x);
-            dd($x->ToArray());
+          //  dd($x->ToArray());
         return (new FastExcel($x))->download('DATASERAH-'.$regional_title.'_'.$start.'.xlsx', function ($row) {
            //dd($row);
             return [
