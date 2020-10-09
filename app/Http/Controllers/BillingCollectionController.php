@@ -978,7 +978,7 @@ $custom =null;
     {
         $chunk = (array)$chunk;
         $chunk['custom'] = $custom;
-      BillingCollectionPoc::insert($chunk->toArray());
+      BillingCollectionPoc::insert($chunk);
     }
     $importer->importedRow = $finale->count();
     $importer->storedRow = $finale->count();
