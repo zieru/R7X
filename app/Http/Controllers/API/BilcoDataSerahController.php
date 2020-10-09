@@ -183,7 +183,7 @@ class BilcoDataSerahController extends Controller
 
         $x = collect($x);
         return (new FastExcel($x))->download('DATASERAH-'.$regional_title.'_'.$start.'.xlsx', function ($row) {
-           dd($row);
+           //dd($row);
             return [
                 'account' => $row->account,
                 'customer_id' => $row->customer_id,
