@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 use App\Helpers\AppHelper;
 use Rap2hpoutre\FastExcel\FastExcel;
-
+use Carbon\Carbon;
 use App\Notifier;
 use DateTime;
 use Illuminate\Support\Collection;
@@ -850,7 +850,13 @@ class BillingCollectionController extends Controller
     ini_set('xdebug.var_display_max_children', '256');
     ini_set('xdebug.var_display_max_data', '1024');
     $x = 1;
-
+$custom =null;
+    $name_extract = explode('_',$name)[0];
+    $filenamedate = Carbon::createFromFormat('Ymd', $name_extract);
+    $between = array('2020-10-07','2020-12-31');
+    if($filenamedate->between($between[0],$between[1]) === true){
+        $custom = true;
+    }
 
     $importer = Importer::create(array(
       'importedRow'=>0,
@@ -869,7 +875,7 @@ class BillingCollectionController extends Controller
     $arr= array();
     $arr1= array();
 
-    $interpreter->addObserver(function(array $row) use (&$i,&$j,&$x,&$arr1,$importer) {
+    $interpreter->addObserver(function(array $row) use (&$i,&$j,&$x,&$arr1,$importer,$custom) {
 
       $lokal = array();
       $periode = $row[0];
@@ -970,6 +976,8 @@ class BillingCollectionController extends Controller
     $chunks =$finale->chunk(500);
     foreach ($chunks as $chunk)
     {
+        $chunk = (array)$chunk;
+        $chunk['custom'] = $custom;
       BillingCollectionPoc::insert($chunk->toArray());
     }
     $importer->importedRow = $finale->count();
