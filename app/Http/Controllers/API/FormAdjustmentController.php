@@ -76,7 +76,7 @@ class FormAdjustmentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function storeold(Request $request)
     {
       //header('Access-Control-Allow-Origin: *');
 
@@ -113,6 +113,33 @@ class FormAdjustmentController extends Controller
       $importer->status = "Finish";
       $importer->save();
       return Response::json(array('message' => 'Upload Success!'),200);
+    }
+    public function store(Request $request)
+    {
+
+        $FormAdjustment = new FormAdjustment();
+        $FormAdjustment->shop = $request->shop;
+        $FormAdjustment->account = $request->account;
+        $FormAdjustment->msisdn = $request->MSISDN;
+        $FormAdjustment->bill_cycle = $request->bill_cycle;
+        $FormAdjustment->status_msisdn = $request->statusmsisdn;
+        $FormAdjustment->los = $request->los;
+        $FormAdjustment->arpu = $request->arpu;
+        $FormAdjustment->bulantagihan = $request->bulantagihan;
+        $FormAdjustment->nominal = $request->nominal;
+        $FormAdjustment->reason = $request->reason;
+        $FormAdjustment->notes_dsc = $request->notes_dsc;
+        $FormAdjustment->nodin_ba = $request->nodin_ba;
+        $FormAdjustment->tgl_adj = $request->tgl_adj;
+        $FormAdjustment->user_eksekutor = $request->user_eksekutor;
+        $FormAdjustment->import_batch = 0;
+        $FormAdjustment->author = Auth::user()->id;
+        $saved = $FormAdjustment->save();
+        if(!$saved){
+            AppHelper::sendErrorAndExit('Error Input ERROR',500);
+        }
+
+        return Response::json(array('message' => 'Upload Success!'),200);
     }
 
     /**

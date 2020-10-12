@@ -253,6 +253,7 @@ class BilcoDataSerahController extends Controller
                 $tahap[] = $dt->addDay($tahap_dx);
             }
         }
+        $tahap_d = $request->tahap;
         if($request->has('outs') === true){
             $selectbillcycle = 'bill_cycle as bill_cycles,';
         }
@@ -267,13 +268,14 @@ class BilcoDataSerahController extends Controller
         if($bill_cycle!=null){
             $d30harea->where('bill_cycle',$bill_cycle);
         }
-        if(sizeof($tahap)>0){
+        /*if(sizeof($tahap)>0){
             $d30harea->where(function($query)use($tahap) {
                 foreach ($tahap as $thpd){
                     $query->orwhere('periode',$thpd->format('Y-m-d'));
                 }
             });
-        }
+        }*/
+        if($tahap_d >0 ) $d30harea->where('tahap_periode',$tahap_d);
         if($request->has('outs') == false){
             //$d30harea->groupBy('kpi');
         }
@@ -298,13 +300,14 @@ class BilcoDataSerahController extends Controller
         $d30h->whereBetween('periode',array($date->format('Y-m-d'),$end->format('Y-m-d')))
             ->orderBy('hlr_region','ASC')
             ->orderBy('kpi','ASC');
-        if(sizeof($tahap)>0){
+        /*if(sizeof($tahap)>0){
             $d30h->where(function($query)use($tahap) {
                 foreach ($tahap as $thpd){
                     $query->orwhere('periode',$thpd->format('Y-m-d'));
                 }
             });
-        }
+        }*/
+        if($tahap_d >0 ) $d30h->where('tahap_periode',$tahap_d);
         $d30h =$d30h->union($d30harea)->get()->toArray();
         $d90harea = BilcoDataSerah::selectRaw('
         sum(total_outstanding) as total,
@@ -318,13 +321,13 @@ class BilcoDataSerahController extends Controller
         if($bill_cycle!=null){
             $d90harea->where('bill_cycle',$bill_cycle);
         }
-        if(sizeof($tahap)>0){
+        /*if(sizeof($tahap)>0){
             $d90harea->where(function($query)use($tahap) {
                 foreach ($tahap as $thpd){
                     $query->orwhere('periode',$thpd->format('Y-m-d'));
                 }
             });
-        }
+        }*/
         if($request->has('outs') === false){
             $d90harea->groupBy('kpi');
         }else{
@@ -335,6 +338,7 @@ class BilcoDataSerahController extends Controller
             ->orderBy('hlr_region','DESC')
             ->orderBy('kpi','ASC')
             ->orderBy('bill_cycle','ASC');
+        if($tahap_d >0 ) $d90harea->where('tahap_periode',$tahap_d);
         $d90harea =$d90harea;
         $helper['selectbillcycle'] = $selectbillcycle;
         $d90h2 = BilcoDataSerah::selectRaw('*')
@@ -377,13 +381,14 @@ class BilcoDataSerahController extends Controller
             ->orderBy('kpi','ASC')
             ->orderBy('bill_cycle','ASC');
         //dd($d90h->get()->toArray());
-        if(sizeof($tahap)>0){
+        /*if(sizeof($tahap)>0){
             $d90h->where(function($query)use($tahap) {
                 foreach ($tahap as $thpd){
                     $query->orwhere('periode',$thpd->format('Y-m-d'));
                 }
             });
-        }
+        }*/
+        if($tahap_d >0 ) $d90h->where('tahap_periode',$tahap_d);
         //dd($d90h->union($d90harea)->get()->toArray());
         $d90h =$d90h->union($d90harea)->get()->toArray();
         //dd($d90h);
