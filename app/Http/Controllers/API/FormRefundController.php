@@ -61,13 +61,37 @@ class FormRefundController extends Controller
         return datatables()->of($data)->toJson();
     }
 
+    public function store(Request $request)
+    {
+
+        $FormRefund = new FormRefund();
+        $FormRefund->shop = $request->shop;
+        $FormRefund->msisdn = $request->MSISDN;
+        $FormRefund->tanggal_permintaan = $request->tanggalPermintaan;
+        $FormRefund->tanggal_eksekusi = $request->tanggalEksekusi;
+        $FormRefund->balance = $request->balance;
+        $FormRefund->new_balance = $request->newbalance;
+        $FormRefund->amount = $request->amount;
+        $FormRefund->reason = $request->reason;
+        $FormRefund->notes_dsc = $request->notes_dsc;
+        $FormRefund->nodin_ba = $request->nodinBa;
+        $FormRefund->import_batch = 0;
+        $FormRefund->author = Auth::user()->id;
+        $saved = $FormRefund->save();
+        if(!$saved){
+            AppHelper::sendErrorAndExit('Error Input ERROR',500);
+        }
+
+        return Response::json(array('message' => 'Upload Success!'),200);
+    }
+
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store2(Request $request)
     {
      // header("Access-Control-Allow-Origin: *");
 
