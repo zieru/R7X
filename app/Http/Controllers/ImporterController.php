@@ -14,7 +14,8 @@ class ImporterController extends Controller
      */
     public function index(Request $request)
     {
-        $x=Importer::where('tipe', $request->get('tipe'));
+        $x= Importer::where('tipe', $request->get('tipe'))
+        ->whereDate('created_at', $request->get('start'));
         return datatables()->of($x)->toJson();
     }
 
