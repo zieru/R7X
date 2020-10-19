@@ -459,7 +459,7 @@ class BilcodataserahCekBayarController extends Controller
 
         $kpis = [30,60,90,120,0];
         if($request->has('end')){
-            $kpis = [$request->periode.'-01',$end];
+            $kpis = ['MoM',$end,$request->periode.'-01'];
         }
         $kpis = array_reverse($kpis);
         //dd($d30h);
@@ -840,13 +840,25 @@ class BilcodataserahCekBayarController extends Controller
             foreach($sum as $s => $v){
                 $finalsum[$s] = $v;
                 if(array_key_exists($s,$sum2)){
+                    unset($finalsum[$s]['period'][$request->end.'-01']);
                     $finalsum[$s]['period'][$request->end.'-01'] = $sum2[$s]['period'][$end];
+                    $finalsum[$s]['period']['MoM'] = array(
+                        'total' => number_format($finalsum[$s]['period'][$start.'-01']['total'] - $finalsum[$s]['period'][$request->end.'-01']['total']),
+                        'totalmsisdn' => number_format($finalsum[$s]['period'][$start.'-01']['totalmsisdn'] - $finalsum[$s]['period'][$request->end.'-01']['totalmsisdn']),
+                        'collection' => number_format($finalsum[$s]['period'][$start.'-01']['collection'] - $finalsum[$s]['period'][$request->end.'-01']['collection']),
+                        'uncollected' => number_format($finalsum[$s]['period'][$start.'-01']['collection'] - $finalsum[$s]['period'][$request->end.'-01']['uncollected']),
+                        'pcollection' => number_format($finalsum[$s]['period'][$start.'-01']['collection'] - $finalsum[$s]['period'][$request->end.'-01']['pcollection'])
+                    );
+                    foreach($finalsum[$s]['children'] as $sc => $vc){
+                        $finalsum[$s]['children'][$sc]['period'][$request->end.'-01'] = $sum2[$s]['children'][$sc]['period'][$end];
+                    }
+                    //$finalsum[$s]['children']['period'][$request->end.'-01'] = $sum2[$s]['children']['period'][$end];
                 }
             }
         }
 
         //dd(DB::getQueryLog());
-        return datatables()->of($finalsum)->with('datecolumn',$kpis)->with('data2',$sum2)->toJson();
+        return datatables()->of($finalsum)->with('datecolumn',$kpis)->toJson();
     }
     public function mom(Request $request){
         $bill_cycle= $selectbillcycle = $end = $date = null;
