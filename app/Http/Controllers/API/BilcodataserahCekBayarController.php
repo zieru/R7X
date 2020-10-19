@@ -844,10 +844,10 @@ class BilcodataserahCekBayarController extends Controller
                     $finalsum[$s]['period'][$request->end.'-01'] = $sum2[$s]['period'][$end];
                     $finalsum[$s]['period']['MoM'] = array(
                         'total' => number_format($finalsum[$s]['period'][$start.'-01']['total'] - $finalsum[$s]['period'][$request->end.'-01']['total']),
-                        'totalmsisdn' => number_format($finalsum[$s]['period'][$start.'-01']['totalmsisdn'] - $finalsum[$s]['period'][$request->end.'-01']['totalmsisdn']),
-                        'collection' => number_format($finalsum[$s]['period'][$start.'-01']['collection'] - $finalsum[$s]['period'][$request->end.'-01']['collection']),
-                        'uncollected' => number_format($finalsum[$s]['period'][$start.'-01']['collection'] - $finalsum[$s]['period'][$request->end.'-01']['uncollected']),
-                        'pcollection' => number_format($finalsum[$s]['period'][$start.'-01']['collection'] - $finalsum[$s]['period'][$request->end.'-01']['pcollection'])
+                        'totalmsisdn' => 0,
+                        'collection' => 0,
+                        'uncollected' => 0,
+                        'pcollection' => 0
                     );
                     foreach($finalsum[$s]['children'] as $sc => $vc){
                         $finalsum[$s]['children'][$sc]['period'][$request->end.'-01'] = $sum2[$s]['children'][$sc]['period'][$end];
