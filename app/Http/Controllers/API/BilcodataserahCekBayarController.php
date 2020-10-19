@@ -307,7 +307,7 @@ class BilcodataserahCekBayarController extends Controller
             if($bill_cycle!=null){
                 $d30harea2->where('bill_cycle',$bill_cycle);
             }
-            $d30harea2->where('tahap_date',$request->get('periode').'-01');
+            $d30harea2->where('tahap_date',$end);
             if($tahap_d > 0) $d30harea2->where('tahap_periode',$tahap_d);
             $d30harea2
                 ->orderBy('hlr_region','DESC')
@@ -346,7 +346,7 @@ class BilcodataserahCekBayarController extends Controller
             if($bill_cycle!=null){
                 $d30h->where('bill_cycle',$bill_cycle);
             }
-            $d30h2->where('tahap_date',$request->get('periode').'-01');
+            $d30h2->where('tahap_date',$end);
             if($tahap_d > 0) $d30h2->where('tahap_periode',$tahap_d);
             $d30h2
                 ->orderBy('hlr_region','ASC')
@@ -386,7 +386,7 @@ class BilcodataserahCekBayarController extends Controller
             if($bill_cycle!=null){
                 $d90harea2->where('bill_cycle',$bill_cycle);
             }
-            $d90harea2->where('tahap_date',$request->get('periode').'-01');
+            $d90harea2->where('tahap_date',$end);
             if($tahap_d > 0) $d90harea2->where('tahap_periode',$tahap_d);
 
             $d90harea2->groupBy('bill_cycle')
@@ -437,7 +437,7 @@ class BilcodataserahCekBayarController extends Controller
                 ->orderBy('hlr_region','DESC')
                 ->orderBy('bill_cycle','ASC')
                 ->orderBy('kpi','ASC');
-            $d90h2->where('tahap_date',$request->get('periode').'-01');
+            $d90h2->where('tahap_date',$end);
             if($tahap_d > 0) $d90h2->where('tahap_periode',$tahap_d);
 
             $d90h2 =$d90h2->union($d90harea2)->get()->toArray();
@@ -834,7 +834,7 @@ class BilcodataserahCekBayarController extends Controller
             }
         }
 
-        $finalsum = [];
+        //$finalsum = [];
         $finalsum = $sum;
         if($request->has('end')){
             foreach($sum as $s => $v){
