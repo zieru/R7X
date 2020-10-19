@@ -851,6 +851,13 @@ class BilcodataserahCekBayarController extends Controller
                     );
                     foreach($finalsum[$s]['children'] as $sc => $vc){
                         $finalsum[$s]['children'][$sc]['period'][$request->end.'-01'] = $sum2[$s]['children'][$sc]['period'][$end];
+                        $finalsum[$s]['children'][$sc]['period']['MoM'] = array(
+                            'total' => number_format($finalsum[$s]['children'][$sc]['period'][$start.'-01']['total'] - $finalsum[$s]['children'][$sc]['period'][$request->end.'-01']['total']),
+                            'totalmsisdn' => number_format((int) filter_var($finalsum[$s]['children'][$sc]['period'][$start.'-01']['totalmsisdn'],FILTER_SANITIZE_NUMBER_INT) - filter_var($finalsum[$s]['children'][$sc]['period'][$request->end.'-01']['totalmsisdn'],FILTER_SANITIZE_NUMBER_INT)) ,
+                            'collection' => number_format((int) filter_var($finalsum[$s]['children'][$sc]['period'][$start.'-01']['collection'],FILTER_SANITIZE_NUMBER_INT) - filter_var($finalsum[$s]['children'][$sc]['period'][$request->end.'-01']['collection'], FILTER_SANITIZE_NUMBER_INT)),
+                            'uncollected' => number_format((int) filter_var($finalsum[$s]['children'][$sc]['period'][$start.'-01']['uncollected'],FILTER_SANITIZE_NUMBER_INT) - (int) filter_var($finalsum[$s]['children'][$sc]['period'][$request->end.'-01']['uncollected'],FILTER_SANITIZE_NUMBER_INT)),
+                            'pcollection' => ((int) filter_var($finalsum[$s]['children'][$sc]['period'][$start.'-01']['pcollection'],FILTER_SANITIZE_NUMBER_INT) - (int) filter_var($finalsum[$s]['children'][$sc]['period'][$request->end.'-01']['pcollection'],FILTER_SANITIZE_NUMBER_INT)) /100 .'%'
+                        );
                     }
                     //$finalsum[$s]['children']['period'][$request->end.'-01'] = $sum2[$s]['children']['period'][$end];
                 }
