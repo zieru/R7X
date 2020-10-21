@@ -84,7 +84,7 @@ class SyncBilcoDataserahCekBayar extends Command
                     ->where('a.tahap_periode',$tahap);
                 $xdata = $x->get()->toArray();
                 echo $basedate->format('Y-m-d');
-                $updatedate = $xdata[0]->tahap_date;
+                $updatedate = $row;
                 echo 'update :' . $updatedate;
                 foreach ($xdata as $y){
                     $y = (array) $y;
