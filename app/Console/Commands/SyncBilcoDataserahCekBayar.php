@@ -208,6 +208,12 @@ class SyncBilcoDataserahCekBayar extends Command
             if($tahap == 1){
                 $date = $date->addDay(-1);
             }
+            if($tahap == 2){
+                $date = $date->addDay(7);
+            }
+            if($tahap == 3){
+                $date = $date->addDay(13);
+            }
             $x = $controller->fetch($date);
             foreach ($x->get()->toArray() as $row){
 
