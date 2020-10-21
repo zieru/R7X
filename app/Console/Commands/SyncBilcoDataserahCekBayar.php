@@ -209,10 +209,10 @@ class SyncBilcoDataserahCekBayar extends Command
                 $date = $date->addDay(-1);
             }
             if($tahap == 2){
-                $date = $date->addDay(7);
+                $date = $date->addDay(7-1);
             }
             if($tahap == 3){
-                $date = $date->addDay(13);
+                $date = $date->addDay(13-1);
             }
             $x = $controller->fetch($date);
             foreach ($x->get()->toArray() as $row){
