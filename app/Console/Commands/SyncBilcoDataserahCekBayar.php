@@ -82,9 +82,11 @@ class SyncBilcoDataserahCekBayar extends Command
                     })
                     ->where('a.tahap_date',$basedate->format('Y-m-d'))
                     ->where('a.tahap_periode',$tahap);
-
+                $xdata = $x->get()->toArray();
                 echo $basedate->format('Y-m-d');
-                foreach ($x->get()->toArray() as $y){
+                $updatedate = $xdata[0]->tahap_date;
+                echo 'update :' . $updatedate;
+                foreach ($xdata as $y){
                     $y = (array) $y;
                     if($y['c30'] != $y['b30']){
                         //BilcodataserahCekBayar::
@@ -109,7 +111,7 @@ class SyncBilcoDataserahCekBayar extends Command
                         BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
                             ->where('tahap_periode', $tahap)
                             ->where('account', $y['account'])
-                            ->update(['b30' => $y['c30'], 'update_date' => $x]);
+                            ->update(['b30' => $y['c30'], 'update_date' => $updatedate]);
                     }
                     if($y['c60'] != $y['b60']){
                         $insert = array(
@@ -133,7 +135,7 @@ class SyncBilcoDataserahCekBayar extends Command
                         BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
                             ->where('tahap_periode', $tahap)
                             ->where('account', $y['account'])
-                            ->update(['b60' => $y['c60'], 'update_date' => $x]);
+                            ->update(['b60' => $y['c60'], 'update_date' => $updatedate]);
                     }
                     if($y['c90'] != $y['b90']){
                         $insert = array(
@@ -157,7 +159,7 @@ class SyncBilcoDataserahCekBayar extends Command
                         BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
                             ->where('tahap_periode', $tahap)
                             ->where('account', $y['account'])
-                            ->update(['b90' => $y['c90'], 'update_date' => $x]);
+                            ->update(['b90' => $y['c90'], 'update_date' => $updatedate]);
                     }
                     if($y['c120'] != $y['b120']){
                         $insert = array(
@@ -181,7 +183,7 @@ class SyncBilcoDataserahCekBayar extends Command
                         BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
                             ->where('tahap_periode', $tahap)
                             ->where('account', $y['account'])
-                            ->update(['b120' => $y['c120'], 'update_date' => $x]);
+                            ->update(['b120' => $y['c120'], 'update_date' => $updatedate]);
                     }
                 }
             }
