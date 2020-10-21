@@ -18,7 +18,6 @@ class BilcodataserahCekBayarController extends Controller
 
         DB::enableQueryLog();
         $date = $date->format('Ymd');
-        dd($date);
         $adate = Carbon::createFromFormat('Ymd', $date);
         $bdate = Carbon::createFromFormat('Ymd', $date)->addDay(1);
         $x= DB::table('sabyan_r7s.bilco_data_serahs AS a')
