@@ -39,6 +39,8 @@ class SyncBilcoDataserahCekBayar extends Command
     public function update($date,$tahap){
         $basedate = Carbon::createFromFormat('Ymd',$date->format('Ymd'));
         $x =  $date->format('Ymd');
+        echo 'update' . $x;
+
         $date = [$date,$date->endOfMonth()];
         $existtable = [];
         while($x <= $date[1]->format('Ymd')){
@@ -107,7 +109,7 @@ class SyncBilcoDataserahCekBayar extends Command
                         BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
                             ->where('tahap_periode', $tahap)
                             ->where('account', $y['account'])
-                            ->update(['b30' => $y['c30']]);
+                            ->update(['b30' => $y['c30'], 'update_date' => $x]);
                     }
                     if($y['c60'] != $y['b60']){
                         $insert = array(
@@ -131,7 +133,7 @@ class SyncBilcoDataserahCekBayar extends Command
                         BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
                             ->where('tahap_periode', $tahap)
                             ->where('account', $y['account'])
-                            ->update(['b60' => $y['c60']]);
+                            ->update(['b60' => $y['c60'], 'update_date' => $x]);
                     }
                     if($y['c90'] != $y['b90']){
                         $insert = array(
@@ -155,7 +157,7 @@ class SyncBilcoDataserahCekBayar extends Command
                         BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
                             ->where('tahap_periode', $tahap)
                             ->where('account', $y['account'])
-                            ->update(['b90' => $y['c90']]);
+                            ->update(['b90' => $y['c90'], 'update_date' => $x]);
                     }
                     if($y['c120'] != $y['b120']){
                         $insert = array(
@@ -179,7 +181,7 @@ class SyncBilcoDataserahCekBayar extends Command
                         BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
                             ->where('tahap_periode', $tahap)
                             ->where('account', $y['account'])
-                            ->update(['b120' => $y['c120']]);
+                            ->update(['b120' => $y['c120'], 'update_date' => $x]);
                     }
                 }
             }
@@ -199,6 +201,7 @@ class SyncBilcoDataserahCekBayar extends Command
         $datex = $this->argument('date');
         $tahap = (int) $this->argument('tahap');
         $date = Carbon::createFromFormat('Y-m-d',$datex.'-01');
+        //dd($date);
         if($update != true){
             if($tahap == 1){
                 $date = $date->addDay(-1);
@@ -240,6 +243,7 @@ class SyncBilcoDataserahCekBayar extends Command
                     $row['kpi'] = '90-120';
                 }
                 $row['total_outstanding'] = $row['a120'] + $row['a90'] + $row['a60'] + $row['a30'];
+                $row['update_date'] = $date;
                 $row['import_batch'] = 0;
                 BilcodataserahCekBayar::insert($row);
             }
