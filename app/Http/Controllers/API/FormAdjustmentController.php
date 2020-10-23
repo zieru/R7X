@@ -118,7 +118,7 @@ class FormAdjustmentController extends Controller
     {
 
         $FormAdjustment = new FormAdjustment();
-        $FormAdjustment->ctptype = $request->ctp_type;
+        $FormAdjustment->ctp_type = $request->ctptype;
         $FormAdjustment->ctp = $request->ctp;
         $FormAdjustment->account = $request->account;
         $FormAdjustment->msisdn = $request->MSISDN;
