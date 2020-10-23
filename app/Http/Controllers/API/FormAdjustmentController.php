@@ -118,7 +118,8 @@ class FormAdjustmentController extends Controller
     {
 
         $FormAdjustment = new FormAdjustment();
-        $FormAdjustment->shop = $request->shop;
+        $FormAdjustment->ctptype = $request->ctp_type;
+        $FormAdjustment->ctp = $request->ctp;
         $FormAdjustment->account = $request->account;
         $FormAdjustment->msisdn = $request->MSISDN;
         $FormAdjustment->bill_cycle = $request->bill_cycle;

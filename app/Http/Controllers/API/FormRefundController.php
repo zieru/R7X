@@ -65,7 +65,8 @@ class FormRefundController extends Controller
     {
 
         $FormRefund = new FormRefund();
-        $FormRefund->shop = $request->shop;
+        $FormRefund->ctp_type = $request->ctptype;
+        $FormRefund->ctp = $request->ctp;
         $FormRefund->msisdn = $request->MSISDN;
         $FormRefund->tanggal_permintaan = $request->tanggalPermintaan;
         $FormRefund->tanggal_eksekusi = $request->tanggalEksekusi;
