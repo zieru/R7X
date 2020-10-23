@@ -12,6 +12,7 @@ use Auth;
 use App\Http\Controllers\Controller;
 use DateTime;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Response;
 
@@ -63,7 +64,7 @@ class FormRefundController extends Controller
 
     public function store(Request $request)
     {
-
+$add = null;
         $FormRefund = new FormRefund();
         $FormRefund->ctp_type = $request->ctptype;
         $FormRefund->ctp = $request->ctp;
@@ -82,8 +83,16 @@ class FormRefundController extends Controller
         if(!$saved){
             AppHelper::sendErrorAndExit('Error Input ERROR',500);
         }
+        if($FormRefund->reason == 'Lain-lain'){
+            if($request->newreason){
+                $add = (array) $request->newreason;
+                DB::table('form_refunds_reason')->insert(
+                    ['reason_name' => $request->newreason, 'date' => Carbon::now()->format('Y-m-d H:i:s'), 'id_refund' => $FormRefund->id]
+                );
+            }
+        }
 
-        return Response::json(array('message' => 'Upload Success!'),200);
+        return Response::json(array('message' => 'Upload Success!','add' => $add),200);
     }
 
     /**
