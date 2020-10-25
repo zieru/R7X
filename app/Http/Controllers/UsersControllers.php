@@ -7,6 +7,8 @@ use GuzzleHttp\Client;
 use App\User;
 use Hash;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Socialite\Facades\Socialite;
 use Redirect;
 use Validator;
@@ -296,6 +298,13 @@ class UsersController extends Controller
         //$user['avatar'] = 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png';
 	    $user['avatar'] = '/avatar2.jpg';
 	    $user['version'] = App::VERSION();
+        $file_size = 0;
+        foreach( File::allFiles(storage_path()) as $file)
+        {
+            $file_size += $file->getSize();
+        }
+        $file_size = number_format($file_size / 1048576,2);
+        $user['disk_size'] = $file_size. ' MB';
         return response()->json($user, $this->successStatus);
     }
 
