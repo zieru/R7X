@@ -56,6 +56,25 @@ class SyncBilcoDataserahCekBayar extends Command
 
         foreach ($existtable as $row){
             //BilcodataserahCekBayar::where('tahap_date',$basedate->format('Ymd'));
+            if($tahap === 1){
+                $sel = 'a.b30,
+                    a.b60,
+                    a.b90,
+                    a.b120,
+                    b.bucket_2 as c30,
+                    b.bucket_3 as c60,
+                    b.bucket_4 as c90,
+                    b.bucket_5 as c120';
+            }else{
+                $sel = "a.b30,
+                    a.b60,
+                    a.b90,
+                    a.b120,
+                    b.bucket_1 as c30,
+                    b.bucket_2 as c60,
+                    b.bucket_3 as c90,
+                    b.bucket_4 as c120";
+            }
             if($row != $basedate->format('Ymd')){
                 $x= DB::table('sabyan_r7s.bilcodataserah_cek_bayars AS a')
                     ->select(DB::raw(
@@ -66,14 +85,7 @@ class SyncBilcoDataserahCekBayar extends Command
                     a.account,
                     a.msisdn,
                     a.customer_id,
-                    a.b30,
-                    a.b60,
-                    a.b90,
-                    a.b120,
-                    b.bucket_2 as c30,
-                    b.bucket_3 as c60,
-                    b.bucket_4 as c90,
-                    b.bucket_5 as c120,
+                    '.$sel.',
                     a.bill_cycle as bill_cycle,
                     a.hlr_region as hlr_region')
                     )
