@@ -85,7 +85,7 @@ class SyncBilcoDataserahCekBayar extends Command
                     ->where('a.tahap_periode',$tahap);
                 $xdata = $x->get()->toArray();
                 $startdate = Carbon::createFromFormat('Y-m-d',$xdata[0]->periode)->format('Ymd') . '_Sumatra';
-                echo 'skip periode :'. $basedate->format('Y-m-d');
+                $this->info('skip periode :'. $basedate->format('Y-m-d') .':' .$row .'');
                 if($row == $startdate){
                     echo ' startfrom :'.$startdate;
                     $updatedate = $row;
