@@ -59,7 +59,8 @@ class SyncBilcoDataserahCekBayar extends Command
             if($row != $basedate->format('Ymd')){
                 $x= DB::table('sabyan_r7s.bilcodataserah_cek_bayars AS a')
                     ->select(DB::raw(
-                        'a.tahap_date,
+                        'a.periode,
+                        a.tahap_date,
                         a.tahap_periode,
                         a.hlr_region,
                     a.account,
@@ -83,109 +84,114 @@ class SyncBilcoDataserahCekBayar extends Command
                     ->where('a.tahap_date',$basedate->format('Y-m-d'))
                     ->where('a.tahap_periode',$tahap);
                 $xdata = $x->get()->toArray();
-                echo $basedate->format('Y-m-d');
-                $updatedate = $row;
-                echo 'update :' . $updatedate;
-                foreach ($xdata as $y){
-                    $y = (array) $y;
-                    if($y['c30'] != $y['b30']){
-                        //BilcodataserahCekBayar::
-                        $insert = array(
-                            'periode' => $y['tahap_date'],
-                            'periode_upd' => $row,
-                            'tahap' => $y['tahap_periode'],
-                            'account' => $y['account'],
-                            'customer_id' => $y['customer_id'],
-                            'msisdn' => $y['msisdn'],
-                            'hlr_region' => $y['hlr_region'],
-                            'nominal_bayar' => $y['b30'] - $y['c30'],
-                            'kpi' => 30,
-                            'import_batch' => 0
-                        );
-                        if($y['c30']==0){
-                            $insert['detil_pembayaran'] = sprintf('Dibayar penuh pada %s total tagihan dibayar = %s', $row, $y['b30']+$y['c30']);
-                        }else{
-                            $insert['detil_pembayaran'] = sprintf('Dibayar partial pada %s total tagihan dibayar = %s', $row, $y['b30']+$y['c30']);
+                $startdate = Carbon::createFromFormat('Y-m-d',$xdata[0]->periode)->format('Ymd') . '_Sumatra';
+                echo 'skip periode :'. $basedate->format('Y-m-d');
+                if($row == $startdate){
+                    echo ' startfrom :'.$startdate;
+                    $updatedate = $row;
+                    echo 'update :' . $updatedate;
+                    foreach ($xdata as $y){
+                        $y = (array) $y;
+                        if($y['c30'] != $y['b30']){
+                            //BilcodataserahCekBayar::
+                            $insert = array(
+                                'periode' => $y['tahap_date'],
+                                'periode_upd' => $row,
+                                'tahap' => $y['tahap_periode'],
+                                'account' => $y['account'],
+                                'customer_id' => $y['customer_id'],
+                                'msisdn' => $y['msisdn'],
+                                'hlr_region' => $y['hlr_region'],
+                                'nominal_bayar' => $y['b30'] - $y['c30'],
+                                'kpi' => 30,
+                                'import_batch' => 0
+                            );
+                            if($y['c30']==0){
+                                $insert['detil_pembayaran'] = sprintf('Dibayar penuh pada %s total tagihan dibayar = %s', $row, $y['b30']+$y['c30']);
+                            }else{
+                                $insert['detil_pembayaran'] = sprintf('Dibayar partial pada %s total tagihan dibayar = %s', $row, $y['b30']+$y['c30']);
+                            }
+                            SyncBilcoDataserahCekBayarLog::insert($insert);
+                            BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
+                                ->where('tahap_periode', $tahap)
+                                ->where('account', $y['account'])
+                                ->update(['b30' => $y['c30'], 'update_date' => $updatedate]);
                         }
-                        SyncBilcoDataserahCekBayarLog::insert($insert);
-                        BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
-                            ->where('tahap_periode', $tahap)
-                            ->where('account', $y['account'])
-                            ->update(['b30' => $y['c30'], 'update_date' => $updatedate]);
-                    }
-                    if($y['c60'] != $y['b60']){
-                        $insert = array(
-                            'periode' => $y['tahap_date'],
-                            'periode_upd' => $row,
-                            'tahap' => $y['tahap_periode'],
-                            'account' => $y['account'],
-                            'customer_id' => $y['customer_id'],
-                            'msisdn' => $y['msisdn'],
-                            'hlr_region' => $y['hlr_region'],
-                            'nominal_bayar' => $y['b60'] - $y['c60'],
-                            'kpi' => 60,
-                            'import_batch' => 0
-                        );
-                        if($y['c60']==0){
-                            $insert['detil_pembayaran'] = sprintf('Dibayar penuh pada %s total tagihan dibayar = %s', $row, $y['b60']+$y['c60']);
-                        }else{
-                            $insert['detil_pembayaran'] = sprintf('Dibayar partial pada %s total tagihan dibayar = %s', $row, $y['b60']+$y['c60']);
+                        if($y['c60'] != $y['b60']){
+                            $insert = array(
+                                'periode' => $y['tahap_date'],
+                                'periode_upd' => $row,
+                                'tahap' => $y['tahap_periode'],
+                                'account' => $y['account'],
+                                'customer_id' => $y['customer_id'],
+                                'msisdn' => $y['msisdn'],
+                                'hlr_region' => $y['hlr_region'],
+                                'nominal_bayar' => $y['b60'] - $y['c60'],
+                                'kpi' => 60,
+                                'import_batch' => 0
+                            );
+                            if($y['c60']==0){
+                                $insert['detil_pembayaran'] = sprintf('Dibayar penuh pada %s total tagihan dibayar = %s', $row, $y['b60']+$y['c60']);
+                            }else{
+                                $insert['detil_pembayaran'] = sprintf('Dibayar partial pada %s total tagihan dibayar = %s', $row, $y['b60']+$y['c60']);
+                            }
+                            SyncBilcoDataserahCekBayarLog::insert($insert);
+                            BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
+                                ->where('tahap_periode', $tahap)
+                                ->where('account', $y['account'])
+                                ->update(['b60' => $y['c60'], 'update_date' => $updatedate]);
                         }
-                        SyncBilcoDataserahCekBayarLog::insert($insert);
-                        BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
-                            ->where('tahap_periode', $tahap)
-                            ->where('account', $y['account'])
-                            ->update(['b60' => $y['c60'], 'update_date' => $updatedate]);
-                    }
-                    if($y['c90'] != $y['b90']){
-                        $insert = array(
-                            'periode' => $y['tahap_date'],
-                            'periode_upd' => $row,
-                            'tahap' => $y['tahap_periode'],
-                            'account' => $y['account'],
-                            'customer_id' => $y['customer_id'],
-                            'msisdn' => $y['msisdn'],
-                            'hlr_region' => $y['hlr_region'],
-                            'nominal_bayar' => $y['b90'] - $y['c90'],
-                            'kpi' => 90,
-                            'import_batch' => 0
-                        );
-                        if($y['c90']==0){
-                            $insert['detil_pembayaran'] = sprintf('Dibayar penuh pada %s total tagihan dibayar = %s', $row, $y['b90']+$y['c90']);
-                        }else{
-                            $insert['detil_pembayaran'] = sprintf('Dibayar partial pada %s total tagihan dibayar = %s', $row, $y['b90']+$y['c90']);
+                        if($y['c90'] != $y['b90']){
+                            $insert = array(
+                                'periode' => $y['tahap_date'],
+                                'periode_upd' => $row,
+                                'tahap' => $y['tahap_periode'],
+                                'account' => $y['account'],
+                                'customer_id' => $y['customer_id'],
+                                'msisdn' => $y['msisdn'],
+                                'hlr_region' => $y['hlr_region'],
+                                'nominal_bayar' => $y['b90'] - $y['c90'],
+                                'kpi' => 90,
+                                'import_batch' => 0
+                            );
+                            if($y['c90']==0){
+                                $insert['detil_pembayaran'] = sprintf('Dibayar penuh pada %s total tagihan dibayar = %s', $row, $y['b90']+$y['c90']);
+                            }else{
+                                $insert['detil_pembayaran'] = sprintf('Dibayar partial pada %s total tagihan dibayar = %s', $row, $y['b90']+$y['c90']);
+                            }
+                            SyncBilcoDataserahCekBayarLog::insert($insert);
+                            BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
+                                ->where('tahap_periode', $tahap)
+                                ->where('account', $y['account'])
+                                ->update(['b90' => $y['c90'], 'update_date' => $updatedate]);
                         }
-                        SyncBilcoDataserahCekBayarLog::insert($insert);
-                        BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
-                            ->where('tahap_periode', $tahap)
-                            ->where('account', $y['account'])
-                            ->update(['b90' => $y['c90'], 'update_date' => $updatedate]);
-                    }
-                    if($y['c120'] != $y['b120']){
-                        $insert = array(
-                            'periode' => $y['tahap_date'],
-                            'periode_upd' => $row,
-                            'tahap' => $y['tahap_periode'],
-                            'account' => $y['account'],
-                            'customer_id' => $y['customer_id'],
-                            'msisdn' => $y['msisdn'],
-                            'hlr_region' => $y['hlr_region'],
-                            'nominal_bayar' => $y['b120'] - $y['c120'],
-                            'kpi' => 120,
-                            'import_batch' => 0
-                        );
-                        if($y['c120']==0){
-                            $insert['detil_pembayaran'] = sprintf('Dibayar penuh pada %s total tagihan dibayar = %s', $row, $y['b120']+$y['c120']);
-                        }else{
-                            $insert['detil_pembayaran'] = sprintf('Dibayar partial pada %s total tagihan dibayar = %s', $row, $y['b120']+$y['c120']);
+                        if($y['c120'] != $y['b120']){
+                            $insert = array(
+                                'periode' => $y['tahap_date'],
+                                'periode_upd' => $row,
+                                'tahap' => $y['tahap_periode'],
+                                'account' => $y['account'],
+                                'customer_id' => $y['customer_id'],
+                                'msisdn' => $y['msisdn'],
+                                'hlr_region' => $y['hlr_region'],
+                                'nominal_bayar' => $y['b120'] - $y['c120'],
+                                'kpi' => 120,
+                                'import_batch' => 0
+                            );
+                            if($y['c120']==0){
+                                $insert['detil_pembayaran'] = sprintf('Dibayar penuh pada %s total tagihan dibayar = %s', $row, $y['b120']+$y['c120']);
+                            }else{
+                                $insert['detil_pembayaran'] = sprintf('Dibayar partial pada %s total tagihan dibayar = %s', $row, $y['b120']+$y['c120']);
+                            }
+                            SyncBilcoDataserahCekBayarLog::insert($insert);
+                            BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
+                                ->where('tahap_periode', $tahap)
+                                ->where('account', $y['account'])
+                                ->update(['b120' => $y['c120'], 'update_date' => $updatedate]);
                         }
-                        SyncBilcoDataserahCekBayarLog::insert($insert);
-                        BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
-                            ->where('tahap_periode', $tahap)
-                            ->where('account', $y['account'])
-                            ->update(['b120' => $y['c120'], 'update_date' => $updatedate]);
                     }
                 }
+
             }
 
         }
