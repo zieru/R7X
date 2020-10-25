@@ -214,7 +214,7 @@ class SyncBilcoDataserahCekBayar extends Command
             if($tahap == 3){
                 $date = $date->addDay(13-1);
             }
-            $x = $controller->fetch($date);
+            $x = $controller->fetch($date,$tahap);
             foreach ($x->get()->toArray() as $row){
 
                 $row = (array) $row;
