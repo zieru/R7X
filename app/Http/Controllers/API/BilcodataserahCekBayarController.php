@@ -20,46 +20,62 @@ class BilcodataserahCekBayarController extends Controller
         $date = $date->format('Ymd');
         $adate = Carbon::createFromFormat('Ymd', $date);
         $bdate = Carbon::createFromFormat('Ymd', $date)->addDay(1);
-        if($tahap === 1){
-            $select = "'b.bill_amount_5 as bb120',
-                    'b.bill_amount_4 as bb90',
-                    'b.bill_amount_3 as bb60',
-                    'b.bill_amount_2 as bb30',
-                    'b.bucket_1 as b0',
-                    'b.bucket_2 as b30',
-                    'b.bucket_3 as b60',
-                    'b.bucket_4 as b90',
-                    'b.bucket_5 as b120'";
-        }else{
-            $select = "'b.bill_amount_4 as bb120',
-                    'b.bill_amount_3 as bb90',
-                    'b.bill_amount_2 as bb60',
-                    'b.bill_amount_1 as bb30',
-                    '0 as b0',
-                    'b.bucket_1 as b30',
-                    'b.bucket_2 as b60',
-                    'b.bucket_3 as b90',
-                    'b.bucket_4 as b120'";
-        }
 
-        $x= DB::table('sabyan_r7s.bilco_data_serahs AS a')
-            ->select('a.periode',
-                    'a.account',
-                    'a.msisdn',
-                    'a.customer_id',
-                    'a.bill_amount_04 as ab120',
-                    'a.bill_amount_03 as ab90',
-                    'a.bill_amount_02 as ab60',
-                    'a.bill_amount_01 as ab30',
-                    'a.bucket_1 as a30',
-                    'a.bucket_2 as a60',
-                    'a.bucket_3 as a90',
-                    'a.bucket_4 as a120',
-                    ".$select.",
-                    'a.bill_cycle as bill_cycle',
-                    'a.hlr_region as hlr_region'
-            )
-            ->Join('sabyan_r7s_data.'.$bdate->format('Ymd').'_Sumatra as b', function($join)
+        $x= DB::table('sabyan_r7s.bilco_data_serahs AS a');
+
+
+        if($tahap === 1){
+            $x->select('a.periode',
+                'a.account',
+                'a.msisdn',
+                'a.customer_id',
+                'a.bill_amount_04 as ab120',
+                'a.bill_amount_03 as ab90',
+                'a.bill_amount_02 as ab60',
+                'a.bill_amount_01 as ab30',
+                'a.bucket_1 as a30',
+                'a.bucket_2 as a60',
+                'a.bucket_3 as a90',
+                'a.bucket_4 as a120',
+                'b.bill_amount_5 as bb120',
+                'b.bill_amount_4 as bb90',
+                'b.bill_amount_3 as bb60',
+                'b.bill_amount_2 as bb30',
+                'b.bucket_1 as b0',
+                'b.bucket_2 as b30',
+                'b.bucket_3 as b60',
+                'b.bucket_4 as b90',
+                'b.bucket_5 as b120',
+                'a.bill_cycle as bill_cycle',
+                'a.hlr_region as hlr_region'
+            );
+        }else{
+            $x->select('a.periode',
+                'a.account',
+                'a.msisdn',
+                'a.customer_id',
+                'a.bill_amount_04 as ab120',
+                'a.bill_amount_03 as ab90',
+                'a.bill_amount_02 as ab60',
+                'a.bill_amount_01 as ab30',
+                'a.bucket_1 as a30',
+                'a.bucket_2 as a60',
+                'a.bucket_3 as a90',
+                'a.bucket_4 as a120',
+                'b.bill_amount_4 as bb120',
+                'b.bill_amount_3 as bb90',
+                'b.bill_amount_2 as bb60',
+                'b.bill_amount_1 as bb30',
+                '0 as b0',
+                'b.bucket_1 as b30',
+                'b.bucket_2 as b60',
+                'b.bucket_3 as b90',
+                'b.bucket_4 as b120',
+                'a.bill_cycle as bill_cycle',
+                'a.hlr_region as hlr_region'
+            );
+        }
+            $x->Join('sabyan_r7s_data.'.$bdate->format('Ymd').'_Sumatra as b', function($join)
             {
                 $join->on('a.account','=','b.account_number');
             })
