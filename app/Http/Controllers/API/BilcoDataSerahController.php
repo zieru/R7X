@@ -103,7 +103,8 @@ class BilcoDataSerahController extends Controller
             ->select('aging.account','aging.customer_id','bilco.periode','aging.msisdn','aging.bill_cycle','aging.regional','aging.grapari','bilco.regional AS hlr_region','aging.hlr_city','aging.bbs','aging.bbs_name','aging.bbs_company_name','aging.bbs_first_address','aging.bbs_second_address',
                 'cmactive.customer_address as cb_address','cmactive.name as cb_name','bbs_city','cmactive.customer_city AS cb_city','aging.bbs_zip_code','aging.bbs_pay_type',
                 'aging.bbs_RT','aging.bill_amount_04','aging.bill_amount_03','aging.bill_amount_02','aging.bill_amount_01',
-                'aging.bucket_4','aging.bucket_3','aging.bucket_2','aging.bucket_1','aging.blocking_status','aging.note','cmactive.customer_phone');
+                'aging.bucket_4','aging.bucket_3','aging.bucket_2','aging.bucket_1','aging.blocking_status','aging.note','cmactive.customer_phone',
+                'cmactive.customer_activedate');
         if($tahap == 1){
             $x->where(function($query) {
                 $query->where(function ($query)     {

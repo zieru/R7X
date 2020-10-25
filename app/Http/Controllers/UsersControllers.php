@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App;
 use Auth;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use App\User;
 use Hash;
@@ -303,8 +304,11 @@ class UsersController extends Controller
         {
             $file_size += $file->getSize();
         }
-        $file_size = number_format($file_size / 1048576,2);
-        $user['disk_size'] = $file_size. ' MB';
+        $file_size = $file_size;
+        $user['disk_capacity_mb']= 1000000;
+        $user['disk_size_mb'] = $file_size;
+        $user['disk_capacity_percent'] = ($user['disk_capacity_mb'] - $file_size)/$user['disk_capacity_mb'] ;
+        $user['datetime'] =  Carbon::now()->toDateTimeString();
         return response()->json($user, $this->successStatus);
     }
 
