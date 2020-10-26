@@ -533,26 +533,26 @@ class BilcodataserahCekBayarController extends Controller
                             break;
                         case 30:
                             $dataserah = $row['total'];
-                            $collection = $row['a30'] - $row['b30'];
+                            $collection = $row['h30'];
                             $total  = $row['a30'];
                             $nmsisdn = $row['d30'];
 
                             break;
                         case 60:
                             $dataserah = $row['total'];
-                            $collection = $row['a60'] - $row['b60'];
+                            $collection = $row['h60'];
                             $nmsisdn = $row['d60'];
                             $total  = $row['a60'];
                             break;
                         case 90:
                             $dataserah = $row['ab90'];
-                            $collection = $row['a90'] - $row['b90'];
+                            $collection = $row['h90'];
                             $total  = $row['a90'];
                             $nmsisdn = $row['d90'];
                             break;
                         case 120:
                             $dataserah = $row['total'];
-                            $collection = $row['a120'] - $row['b120'];
+                            $collection = $row['h120'];
                             $total  = $row['a120'];
                             $nmsisdn = $row['d120'];
                             break;
@@ -572,7 +572,7 @@ class BilcodataserahCekBayarController extends Controller
 
                     $sum[$row['regional']]['period'][$p]['uncollected'] = number_format($uncollected);
                     $sum[$row['regional']]['period'][$p]['pcollection'] = number_format(($pcollection)*100,2).'%';
-                    $sum[$row['regional']]['period'][$p]['collection'] = number_format($row['total_new']);
+                    $sum[$row['regional']]['period'][$p]['collection'] = number_format($collection);
                     $sum[$row['regional']]['period'][$p]['totalmsisdn'] = number_format($dataserah);
                     if($msisdn === true){
                         $sum[$row['regional']]['period'][$p]['totalmsisdn'] = number_format($nmsisdn);

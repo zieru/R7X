@@ -105,7 +105,7 @@ class SyncBilcoDataserahCekBayar extends Command
                     'storedRow'=>0,
                     'status' => 'QUEUE',
                     'tipe' => 'dataserah:cekbayar update',
-                    'filename' => 'dataserah:cekbayar update'.$date->format('Ymd')
+                    'filename' => 'dataserah:cekbayar update'
                 ));
                 if($currdate > $startdate){
                     echo ' startfrom :'.$startdate;
