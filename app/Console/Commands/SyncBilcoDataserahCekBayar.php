@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Http\Controllers\API\BilcodataserahCekBayarController;
+use App\Importer;
 use App\Models\BilcodataserahCekBayar;
 use App\Models\SyncBilcoDataserahCekBayarLog;
 use Carbon\Carbon;
@@ -99,6 +100,13 @@ class SyncBilcoDataserahCekBayar extends Command
                 $startdate = Carbon::createFromFormat('Y-m-d',$xdata[0]->periode)->format('Ymd');
                 $currdate = Carbon::createFromFormat('Ymd',explode('_',$row)[0])->format('Ymd');
                 $this->info('skip periode :'. $basedate->format('Y-m-d') .':' .$row .'');
+                $importer  = Importer::create(array(
+                    'importedRow'=>0,
+                    'storedRow'=>0,
+                    'status' => 'QUEUE',
+                    'tipe' => 'dataserah:cekbayar update',
+                    'filename' => 'dataserah:cekbayar update'.$date->format('Ymd')
+                ));
                 if($currdate > $startdate){
                     echo ' startfrom :'.$startdate;
                     $updatedate = $row;
@@ -117,7 +125,7 @@ class SyncBilcoDataserahCekBayar extends Command
                                 'hlr_region' => $y['hlr_region'],
                                 'nominal_bayar' => $y['b30'] - $y['c30'],
                                 'kpi' => 30,
-                                'import_batch' => 0
+                                'import_batch' => $importer->id
                             );
                             if($y['c30']==0){
                                 $insert['detil_pembayaran'] = sprintf('Dibayar penuh pada %s total tagihan dibayar = %s', $row, $y['b30']+$y['c30']);
@@ -141,7 +149,7 @@ class SyncBilcoDataserahCekBayar extends Command
                                 'hlr_region' => $y['hlr_region'],
                                 'nominal_bayar' => $y['b60'] - $y['c60'],
                                 'kpi' => 60,
-                                'import_batch' => 0
+                                'import_batch' => $importer->id
                             );
                             if($y['c60']==0){
                                 $insert['detil_pembayaran'] = sprintf('Dibayar penuh pada %s total tagihan dibayar = %s', $row, $y['b60']+$y['c60']);
@@ -165,7 +173,7 @@ class SyncBilcoDataserahCekBayar extends Command
                                 'hlr_region' => $y['hlr_region'],
                                 'nominal_bayar' => $y['b90'] - $y['c90'],
                                 'kpi' => 90,
-                                'import_batch' => 0
+                                'import_batch' => $importer->id
                             );
                             if($y['c90']==0){
                                 $insert['detil_pembayaran'] = sprintf('Dibayar penuh pada %s total tagihan dibayar = %s', $row, $y['b90']+$y['c90']);
@@ -189,7 +197,7 @@ class SyncBilcoDataserahCekBayar extends Command
                                 'hlr_region' => $y['hlr_region'],
                                 'nominal_bayar' => $y['b120'] - $y['c120'],
                                 'kpi' => 120,
-                                'import_batch' => 0
+                                'import_batch' => $importer->id
                             );
                             if($y['c120']==0){
                                 $insert['detil_pembayaran'] = sprintf('Dibayar penuh pada %s total tagihan dibayar = %s', $row, $y['b120']+$y['c120']);
@@ -204,6 +212,8 @@ class SyncBilcoDataserahCekBayar extends Command
                         }
                     }
                 }
+                $importer->status = 'finish';
+                $importer->save();
 
             }
 
@@ -234,8 +244,14 @@ class SyncBilcoDataserahCekBayar extends Command
                 $date = $date->addDay(13-1);
             }
             $x = $controller->fetch($date,$tahap);
+            $importer  = Importer::create(array(
+                'importedRow'=>0,
+                'storedRow'=>0,
+                'status' => 'QUEUE',
+                'tipe' => 'dataserah:cekbayar',
+                'filename' => 'dataserah:cekbayar '.$date->format('Ymd')
+            ));
             foreach ($x->get()->toArray() as $row){
-
                 $row = (array) $row;
                 $date = Carbon::createFromFormat('Y-m-d', $row['periode']);
                 $bilcoenddate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2)->endOfMonth();
@@ -271,8 +287,11 @@ class SyncBilcoDataserahCekBayar extends Command
                 }
                 $row['total_outstanding'] = $row['a120'] + $row['a90'] + $row['a60'] + $row['a30'];
                 $row['update_date'] = $date;
-                $row['import_batch'] = 0;
+                $row['import_batch'] = $importer->id;
                 BilcodataserahCekBayar::insert($row);
+                $importer->importedRow =sizeof($row);
+                $importer->status = 'finish';
+                $importer->save();
             }
         }else{
             $this->update($date,$tahap);
