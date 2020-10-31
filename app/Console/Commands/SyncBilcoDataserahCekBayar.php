@@ -39,16 +39,19 @@ class SyncBilcoDataserahCekBayar extends Command
 
     public function update($date,$tahap){
         $basedate = Carbon::createFromFormat('Ymd',$date->format('Ymd'));
-        $x =  $date->format('Ymd');
+        $x_endofmonth = $date->endOfMonth();
+        $x =  $date->format('Ymd')->addDay(-1);
         echo 'update' . $x;
 
-        $date = [$date,$date->endOfMonth()];
+        $date = [$date,$x_endofmonth];
         $existtable = [];
+
         while($x <= $date[1]->format('Ymd')){
             $table = sprintf('%s_Sumatra',$x);
             $exist = Schema::connection('mysql2')->hasTable($table);
-            echo 'cek :'.$table;
-            echo $exist . PHP_EOL;
+            echo 'cek : '.$table;
+            echo ($exist ? ' exist' : 'not');
+            echo PHP_EOL;
             if($exist == 1){
                 $existtable[] = $x;
             }
@@ -107,7 +110,7 @@ class SyncBilcoDataserahCekBayar extends Command
                     'tipe' => 'dataserah:cekbayar update',
                     'filename' => 'dataserah:cekbayar update'
                 ));
-                if($currdate > $startdate){
+                if($currdate >= $startdate){
                     echo ' startfrom :'.$startdate;
                     $updatedate = $row;
                     echo 'update :' . $updatedate;
