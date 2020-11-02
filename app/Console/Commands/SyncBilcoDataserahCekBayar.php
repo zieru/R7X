@@ -39,8 +39,8 @@ class SyncBilcoDataserahCekBayar extends Command
 
     public function update($date,$tahap){
         $basedate = Carbon::createFromFormat('Ymd',$date->format('Ymd'));
-        $x_endofmonth = $date->endOfMonth();
-        $x =  $date->format('Ymd')->addDay(-1);
+        $x =  Carbon::createFromFormat('Ymd',$date->format('Ymd'))->addDay(-1);
+        $x_endofmonth = Carbon::createFromFormat('Ymd',$date->format('Ymd'))->endOfMonth();
         echo 'update' . $x;
 
         $date = [$date,$x_endofmonth];
@@ -52,6 +52,7 @@ class SyncBilcoDataserahCekBayar extends Command
             echo 'cek : '.$table;
             echo ($exist ? ' exist' : 'not');
             echo PHP_EOL;
+
             if($exist == 1){
                 $existtable[] = $x;
             }
