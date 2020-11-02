@@ -18,7 +18,7 @@ class SyncBilcoDataserahCekBayar extends Command
      *
      * @var string
      */
-    protected $signature = 'SyncBilcoDataserah:CekBayar {date} {tahap} {--update}';
+    protected $signature = 'syncbilcodataserah:cekbayar {date} {tahap} {--update}';
 
     /**
      * The console command description.

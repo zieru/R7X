@@ -17,7 +17,7 @@ class SyncBilcoDataSerah extends Command
      *
      * @var string
      */
-    protected $signature = 'SyncBilcoDataSerah {date}';
+    protected $signature = 'syncbilcodataserah {date}';
     /**
      * The console command description.
      *

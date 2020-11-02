@@ -104,7 +104,7 @@ class BilcoDataSerahController extends Controller
                 'cmactive.customer_address as cb_address','cmactive.name as cb_name','bbs_city','cmactive.customer_city AS cb_city','aging.bbs_zip_code','aging.bbs_pay_type',
                 'aging.bbs_RT','aging.bill_amount_04','aging.bill_amount_03','aging.bill_amount_02','aging.bill_amount_01',
                 'aging.bucket_4','aging.bucket_3','aging.bucket_2','aging.bucket_1','aging.blocking_status','aging.note','cmactive.customer_phone',
-                'cmactive.activation_date',DB::raw("str_to_date(activation_date,'%Y%m%d') as activation_date_2"), DB::raw("timestampdiff(month, activation_date,now()) as los"));
+                'cmactive.activation_date',DB::raw("str_to_date(activation_date,'%Y%m%d') as activation_date_2"));
         if($tahap == 1){
             $x->where(function($query) {
                 $query->where(function ($query)     {
@@ -141,8 +141,9 @@ class BilcoDataSerahController extends Controller
 
             ->groupBy('aging.account')
             ->orderBy('aging.account');
-        //DB::getQueryLog();
-        //dd($x);
+        //dd(DB::getQueryLog());
+
+        //dd($x->get()->toArray()[0]);
         return $x;
     }
 
