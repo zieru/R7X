@@ -190,6 +190,8 @@ class BilcoDataSerahController extends Controller
                 'account' => $row->account,
                 'customer_id' => $row->customer_id,
                 'msisdn' => $row->msisdn,
+                'activation_date' => $row->activation_date,
+                'los' => $row->los,
                 'bill_cycle' => $row->bill_cycle,
                 'regional' => $row->regional,
                 'grapari' => $row->grapari,
