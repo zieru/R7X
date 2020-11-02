@@ -39,7 +39,7 @@ class SyncBilcoDataserahCekBayar extends Command
 
     public function update($date,$tahap){
         $basedate = Carbon::createFromFormat('Ymd',$date->format('Ymd'));
-        $x =  Carbon::createFromFormat('Ymd',$date->format('Ymd'))->addDay(-1);
+        $x =  Carbon::createFromFormat('Ymd',$date->format('Ymd'))->format("Ymd");
         $x_endofmonth = Carbon::createFromFormat('Ymd',$date->format('Ymd'))->endOfMonth();
         echo 'update' . $x;
 
