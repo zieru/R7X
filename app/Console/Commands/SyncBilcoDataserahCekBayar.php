@@ -247,7 +247,6 @@ class SyncBilcoDataserahCekBayar extends Command
                 $date = $date->addDay(13-1);
             }
 
-            dd($date);
             $x = $controller->fetch($date,$tahap);
             $importer  = Importer::create(array(
                 'importedRow'=>0,
