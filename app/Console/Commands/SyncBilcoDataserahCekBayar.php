@@ -38,12 +38,6 @@ class SyncBilcoDataserahCekBayar extends Command
     }
 
     public function update($date,$tahap){
-        $klo = array(
-            'kpi' => 30,
-            'import_batch' => 0
-        );
-        SyncBilcoDataserahCekBayarLog::insert($klo);
-        die();
         $basedate = Carbon::createFromFormat('Ymd',$date->format('Ymd'));
         $x =  Carbon::createFromFormat('Ymd',$date->format('Ymd'))->format("Ymd");
         $x_endofmonth = Carbon::createFromFormat('Ymd',$date->format('Ymd'))->endOfMonth();
