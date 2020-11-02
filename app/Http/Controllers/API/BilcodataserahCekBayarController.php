@@ -74,7 +74,7 @@ class BilcodataserahCekBayarController extends Controller
                 'a.hlr_region as hlr_region'
             );
         }
-            $x->Join('sabyan_r7s_data.'.$bdate->format('Ymd').'_Sumatra as b', function($join)
+            $x->Join('sabyan_r7s_data.'.$adate->format('Ymd').'_Sumatra as b', function($join)
             {
                 $join->on('a.account','=','b.account_number');
             })

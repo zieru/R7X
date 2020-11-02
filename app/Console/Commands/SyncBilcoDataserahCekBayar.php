@@ -236,7 +236,6 @@ class SyncBilcoDataserahCekBayar extends Command
         $datex = $this->argument('date');
         $tahap = (int) $this->argument('tahap');
         $date = Carbon::createFromFormat('Y-m-d',$datex.'-01');
-        //dd($date);
         if($update != true){
             if($tahap == 1){
                 $date = $date->addDay(-1);
@@ -247,6 +246,8 @@ class SyncBilcoDataserahCekBayar extends Command
             if($tahap == 3){
                 $date = $date->addDay(13-1);
             }
+
+            dd($date);
             $x = $controller->fetch($date,$tahap);
             $importer  = Importer::create(array(
                 'importedRow'=>0,

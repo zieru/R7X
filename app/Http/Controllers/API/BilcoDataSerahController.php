@@ -141,7 +141,8 @@ class BilcoDataSerahController extends Controller
 
             ->groupBy('aging.account')
             ->orderBy('aging.account');
-        //dd(DB::getQueryLog());
+        $x->get();
+        dd(DB::getQueryLog());
 
         //dd($x->get()->toArray()[0]);
         return $x;
