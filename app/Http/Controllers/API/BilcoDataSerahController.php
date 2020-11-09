@@ -142,7 +142,7 @@ class BilcoDataSerahController extends Controller
             ->groupBy('aging.account')
             ->orderBy('aging.account');
         $x->get();
-        dd(DB::getQueryLog());
+       // dd(DB::getQueryLog());
 
         //dd($x->get()->toArray()[0]);
         return $x;
@@ -585,8 +585,8 @@ class BilcoDataSerahController extends Controller
             $tahap = $tahap_d;
         }
         $d90harea = BilcoDataSerah::selectRaw('count( msisdn) as msisdn,
-	sum( bucket_1 ) as bucket_1,
-	sum( bucket_2 ) as bucket_2,
+	SUM(IF(tahap_periode!=1 ,bucket_1,0)) AS bucket_1,
+	SUM(IF(tahap_periode!=1 ,bucket_2,bucket_1)) AS bucket_2,
 	sum( bucket_3 ) as bucket_3,
 	sum( bucket_4 ) as bucket_4,
         "Area Sumatera" as regional,
