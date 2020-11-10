@@ -584,23 +584,18 @@ class BilcoDataSerahController extends Controller
             }
             $tahap = $tahap_d;
         }
-        $d90harea = BilcoDataSerah::selectRaw('count( msisdn) as msisdn,
+        $general_select = 'count( msisdn) as msisdn,
 	SUM(IF(tahap_periode!=1 ,bucket_1,0)) AS bucket_1,
 	SUM(IF(tahap_periode!=1 ,bucket_2,bucket_1)) AS bucket_2,
-	sum( bucket_3 ) as bucket_3,
-	sum( bucket_4 ) as bucket_4,
-        "Area Sumatera" as regional,
-	sum(total_outstanding) as total_outstanding')
+	SUM(IF(tahap_periode!=1 ,bucket_3,bucket_2)) AS bucket_3,
+	SUM(IF(tahap_periode!=1 ,bucket_4,bucket_3)) AS bucket_4,
+	sum(total_outstanding) as total_outstanding,';
+        $d90harea = BilcoDataSerah::selectRaw($general_select.'
+        "Area Sumatera" as regional')
             ->whereIn('hlr_region',array('Sumbagut','Sumbagteng','Sumbagsel'))
             ->whereBetween('periode',$periode);
         if($tahap != null)$d90harea->where('tahap_periode',$tahap);
-        $d90h = BilcoDataSerah::selectRaw('count( msisdn) as msisdn,
-	sum( bucket_1 ) as bucket_1,
-	sum( bucket_2 ) as bucket_2,
-	sum( bucket_3 ) as bucket_3,
-	sum( bucket_4 ) as bucket_4,
-        hlr_region as regional,
-	sum(total_outstanding) as total_outstanding')
+        $d90h = BilcoDataSerah::selectRaw($general_select.'hlr_region as regional')
             ->groupBy('hlr_region')
             ->whereIn('hlr_region',array('Sumbagut','Sumbagteng','Sumbagsel'))
             ->whereBetween('periode',$periode);
