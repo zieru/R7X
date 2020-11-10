@@ -136,19 +136,31 @@ class BilcodataserahCekBayarController extends Controller
             $end = null;
             $end = Carbon::createFromFormat('Y-m-d', $request->end.'-01')->format('Y-m-d');
         }
-        $d30harea = BilcodataserahCekBayar::selectRaw('
-        sum(a30) as a30,
-        sum(a60) as a60,
-        sum(a90) as a90,
-        sum(a120) as a120,
-        sum(b30) as b30,
-        sum(b60) as b60,
-        sum(b90) as b90,
-        sum(b120) as b120,
-        sum(h30) as h30,
-        sum(h60) as h60,
-        sum(h90) as h90,
-        sum(h120) as h120,
+        $generalcolumn = '
+        SUM(IF(tahap_periode != 1, a30, 0)) as a30,
+        SUM(IF(tahap_periode != 1, a60, 0)) as a60,
+        SUM(IF(tahap_periode != 1, a90, 0)) as a90,
+        SUM(IF(tahap_periode != 1, a120, 0)) as a120,
+        0 as a30s,
+        SUM(IF(tahap_periode = 1, a30, 0)) as a60s,
+        SUM(IF(tahap_periode = 1, a60, 0)) as a90s,
+        SUM(IF(tahap_periode = 1, a90, 0)) as a120s,
+        SUM(IF(tahap_periode != 1, b30, 0)) as b30,
+        SUM(IF(tahap_periode != 1, b60, 0)) as b60,
+        SUM(IF(tahap_periode != 1, b90, 0)) as b90,
+        SUM(IF(tahap_periode != 1, b120, 0)) as b120,
+        0 as b30s,
+        SUM(IF(tahap_periode = 1, b30, 0)) as b60s,
+        SUM(IF(tahap_periode = 1, b60, 0)) as b90s,
+        SUM(IF(tahap_periode = 1, b90, 0)) as b120s,
+        SUM(IF(tahap_periode != 1, h30, 0)) as h30,
+        SUM(IF(tahap_periode != 1, h60, 0)) as h60,
+        SUM(IF(tahap_periode != 1, h90, 0)) as h90,
+        SUM(IF(tahap_periode != 1, h120, 0)) as h120,
+        0 as h30s,
+        SUM(IF(tahap_periode = 1, h30, 0)) as h60s,
+        SUM(IF(tahap_periode = 1, h60, 0)) as h90s,
+        SUM(IF(tahap_periode = 1, h90, 0)) as h120s,
         count(a30) as c30,
         count(a60) as c60,
         count(a90) as c90,
@@ -169,6 +181,9 @@ class BilcodataserahCekBayarController extends Controller
          kpi_h as periodes,
          kpi as kpis,'.$selectbillcycle.'kpi,
          tahap_periode,
+        ';
+        $d30harea = BilcodataserahCekBayar::selectRaw('
+        '.$generalcolumn.'
         "AREA Sumatra" AS regional');
         if($bill_cycle!=null){
             $d30harea->where('bill_cycle',$bill_cycle);
@@ -181,38 +196,7 @@ class BilcodataserahCekBayarController extends Controller
 
 
         $d30h = BilcodataserahCekBayar::selectRaw('
-       sum(a30) as a30,
-        sum(a60) as a60,
-        sum(a90) as a90,
-        sum(a120) as a120,
-        sum(b30) as b30,
-        sum(b60) as b60,
-        sum(b90) as b90,
-        sum(b120) as b120,
-        sum(h30) as h30,
-        sum(h60) as h60,
-        sum(h90) as h90,
-        sum(h120) as h120,
-        count(a30) as c30,
-        count(a60) as c60,
-        count(a90) as c90,
-        count(a120) as c120,
-        SUM(if(a30 > 0, 1, 0)) AS ma30,
-        SUM(if(a60 > 0, 1, 0)) AS ma60,
-        SUM(if(a90 > 0, 1, 0)) AS ma90,
-        SUM(if(a120 > 0, 1, 0)) AS ma120,
-        SUM(if(b30 > 0, 1, 0)) AS mb30,
-        SUM(if(b60 > 0, 1, 0)) AS mb60,
-        SUM(if(b90 > 0, 1, 0)) AS mb90,
-        SUM(if(b120 > 0, 1, 0)) AS mb120,
-        sum(ab30) as ab30,sum(ab60) as ab60,sum(ab90) as ab90,sum(ab120) as ab120,
-        sum(bb30) as bb30,sum(bb60) as bb60,sum(bb90) as bb90,sum(bb120) as bb120,
-        sum(total_outstanding) as total,
-        sum(total_outstanding_new) as total_new,
-        count(msisdn) as totalmsisdn,
-        kpi_h as periodes,
-        kpi as kpis,'.$selectbillcycle.'kpi,
-        tahap_periode,
+        '.$generalcolumn.'
         hlr_region as regional')
             ->groupBy('hlr_region');
         if($bill_cycle!=null){
@@ -226,40 +210,7 @@ class BilcodataserahCekBayarController extends Controller
         $d30h =$d30h->union($d30harea)->get()->toArray();
 
         $d90harea = BilcodataserahCekBayar::selectRaw('
-        sum(a30) as a30,
-        sum(a60) as a60,
-        sum(a90) as a90,
-        sum(a120) as a120,
-        sum(b30) as b30,
-        sum(b60) as b60,
-        sum(b90) as b90,
-        sum(b120) as b120,
-        sum(h30) as h30,
-        sum(h60) as h60,
-        sum(h90) as h90,
-        sum(h120) as h120,
-        count(a30) as c30,
-        count(a60) as c60,
-        count(a90) as c90,
-        count(a120) as c120,
-        SUM(if(a30 > 0, 1, 0)) AS ma30,
-        SUM(if(a60 > 0, 1, 0)) AS ma60,
-        SUM(if(a90 > 0, 1, 0)) AS ma90,
-        SUM(if(a120 > 0, 1, 0)) AS ma120,
-        SUM(if(b30 > 0, 1, 0)) AS mb30,
-        SUM(if(b60 > 0, 1, 0)) AS mb60,
-        SUM(if(b90 > 0, 1, 0)) AS mb90,
-        SUM(if(b120 > 0, 1, 0)) AS mb120,
-        sum(ab30) as ab30,sum(ab60) as ab60,sum(ab90) as ab90,sum(ab120) as ab120,
-        sum(bb30) as bb30,sum(bb60) as bb60,sum(bb90) as bb90,sum(bb120) as bb120,
-        sum(total_outstanding) as total,
-        sum(total_outstanding_new) as total_new,
-        count(msisdn) as totalmsisdn,
-         kpi_h as periodes,
-         kpi as kpis,'
-            .$selectbillcycle.
-            'kpi_h as kpi,
-            tahap_periode,
+        '.$generalcolumn.'
         "AREA Sumatra" AS regional');
         if($bill_cycle!=null){
             $d90harea->where('bill_cycle',$bill_cycle);
@@ -273,39 +224,7 @@ class BilcodataserahCekBayarController extends Controller
         $d90harea =$d90harea;
 
         $d90h = BilcodataserahCekBayar::selectRaw('
-        sum(a30) as a30,
-        sum(a60) as a60,
-        sum(a90) as a90,
-        sum(a120) as a120,
-        sum(b30) as b30,
-        sum(b60) as b60,
-        sum(b90) as b90,
-        sum(b120) as b120,
-        sum(h30) as h30,
-        sum(h60) as h60,
-        sum(h90) as h90,
-        sum(h120) as h120,
-        count(a30) as c30,
-        count(a60) as c60,
-        count(a90) as c90,
-        count(a120) as c120,
-        SUM(if(a30 > 0, 1, 0)) AS ma30,
-        SUM(if(a60 > 0, 1, 0)) AS ma60,
-        SUM(if(a90 > 0, 1, 0)) AS ma90,
-        SUM(if(a120 > 0, 1, 0)) AS ma120,
-        SUM(if(b30 > 0, 1, 0)) AS mb30,
-        SUM(if(b60 > 0, 1, 0)) AS mb60,
-        SUM(if(b90 > 0, 1, 0)) AS mb90,
-        SUM(if(b120 > 0, 1, 0)) AS mb120,
-        sum(ab30) as ab30,sum(ab60) as ab60,sum(ab90) as ab90,sum(ab120) as ab120,
-        sum(bb30) as bb30,sum(bb60) as bb60,sum(bb90) as bb90,sum(bb120) as bb120,
-        sum(total_outstanding) as total,
-        sum(total_outstanding_new) as total_new,
-        count(msisdn) as totalmsisdn,
-         kpi_h as periodes,
-         kpi as kpis,'.$selectbillcycle.'
-        kpi_h as kpi,
-        tahap_periode,
+        '.$generalcolumn.'
         hlr_region as regional')
             ->groupBy('hlr_region');
         if($bill_cycle!=null){
@@ -556,37 +475,37 @@ class BilcodataserahCekBayarController extends Controller
                             $bmsisdn = $row['mb30'] + $row['mb60'] + $row['mb90'] + $row['mb120'];
                             break;
                         case 30:
-                                $dataserah = $row['a30'];
-                                $collection = $row['h30'];
-                                $total  = $row['a30'];
+                                $dataserah = $row['a30'] + $row['a30s'];
+                                $collection = $row['h30'] + $row['h30s'];
+                                $total  = $dataserah;
                                 $nmsisdn = $row['ma30'];
                                 $bmsisdn = $row['mb30'];
                             break;
                         case 60:
-                                $dataserah = $row['a60'];
-                                $collection = $row['h60'];
+                                $dataserah = $row['a60'] + $row['a60s'];
+                                $collection = $row['h60'] + $row['h60s'];
                                 $nmsisdn = $row['ma60'];
                                 $bmsisdn = $row['mb60'];
-                                $total = $row['a60'];
+                                $total = $dataserah;
                             break;
                         case 90:
-                                $dataserah = $row['a90'];
-                                $collection = $row['h90'];
-                                $total = $row['a90'];
+                                $dataserah = $row['a90'] + $row['a90s'];
+                                $collection = $row['h90'] + $row['h90s'];
+                                $total = $dataserah;
                                 $nmsisdn = $row['ma90'];
                                 $bmsisdn = $row['mb90'];
                             break;
                         case 120:
-                                $dataserah = $row['a120'];
-                                $collection = $row['h120'];
-                                $total = $row['a120'];
+                                $dataserah = $row['a120'] + $row['a120s'];
+                                $collection = $row['h120'] + $row['h120s'];
+                                $total = $dataserah;
                                 $nmsisdn = $row['ma120'];
                                 $bmsisdn = $row['mb120'];
                             break;
                         default:
                             $dataserah = $row['total'];
-                            $collection = $row['a30'] + $row['a60'] + $row['a90'] + $row['a120'] - $row['b30'] - $row['b60'] - $row['b90'] - $row['b120'];
-                            $total  = $row['a30'] + $row['a60'] + $row['a90'] + $row['a120'] ;
+                            $collection = $row['a30'] + $row['a60'] + $row['a90'] + $row['a120'] + $row['a30s'] + $row['a60s'] + $row['a90s'] + $row['a120s'] - $row['b30'] - $row['b60'] - $row['b90'] - $row['b120'];
+                            $total  = $row['a30'] + $row['a60'] + $row['a90'] + $row['a120'] + $row['a30s'] + $row['a60s'] + $row['a90s'] + $row['a120s'];
                             $nmsisdn = $row['ma30'] + $row['ma60'] + $row['ma90'] + $row['ma120'];
                             $bmsisdn = $row['mb30'] + $row['mb60'] + $row['mb90'] + $row['mb120'];
                     }
@@ -602,14 +521,11 @@ class BilcodataserahCekBayarController extends Controller
                         $pcollection = ($collection/$dataserah);
                     }
                     $px = $p;
-                    if((int)$row['tahap_periode'] == 1 AND $p > 0) $px = $px + 30;
-
-                        $sum[$row['regional']]['period'][$px]['uncollected'] = number_format($uncollected);
-                        $sum[$row['regional']]['period'][$px]['pcollection'] = number_format(($pcollection)*100,2).'%';
-                        $sum[$row['regional']]['period'][$px]['collection'] = number_format($collection);
-                        $sum[$row['regional']]['period'][$px]['totalmsisdn'] = number_format($dataserah);
-                        $sum[$row['regional']]['period'][$px]['total'] = $dataserah;
-
+                    $sum[$row['regional']]['period'][$px]['uncollected'] = number_format($uncollected);
+                    $sum[$row['regional']]['period'][$px]['pcollection'] = number_format(($pcollection)*100,2).'%';
+                    $sum[$row['regional']]['period'][$px]['collection'] = number_format($collection);
+                    $sum[$row['regional']]['period'][$px]['totalmsisdn'] = number_format($dataserah);
+                    $sum[$row['regional']]['period'][$px]['total'] = $dataserah;
                 }
                 foreach ($d90h as $child){
 
@@ -640,37 +556,37 @@ class BilcodataserahCekBayarController extends Controller
                                     $bmsisdn = $child['mb30'] + $child['mb60'] + $child['mb90'] + $child['mb120'];
                                     break;
                                 case 30:
-                                    $dataserah = $child['a30'];
-                                    $collection = $child['h30'];
+                                    $dataserah = $child['a30'] + $child['a30s'];
+                                    $collection = $child['h30'] + $child['h30s'];
                                     $nmsisdn = $child['ma30'];
                                     $bmsisdn = $child['mb30'];
-                                    $total  = $child['a30'];
+                                    $total  = $dataserah;
                                     break;
                                 case 60:
-                                    $dataserah = $child['a60'];
-                                    $collection = $child['h60'];
+                                    $dataserah = $child['a60'] + $child['a60s'];
+                                    $collection = $child['h60'] + $child['h60s'];
                                     $nmsisdn =$child['ma60'];
                                     $bmsisdn = $child['mb60'];
-                                    $total  = $child['a60'];
+                                    $total  = $dataserah;
                                     break;
                                 case 90:
-                                    $dataserah = $child['a90'];
-                                    $collection = $child['h90'];
+                                    $dataserah = $child['a90'] + $child['a90s'];
+                                    $collection = $child['h90'] + $child['h90s'];
                                     $nmsisdn = $child['ma90'];
                                     $bmsisdn = $child['mb90'];
-                                    $total  = $child['a90'];
+                                    $total  = $dataserah;
                                     break;
                                 case 120:
-                                    $dataserah = $child['a120'];
-                                    $collection = $child['h120'];
+                                    $dataserah = $child['a120'] + $child['a120s'];
+                                    $collection = $child['h120'] + $child['h120s'];
                                     $nmsisdn = $child['ma120'];
                                     $bmsisdn = $child['mb120'];
-                                    $total  = $child['a120'];
+                                    $total  = $dataserah;
                                     break;
                                 default:
                                     $dataserah = $child['total'];
                                     $collection = $child['a30'] + $child['a60'] + $child['a90'] + $child['a120'] - $child['b30'] - $child['b60'] - $child['b90'] - $row['b120'];
-                                    $total  = $child['a30'] + $child['a60'] + $child['a90'] + $child['a120'] ;
+                                    $total  = $dataserah;
                                     $nmsisdn = $child['ma30'] + $child['ma60'] + $child['ma90'] + $child['ma120'];
                                     $bmsisdn = $child['mb30'] + $child['mb60'] + $child['mb90'] + $child['mb120'];
                             }
