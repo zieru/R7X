@@ -38,11 +38,10 @@ class SyncBilcoDataserahCekBayar extends Command
     }
 
     public function update($date,$tahap){
-        $basedate = Carbon::createFromFormat('Ymd',$date->format('Ymd'));
-        $x =  Carbon::createFromFormat('Ymd',$date->format('Ymd'))->format("Ymd");
+        $basedate = Carbon::createFromFormat('Ymd',$date->format('Ymd'))->addDays(1);
+        $x =  Carbon::createFromFormat('Ymd',$basedate->format('Ymd'))->format("Ymd");
         $x_endofmonth = Carbon::createFromFormat('Ymd',$date->format('Ymd'))->endOfMonth();
-        echo 'update' . $x;
-
+        $this->info(sprintf('update cekbayar from %s until %s',$x,$x_endofmonth->format('Ymd')));
         $date = [$date,$x_endofmonth];
         $existtable = [];
 
