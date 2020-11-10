@@ -38,10 +38,18 @@ class SyncBilcoDataserahCekBayar extends Command
     }
 
     public function update($date,$tahap){
+        $importer  = Importer::create(array(
+            'importedRow'=>0,
+            'storedRow'=>0,
+            'status' => 'QUEUE',
+            'tipe' => 'dataserah:cekbayar update',
+            'filename' => 'dataserah:cekbayar update'
+        ));
         $basedate = Carbon::createFromFormat('Ymd',$date->format('Ymd'))->addDays(1);
         $x =  Carbon::createFromFormat('Ymd',$basedate->format('Ymd'))->format("Ymd");
         $x_endofmonth = Carbon::createFromFormat('Ymd',$date->format('Ymd'))->endOfMonth();
-        $this->info(sprintf('update cekbayar from %s until %s',$x,$x_endofmonth->format('Ymd')));
+        $this->info(sprintf('Job #%d update cekbayar from %s until %s',$importer->id,$x,$x_endofmonth->format('Ymd')));
+        die();
         $date = [$date,$x_endofmonth];
         $existtable = [];
 
@@ -103,13 +111,7 @@ class SyncBilcoDataserahCekBayar extends Command
                 $startdate = Carbon::createFromFormat('Y-m-d',$xdata[0]->periode)->format('Ymd');
                 $currdate = Carbon::createFromFormat('Ymd',explode('_',$row)[0])->format('Ymd');
                 $this->info('skip periode :'. $basedate->format('Y-m-d') .':' .$row .'');
-                $importer  = Importer::create(array(
-                    'importedRow'=>0,
-                    'storedRow'=>0,
-                    'status' => 'QUEUE',
-                    'tipe' => 'dataserah:cekbayar update',
-                    'filename' => 'dataserah:cekbayar update'
-                ));
+
                 if($currdate >= $startdate){
                     echo ' startfrom :'.$startdate;
                     $updatedate = $row;
