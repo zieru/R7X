@@ -56,7 +56,7 @@ class SyncBilcoDataserahCekBayar extends Command
             $table = sprintf('%s_Sumatra',$x);
             $exist = Schema::connection('mysql2')->hasTable($table);
             echo 'cek : '.$table;
-            echo ($exist ? ' exist' : 'not');
+            echo ($exist ? ' exist' : ' not exist');
             echo PHP_EOL;
 
             if($exist == 1){
@@ -86,7 +86,9 @@ class SyncBilcoDataserahCekBayar extends Command
                     b.bucket_3 as c90,
                     b.bucket_4 as c120";
             }
-            if($row != $basedate->format('Ymd')){
+            if($row){
+                $this->info('trying '.$row.'_Sumatra');
+                echo PHP_EOL;
                 $x= DB::table('sabyan_r7s.bilcodataserah_cek_bayars AS a')
                     ->select(DB::raw(
                         'a.periode,
@@ -104,9 +106,11 @@ class SyncBilcoDataserahCekBayar extends Command
                     {
                         $join->on('a.account','=','b.account_number');
                     })
-                    ->where('a.tahap_date',$basedate->format('Y-m-d'))
+                    ->where('a.tahap_date',Carbon::createFromFormat('Ymd',$basedate->format('Ymd'))->startOfMonth())
                     ->where('a.tahap_periode',$tahap);
                 $xdata = $x->get()->toArray();
+                //echo Carbon::createFromFormat('Ymd',$basedate->format('Ymd'))->startOfMonth();
+                //dd($xdata);
                 $startdate = Carbon::createFromFormat('Y-m-d',$xdata[0]->periode)->format('Ymd');
                 $currdate = Carbon::createFromFormat('Ymd',explode('_',$row)[0])->format('Ymd');
                 $this->info('skip periode :'. $basedate->format('Y-m-d') .':' .$row .'');
