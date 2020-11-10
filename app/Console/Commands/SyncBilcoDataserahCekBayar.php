@@ -268,8 +268,9 @@ class SyncBilcoDataserahCekBayar extends Command
                     default:
                         $tahap = 2;
                 }
-                $row['kpi'] = '';
+                //$row['kpi'] = '';
                 $row['tahap'] = $tahap;
+                /*
                 if($row['a60'] > 0 AND $row['a30'] > 0){
                     $row['kpi'] = '30-60';
                     if($tahap === 1){
@@ -289,6 +290,7 @@ class SyncBilcoDataserahCekBayar extends Command
                 if($row['a120'] > 0 && $row['a90'] > 0){
                     $row['kpi'] = '90-120';
                 }
+                */
                 $row['total_outstanding'] = $row['a120'] + $row['a90'] + $row['a60'] + $row['a30'];
                 $row['update_date'] = $date;
                 $row['import_batch'] = $importer->id;
