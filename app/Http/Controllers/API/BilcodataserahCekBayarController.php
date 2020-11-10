@@ -258,7 +258,7 @@ class BilcodataserahCekBayarController extends Controller
          kpi_h as periodes,
          kpi as kpis,'
             .$selectbillcycle.
-            'kpi as kpi,
+            'kpi_h as kpi,
             tahap_periode,
         "AREA Sumatra" AS regional');
         if($bill_cycle!=null){
@@ -304,7 +304,7 @@ class BilcodataserahCekBayarController extends Controller
         count(msisdn) as totalmsisdn,
          kpi_h as periodes,
          kpi as kpis,'.$selectbillcycle.'
-        bill_cycle as kpi,
+        kpi_h as kpi,
         tahap_periode,
         hlr_region as regional')
             ->groupBy('hlr_region');
@@ -684,13 +684,17 @@ class BilcodataserahCekBayarController extends Controller
                             if($total > 0){
                                 $pcollection = ($collection/$dataserah);
                             }
-                            $child['id'] = sprintf('sub#%s#%s#%s#%s#%s',$l,$lc,$child['regional'],$child['periodes'],$child['kpi']);
-                            $child['period'][$p]['total'] = number_format($total);
-                            $child['period'][$p]['uncollected'] = number_format($uncollected);
-                            $child['period'][$p]['pcollection'] = number_format(($pcollection)*100,2).'%';
-                            $child['period'][$p]['collection'] = number_format($collection);
-                            $child['period'][$p]['totalmsisdn'] = number_format($dataserah);
-                            $child['period'][$p]['total'] = $dataserah;
+                            $px = $p;
+                            if((int)$child['tahap_periode'] == 1 AND $p > 0) $px = $px + 30;
+
+                            $child['period'][$px]['total'] = number_format($total);
+                            $child['id'] = sprintf('sub#%s#%s#%s#%s#%s#%s',$px,$l,$lc,$child['regional'],$child['periodes'],$child['kpi']);
+                            $child['period'][$px]['id'] = sprintf('sub#%s#%s#%s#%s#%s#%s',$px,$l,$lc,$child['regional'],$child['periodes'],$child['kpi']);
+                            $child['period'][$px]['uncollected'] = number_format($uncollected);
+                            $child['period'][$px]['pcollection'] = number_format(($pcollection)*100,2).'%';
+                            $child['period'][$px]['collection'] = number_format($collection);
+                            $child['period'][$px]['totalmsisdn'] = number_format($dataserah);
+                            $child['period'][$px]['total'] = $dataserah;
                             if(strtolower($child['regional']) == 'area sumatra'){
                                 //var_dump($child);
                             }
