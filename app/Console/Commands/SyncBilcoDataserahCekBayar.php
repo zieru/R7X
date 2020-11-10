@@ -49,7 +49,6 @@ class SyncBilcoDataserahCekBayar extends Command
         $x =  Carbon::createFromFormat('Ymd',$basedate->format('Ymd'))->format("Ymd");
         $x_endofmonth = Carbon::createFromFormat('Ymd',$date->format('Ymd'))->endOfMonth();
         $this->info(sprintf('Job #%d update cekbayar from %s until %s',$importer->id,$x,$x_endofmonth->format('Ymd')));
-        die();
         $date = [$date,$x_endofmonth];
         $existtable = [];
 
