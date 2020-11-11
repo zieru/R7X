@@ -477,8 +477,8 @@ class BilcodataserahCekBayarController extends Controller
                     switch($p){
                         case 0:
                             $dataserah = $row['total'];
-                            $collection = $row['a30'] + $row['a60'] + $row['a90'] + $row['a120'] - $row['b30'] - $row['b60'] - $row['b90'] - $row['b120'];
-                            $total  = $row['a30'] + $row['a60'] + $row['a90'] + $row['a120'] ;
+                            $collection = $row['h30'] + $row['h30s'] + $row['h60'] + $row['h60s'] + $row['h90'] + $row['h90s'] + $row['h120'] + $row['h120s'];
+                            $total  = $dataserah;
                             $nmsisdn = $row['ma30'] + $row['ma60'] + $row['ma90'] + $row['ma120'] + $row['ma30s'] + $row['ma60s'] + $row['ma90s'] + $row['ma120s'];
                             $bmsisdn = $row['mb30'] + $row['mb60'] + $row['mb90'] + $row['mb120'] + $row['mb30s'] + $row['mb60s'] + $row['mb90s'] + $row['mb120s'];
                             break;
@@ -512,8 +512,8 @@ class BilcodataserahCekBayarController extends Controller
                             break;
                         default:
                             $dataserah = $row['total'];
-                            $collection = $row['a30'] + $row['a60'] + $row['a90'] + $row['a120'] + $row['a30s'] + $row['a60s'] + $row['a90s'] + $row['a120s'] - $row['b30'] - $row['b60'] - $row['b90'] - $row['b120'];
-                            $total  = $row['a30'] + $row['a60'] + $row['a90'] + $row['a120'] + $row['a30s'] + $row['a60s'] + $row['a90s'] + $row['a120s'];
+                            $collection = $row['h30'] + $row['h30s'] + $row['h60'] + $row['h60s'] + $row['h90'] + $row['h90s'] + $row['h120'] + $row['h120s'];
+                            $total  = $dataserah;
                             $nmsisdn = $row['ma30'] + $row['ma60'] + $row['ma90'] + $row['ma120'] + $row['ma30s'] + $row['ma60s'] + $row['ma90s'] + $row['ma120s'];
                             $bmsisdn = $row['mb30'] + $row['mb60'] + $row['mb90'] + $row['mb120'] + $row['mb30s'] + $row['mb60s'] + $row['mb90s'] + $row['mb120s'];
                     }
@@ -558,8 +558,8 @@ class BilcodataserahCekBayarController extends Controller
                             switch($p){
                                 case 0:
                                     $dataserah = $child['total'];
-                                    $collection = $child['a30'] + $child['a60'] + $child['a90'] + $child['a120'] - $child['b30'] - $child['b60'] - $child['b90'] - $row['b120'];
-                                    $total  = $child['a30'] + $child['a60'] + $child['a90'] + $child['a120'] ;
+                                    $collection = $child['h30'] + $child['h30s'] + $child['h60'] + $child['h60s'] + $child['h90'] + $child['h90s'] + $child['h120'] + $child['h120s'];
+                                    $total  = $dataserah ;
                                     $nmsisdn = $child['ma30'] + $child['ma60'] + $child['ma90'] + $child['ma120'];
                                     $bmsisdn = $child['mb30'] + $child['mb60'] + $child['mb90'] + $child['mb120'];
                                     break;
@@ -593,8 +593,8 @@ class BilcodataserahCekBayarController extends Controller
                                     break;
                                 default:
                                     $dataserah = $child['total'];
-                                    $collection = $child['a30'] + $child['a60'] + $child['a90'] + $child['a120'] - $child['b30'] - $child['b60'] - $child['b90'] - $row['b120'];
-                                    $total  = $dataserah;
+                                    $collection = $child['h30'] + $child['h30s'] + $child['h60'] + $child['h60s'] + $child['h90'] + $child['h90s'] + $child['h120'] + $child['h120s'];
+                                    $total  = $dataserah ;
                                     $nmsisdn = $child['ma30'] + $child['ma60'] + $child['ma90'] + $child['ma120'];
                                     $bmsisdn = $child['mb30'] + $child['mb60'] + $child['mb90'] + $child['mb120'];
                             }
