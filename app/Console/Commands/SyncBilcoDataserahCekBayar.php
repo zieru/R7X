@@ -45,7 +45,8 @@ class SyncBilcoDataserahCekBayar extends Command
             'tipe' => 'dataserah:cekbayar update',
             'filename' => 'dataserah:cekbayar update'
         ));
-        $basedate = Carbon::createFromFormat('Ymd',$date->format('Ymd'))->addDays(1);
+        //$basedate = Carbon::createFromFormat('Ymd',$date->format('Ymd'))->addDays(1);
+        $basedate = Carbon::createFromFormat('Ymd','2020-11-09');
         $x =  Carbon::createFromFormat('Ymd',$basedate->format('Ymd'))->format("Ymd");
         $x_endofmonth = Carbon::createFromFormat('Ymd',$date->format('Ymd'))->endOfMonth();
         $this->info(sprintf('Job #%d update cekbayar from %s until %s',$importer->id,$x,$x_endofmonth->format('Ymd')));
