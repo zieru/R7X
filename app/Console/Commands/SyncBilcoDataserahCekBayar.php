@@ -18,7 +18,7 @@ class SyncBilcoDataserahCekBayar extends Command
      *
      * @var string
      */
-    protected $signature = 'syncbilcodataserah:cekbayar {date} {tahap} {--update}';
+    protected $signature = 'syncbilcodataserah:cekbayar {date} {tahap} {--update} {--from=null}';
 
     /**
      * The console command description.
@@ -37,7 +37,7 @@ class SyncBilcoDataserahCekBayar extends Command
         parent::__construct();
     }
 
-    public function update($date,$tahap){
+    public function update($date,$tahap,$from){
         $importer  = Importer::create(array(
             'importedRow'=>0,
             'storedRow'=>0,
@@ -45,8 +45,9 @@ class SyncBilcoDataserahCekBayar extends Command
             'tipe' => 'dataserah:cekbayar update',
             'filename' => 'dataserah:cekbayar update'
         ));
-        //$basedate = Carbon::createFromFormat('Ymd',$date->format('Ymd'))->addDays(1);
-        $basedate = Carbon::createFromFormat('Ymd','2020-11-09');
+        $basedate = Carbon::createFromFormat('Ymd',$date->format('Ymd'))->addDays(1);
+        if($from != null) $basedate = Carbon::createFromFormat('Ymd',$date->format('Ym').$from);
+        $basedate = Carbon::createFromFormat('Ymd','20201109');
         $x =  Carbon::createFromFormat('Ymd',$basedate->format('Ymd'))->format("Ymd");
         $x_endofmonth = Carbon::createFromFormat('Ymd',$date->format('Ymd'))->endOfMonth();
         $this->info(sprintf('Job #%d update cekbayar from %s until %s',$importer->id,$x,$x_endofmonth->format('Ymd')));
@@ -236,6 +237,10 @@ class SyncBilcoDataserahCekBayar extends Command
      */
     public function handle()
     {
+        $from  = null;
+        if($this->option('from') != 'null'){
+            $from = $this->option('from');
+        }
         $update = $this->option('update');
         $controller = new BilcodataserahCekBayarController();
         $datex = $this->argument('date');
@@ -305,7 +310,7 @@ class SyncBilcoDataserahCekBayar extends Command
                 $importer->save();
             }
         }else{
-            $this->update($date,$tahap);
+            $this->update($date,$tahap,$from);
         }
         return 0;
     }
