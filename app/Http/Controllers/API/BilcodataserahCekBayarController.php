@@ -42,11 +42,11 @@ class BilcodataserahCekBayarController extends Controller
                 'b.bill_amount_4 as bb90',
                 'b.bill_amount_3 as bb60',
                 'b.bill_amount_2 as bb30',
-                'b.bucket_1 as b0',
-                'b.bucket_2 as b30',
-                'b.bucket_3 as b60',
-                'b.bucket_4 as b90',
-                'b.bucket_5 as b120',
+                //'b.bucket_1 as b0',
+                'b.bucket_1 as b30',
+                'b.bucket_2 as b60',
+                'b.bucket_3 as b90',
+                'b.bucket_4 as b120',
                 'a.bill_cycle as bill_cycle',
                 'a.hlr_region as hlr_region'
             );
