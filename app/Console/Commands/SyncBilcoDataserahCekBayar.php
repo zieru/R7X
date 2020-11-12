@@ -45,7 +45,7 @@ class SyncBilcoDataserahCekBayar extends Command
             'tipe' => 'dataserah:cekbayar update',
             'filename' => 'dataserah:cekbayar update'
         ));
-        $basedate = Carbon::createFromFormat('Ymd',$date->format('Ymd'))->addDays(1);
+        $basedate = Carbon::createFromFormat('Ymd',$date->format('Ymd'));
         if($from != null) $basedate = Carbon::createFromFormat('Ymd',$date->format('Ym').$from);
         //$basedate = Carbon::createFromFormat('Ymd',$date->format('Ymd'));
         $x =  Carbon::createFromFormat('Ymd',$basedate->format('Ymd'))->format("Ymd");
