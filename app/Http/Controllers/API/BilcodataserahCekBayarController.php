@@ -609,7 +609,6 @@ class BilcodataserahCekBayarController extends Controller
                                 $pcollection = ($collection/$dataserah);
                             }
                             $px = $p;
-                            if((int)$child['tahap_periode'] == 1 AND $p > 0) $px = $px + 30;
 
                             $child['period'][$px]['total'] = number_format($total);
                             $child['id'] = sprintf('sub#%s#%s#%s#%s#%s#%s',$px,$l,$lc,$child['regional'],$child['periodes'],$child['kpi']);
