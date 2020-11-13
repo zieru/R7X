@@ -255,35 +255,7 @@ class BilcodataserahCekBayarController extends Controller
 
 
         if($request->has('end')){
-            $d30harea2 = BilcodataserahCekBayar::selectRaw('
-        sum(a30) as a30,
-        sum(a60) as a60,
-        sum(a90) as a90,
-        sum(a120) as a120,
-        sum(b30) as b30,
-        sum(b60) as b60,
-        sum(b90) as b90,
-        sum(b120) as b120,
-        sum(h30) as h30,
-        sum(h60) as h60,
-        sum(h90) as h90,
-        sum(h120) as h120,
-        count(a30) as c30,
-        count(a60) as c60,
-        count(a90) as c90,
-        count(a120) as c120,
-        count(b30) as d30,
-        count(b60) as d60,
-        count(b90) as d90,
-        count(b120) as d120,
-        sum(ab30) as ab30,sum(ab60) as ab60,sum(ab90) as ab90,sum(ab120) as ab120,
-        sum(bb30) as bb30,sum(bb60) as bb60,sum(bb90) as bb90,sum(bb120) as bb120,
-        sum(total_outstanding) as total,
-        sum(total_outstanding_new) as total_new,
-        count(msisdn) as totalmsisdn,
-         kpi_h as periodes,
-         kpi as kpis,'.$selectbillcycle.'kpi,
-        "AREA Sumatra" AS regional');
+            $d30harea2 = BilcodataserahCekBayar::selectRaw($generalcolumn.'"AREA Sumatra" AS regional');
             if($bill_cycle!=null){
                 $d30harea2->where('bill_cycle',$bill_cycle);
             }
@@ -293,36 +265,8 @@ class BilcodataserahCekBayarController extends Controller
                 ->orderBy('hlr_region','DESC')
                 ->orderBy('kpi','ASC');
 
-
-            $d30h2 = BilcodataserahCekBayar::selectRaw('
-       sum(a30) as a30,
-        sum(a60) as a60,
-        sum(a90) as a90,
-        sum(a120) as a120,
-        sum(b30) as b30,
-        sum(b60) as b60,
-        sum(b90) as b90,
-        sum(b120) as b120,
-        sum(h30) as h30,
-        sum(h60) as h60,
-        sum(h90) as h90,
-        sum(h120) as h120,
-        count(a30) as c30,
-        count(a60) as c60,
-        count(a90) as c90,
-        count(a120) as c120,
-        SUM(if(b30 > 0, 1, 0)) AS d30,
-        SUM(if(b60 > 0, 1, 0)) AS d60,
-        SUM(if(b90 > 0, 1, 0)) AS d90,
-        SUM(if(b120 > 0, 1, 0)) AS d120,
-        sum(ab30) as ab30,sum(ab60) as ab60,sum(ab90) as ab90,sum(ab120) as ab120,
-        sum(bb30) as bb30,sum(bb60) as bb60,sum(bb90) as bb90,sum(bb120) as bb120,
-        sum(total_outstanding) as total,
-        sum(total_outstanding_new) as total_new,
-        count(msisdn) as totalmsisdn,
-      kpi_h as periodes,
-        kpi as kpis,'.$selectbillcycle.'kpi,
-        hlr_region as regional')
+            $d30h2 = BilcodataserahCekBayar::selectRaw($generalcolumn.'
+            hlr_region as regional')
                 ->groupBy('hlr_region');
             if($bill_cycle!=null){
                 $d30h->where('bill_cycle',$bill_cycle);
@@ -334,37 +278,7 @@ class BilcodataserahCekBayarController extends Controller
                 ->orderBy('kpi','ASC');
             $d30h2 =$d30h2->union($d30harea)->get()->toArray();
 
-            $d90harea2 = BilcodataserahCekBayar::selectRaw('
-        sum(a30) as a30,
-        sum(a60) as a60,
-        sum(a90) as a90,
-        sum(a120) as a120,
-        sum(b30) as b30,
-        sum(b60) as b60,
-        sum(b90) as b90,
-        sum(b120) as b120,
-        sum(h30) as h30,
-        sum(h60) as h60,
-        sum(h90) as h90,
-        sum(h120) as h120,
-        count(a30) as c30,
-        count(a60) as c60,
-        count(a90) as c90,
-        count(a120) as c120,
-        SUM(if(b30 > 0, 1, 0)) AS d30,
-        SUM(if(b60 > 0, 1, 0)) AS d60,
-        SUM(if(b90 > 0, 1, 0)) AS d90,
-        SUM(if(b120 > 0, 1, 0)) AS d120,
-        sum(ab30) as ab30,sum(ab60) as ab60,sum(ab90) as ab90,sum(ab120) as ab120,
-        sum(bb30) as bb30,sum(bb60) as bb60,sum(bb90) as bb90,sum(bb120) as bb120,
-        sum(total_outstanding) as total,
-        sum(total_outstanding_new) as total_new,
-        count(msisdn) as totalmsisdn,
-         kpi_h as periodes,
-         kpi as kpis,'
-                .$selectbillcycle.
-                'kpi as kpi,
-        "AREA Sumatra" AS regional');
+            $d90harea2 = BilcodataserahCekBayar::selectRaw($generalcolumn.'"AREA Sumatra" AS regional');
             if($bill_cycle!=null){
                 $d90harea2->where('bill_cycle',$bill_cycle);
             }
@@ -376,36 +290,7 @@ class BilcodataserahCekBayarController extends Controller
                 ->orderBy('kpi','ASC');
             $d90harea2 =$d90harea2;
 
-            $d90h2 = BilcodataserahCekBayar::selectRaw('
-        sum(a30) as a30,
-        sum(a60) as a60,
-        sum(a90) as a90,
-        sum(a120) as a120,
-        sum(b30) as b30,
-        sum(b60) as b60,
-        sum(b90) as b90,
-        sum(b120) as b120,
-        sum(h30) as h30,
-        sum(h60) as h60,
-        sum(h90) as h90,
-        sum(h120) as h120,
-        count(a30) as c30,
-        count(a60) as c60,
-        count(a90) as c90,
-        count(a120) as c120,
-        SUM(if(b30 > 0, 1, 0)) AS d30,
-        SUM(if(b60 > 0, 1, 0)) AS d60,
-        SUM(if(b90 > 0, 1, 0)) AS d90,
-        SUM(if(b120 > 0, 1, 0)) AS d120,
-        sum(ab30) as ab30,sum(ab60) as ab60,sum(ab90) as ab90,sum(ab120) as ab120,
-        sum(bb30) as bb30,sum(bb60) as bb60,sum(bb90) as bb90,sum(bb120) as bb120,
-        sum(total_outstanding) as total,
-        sum(total_outstanding_new) as total_new,
-        count(msisdn) as totalmsisdn,
-         kpi_h as periodes,
-         kpi as kpis,'.$selectbillcycle.'
-        bill_cycle as kpi,
-        hlr_region as regional')
+            $d90h2 = BilcodataserahCekBayar::selectRaw($generalcolumn.'hlr_region as regional')
                 ->groupBy('hlr_region');
             if($bill_cycle!=null){
                 $d90h2->where('bill_cycle',$bill_cycle);
