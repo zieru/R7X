@@ -1,46 +1,79 @@
 <?php
-/*
+
 namespace App\Http\Controllers;
+use App;
 use Auth;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use App\User;
+use Hash;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Socialite\Facades\Socialite;
 use Redirect;
 use Validator;
 use Exception;
 use Illuminate\Http\Request;
-use Laravel\Passport\Client as OClient;
+use Laravel\Passport\Client as OClient;use App\Components\User\Repositories\UserRepository;
 
 class UsersController extends Controller
 {
-  private $userRepository;
-
-  /**
-   * UserController constructor.
-   * @param UserRepository $userRepository
-   */
+  private  $userRepository;
+    public $successStatus = 200;
   public function __construct(UserRepository $userRepository)
   {
     $this->userRepository = $userRepository;
   }
-    public $successStatus = 200;
+    public function authCheck(Request $request)
+    {
+        $input = $request->all();
+
+        $this->validate($request, [
+            'username' => 'required',
+            'password' => 'required',
+        ]);
+
+        $fieldType = filter_var($request->username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        if (auth()->attempt(array($fieldType => $input['username'], 'password' => $input['password']),false,false)){
+            $user = Auth::user();
+            if($user->isActive()) {
+                $user['user_group'] = $user_group = User::with('groups')->find($user->id)->groups->first();
+                $user['user_group_id'] = $user_group->id;
+                switch ($user_group->id) {
+                    case 1:
+                        $user_perm[] = 'admin';
+                        break;
+                    default:
+                        $user_perm[] = 'user';
+                }
+                return response()->json($user, 200);
+            }
+        }else{
+            return response()->json(['error'=>'Unauthorised'], 401);
+        }
+
+    }
 
     public function login(Request $request) {
-        if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
-            $oClient = OClient::where('password_client', 1)->first();
 
 
-            $x = (array) $this->getTokenAndRefreshToken($oClient, array('email'=>request('email'), 'password' => request('password'), 'type'=>'password'));
-            $x['original']['status'] = 'ok';
-            if($request->has('redirect')){
-                $request->session()->flash('token_data', $x['original']);
-                return redirect($request->get('redirect'));
-            }
+        $fieldType = filter_var(request('email'), FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        if (Auth::attempt([$fieldType => request('email'), 'password' => request('password'),'active' => 1])) {
+            $user = Auth::user();
+                $oClient = OClient::where('password_client', 1)->first();
+
+                $x = (array) $this->getTokenAndRefreshToken($oClient, array('email'=>Auth::user()->email, 'password' => request('password'), 'type'=>'password'));
+                $x['original']['status'] = 'ok';
+                if($request->has('redirect')){
+                    $request->session()->flash('token_data', $x['original']);
+                    return redirect($request->get('redirect'));
+                }
             return response()->json($x['original'],200);
         }
         else {
-            return response()->json(['error'=>'Unauthorised'], 401);
+            return response()->json(['error'=>'Unauthorised, Please ask administrator to create your account or activate your account'], 401);
         }
     }
     public function redirectToProvider(Request $request)
@@ -114,19 +147,23 @@ class UsersController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users',
             'password' => 'required',
-            'c_password' => 'required|same:password',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['error'=>$validator->errors()], 401);
         }
 
+        echo 'pass';
         $password = $request->password;
         $input = $request->all();
-        $input['password'] = bcrypt($input['password']);
+        //$input['password'] = Hash::make($password);
+        var_dump($input);
         $user = User::create($input);
-        $oClient = OClient::where('password_client', 1)->first();
-        return $this->getTokenAndRefreshToken($oClient, $user->email, $password);
+        $user->groups()->attach($request->post('group'));
+        $user->save();
+        return $user;
+        //$oClient = OClient::where('password_client', 1)->first();
+        //return $this->getTokenAndRefreshToken($oClient, $user->email, $password);
     }
 
     public function refreshToken(Request $request) {
@@ -197,7 +234,7 @@ class UsersController extends Controller
                     'password' => $credential['password'],
                     'scope' => '*',
                 );
-            break;
+                break;
             case 'social':
                 $form_params = array(
                     'grant_type' => 'social',
@@ -215,39 +252,66 @@ class UsersController extends Controller
         $result = json_decode((string) $response->getBody(), true);
         return response()->json($result, $this->successStatus);
     }
+  public function userlist(){
+
+    $data = datatables()->of($this->userRepository->listUsers(request()->all())->toArray()['data']);
+    return $data->toJson();
+  }
 
     public function details() {
+      $user_perm = array('dashboard','formrefund','formadj');
+      $perm_combine = array();
         $user = Auth::user();
         $permission = $user->getCombinedPermissions();
 
-        $user['group'] = 'x';
+        $user['user_group'] = $user_group = User::with('groups')->find($user->id)->groups->first();
+        $user['user_group_id'] = $user_group->id;
+          switch ($user_group->id){
+            case 1:
+              $user_perm[] = 'admin';
+              break;
+            Case 5;
+                $user_perm[] = 'admin';
+                $user_perm[] = 'itdev';
+                break;
+            default:
+              $user_perm[] = 'user';
+          }
+
+          foreach ($user_perm as $x){
+            $perm_combine[] = array(
+              'roleId'=>'admin',
+              'permissionId'=> $x,
+              'permissionName'=> '仪表盘',
+              'actions'=> '[{"action":"add","defaultCheck":false,"describe":"新增"},{"action":"query","defaultCheck":false,"describe":"查询"},{"action":"get","defaultCheck":false,"describe":"详情"},{"action":"update","defaultCheck":false,"describe":"修改"},{"action":"delete","defaultCheck":false,"describe":"删除"}]',
+              'actionList'=> null,
+              'dataAccess'=> null
+            );
+          }
+        $user['group'] = '2x';
         $user['permission']  = $permission;
         $user['role']  = array('id'=> 'admin', 'name'=> "管理员", 'describe'=> "拥有所有权限",'status' => 1, 'creatorId'=> "system",
-            "permissionList"=> array('dashboard'),
-            'permissions' =>
-            array(
-                array(
-                    'roleId'=>'admin',
-                    'permissionId'=> 'dashboard',
-                    'permissionName'=> '仪表盘',
-                    'actions'=> '[{"action":"add","defaultCheck":false,"describe":"新增"},{"action":"query","defaultCheck":false,"describe":"查询"},{"action":"get","defaultCheck":false,"describe":"详情"},{"action":"update","defaultCheck":false,"describe":"修改"},{"action":"delete","defaultCheck":false,"describe":"删除"}]',
-                    'actionList'=> null,
-                    'dataAccess'=> null
-                ),
-                array(
-                    'roleId'=>'admin',
-                    'permissionId'=> 'user',
-                    'permissionName'=> '仪表盘',
-                    'actions'=> '[{"action":"add","defaultCheck":false,"describe":"新增"},{"action":"query","defaultCheck":false,"describe":"查询"},{"action":"get","defaultCheck":false,"describe":"详情"},{"action":"update","defaultCheck":false,"describe":"修改"},{"action":"delete","defaultCheck":false,"describe":"删除"}]',
-                    'actionList'=> null,
-                    'dataAccess'=> null
-                )
-            )
+            "permissionList"=> $user_perm,
+            'permissions' => $perm_combine
         );
 
         $user['roleId']  = "admin";
-        $user['avatar'] = 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png';
-
+        //$user['avatar'] = 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png';
+	    $user['avatar'] = '/avatar2.jpg';
+	    $user['version'] = App::VERSION();
+        $appDetail['version'] = App::VERSION();
+        $appDetail['name'] = env('APP_NAME');
+        $user['App'] = $appDetail;
+        $file_size = 0;
+        foreach( File::allFiles(storage_path()) as $file)
+        {
+            $file_size += $file->getSize();
+        }
+        $file_size = $file_size;
+        $user['disk_capacity_mb']= 1000000;
+        $user['disk_size_mb'] = $file_size;
+        $user['disk_capacity_percent'] = ($user['disk_capacity_mb'] - $file_size)/$user['disk_capacity_mb'] ;
+        $user['datetime'] =  Carbon::now()->toDateTimeString();
         return response()->json($user, $this->successStatus);
     }
 
@@ -258,15 +322,23 @@ class UsersController extends Controller
         ]);
     }
 
-    public function userlist(){
-      echo 'x';
-      $data = $this->userRepository->listUsers(request()->all());
 
-      return $this->sendResponseOk($data,"list users ok.");
-    }
 
     public function unauthorized() {
         return response()->json("unauthorized", 401);
     }
+
+    public function activateUser(){
+      $stat = false;
+      $return = array('success' => $stat,'active'=> null, 'name' => null);
+      $user = User::find(request('user_id'));
+      $user->active = request('active');
+      $user->save();
+      if($user->wasChanged('active')){
+        $stat = true;
+        $return = array('success' => $stat,'active'=> $user->active, 'name' => $user->name);
+      }
+
+      return datatables()->of(array($return))->toJson();
+    }
 }
-*/
