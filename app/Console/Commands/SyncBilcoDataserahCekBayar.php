@@ -132,17 +132,18 @@ class SyncBilcoDataserahCekBayar extends Command
                             'customer_id' => $y['customer_id'],
                             'msisdn' => $y['msisdn'],
                             'hlr_region' => $y['hlr_region'],
-                            'nominal_bayar' => $y['b30'] - $y['c30'],
                             'import_batch' => $importer->id
                         );
 
                         if($y['c60'] != $y['b60']){
                             $update = ['h60' =>  $y['b60'] - $y['c60'],'h60f' =>  $y['c60']];
+                            $update['nominal_bayar_60'] = $y['b60'] - $y['c60'];
                             if($y['c60']==0){
-                                $update['detil_pembayaran'] = sprintf('Dibayar penuh kpi 60 pada %s total tagihan dibayar = %s', $row, $y['b60']+$y['c60']);
+                                $update['status_bayar_60'] = sprintf('Dibayar penuh kpi 60 pada %s total tagihan dibayar = %s', $row, $update['nominal_bayar_60']);
                             }else{
-                                $update['detil_pembayaran'] = sprintf('Dibayar partial kpi 60 pada %s total tagihan dibayar = %s', $row, $y['b60']+$y['c60']);
+                                $update['status_bayar_60'] = sprintf('Dibayar partial kpi 60 pada %s total tagihan dibayar = %s', $row, $update['nominal_bayar_60']);
                             }
+
                             SyncBilcoDataserahCekBayarLog::updateOrCreate($insert,$update);
                             BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
                                 ->where('tahap_periode', $tahap)
@@ -151,10 +152,11 @@ class SyncBilcoDataserahCekBayar extends Command
                         }
                         if($y['c30'] != $y['b30']){
                             $update = ['h30' =>  $y['b30'] - $y['c30'],'h30f' =>  $y['c30']];
+                            $update['nominal_bayar_30'] = $y['b30'] - $y['c30'];
                             if($y['c30']==0){
-                                $update['detil_pembayaran'] = sprintf('Dibayar penuh kpi 30 pada %s total tagihan dibayar = %s', $row, $y['b30']+$y['c30']);
+                                $update['status_bayar_30'] = sprintf('Dibayar penuh kpi 30 pada %s total tagihan dibayar = %s', $row,$update['nominal_bayar_30']);
                             }else{
-                                $update['detil_pembayaran'] = sprintf('Dibayar partial kpi 30 pada %s total tagihan dibayar = %s', $row, $y['b30']+$y['c30']);
+                                $update['status_bayar_30'] = sprintf('Dibayar partial kpi 30 pada %s total tagihan dibayar = %s', $row, $update['nominal_bayar_30']);
                             }
                             SyncBilcoDataserahCekBayarLog::updateOrCreate($insert,$update);
                             BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
