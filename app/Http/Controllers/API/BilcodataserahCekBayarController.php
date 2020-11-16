@@ -76,10 +76,10 @@ class BilcodataserahCekBayarController extends Controller
                 'a.hlr_region as hlr_region'
             );
         }
-            $x->Join('sabyan_r7s_data.'.$bdate->format('Ymd').'_Sumatra as b', function($join)
-            {
-                $join->on('a.account','=','b.account_number');
-            })
+        $x->Join('sabyan_r7s_data.'.$bdate->format('Ymd').'_Sumatra as b', function($join)
+        {
+            $join->on('a.account','=','b.account_number');
+        })
             ->where('a.periode',$adate->format('Y-m-d'));
 
         //DB::getQueryLog();
@@ -209,7 +209,7 @@ class BilcodataserahCekBayarController extends Controller
         if($bill_cycle!=null){
             $d30harea->where('bill_cycle',$bill_cycle);
         }
-        $d30harea->where('tahap_date',$startx->format('Y-m-d'));
+        $d30harea->where('tahap_date',$startx);
         if($tahap_d > 0) $d30harea->where('tahap_periode',$tahap_d);
         $d30harea
             ->orderBy('hlr_region','DESC')
@@ -223,7 +223,7 @@ class BilcodataserahCekBayarController extends Controller
         if($bill_cycle!=null){
             $d30h->where('bill_cycle',$bill_cycle);
         }
-        $d30h->where('tahap_date',$startx->format('Y-m-d'));
+        $d30h->where('tahap_date',$startx);
         if($tahap_d > 0) $d30h->where('tahap_periode',$tahap_d);
         $d30h
             ->orderBy('hlr_region','ASC')
@@ -236,7 +236,7 @@ class BilcodataserahCekBayarController extends Controller
         if($bill_cycle!=null){
             $d90harea->where('bill_cycle',$bill_cycle);
         }
-        $d90harea->where('tahap_date',$startx->format('Y-m-d'));
+        $d90harea->where('tahap_date',$startx);
         if($tahap_d > 0) $d90harea->where('tahap_periode',$tahap_d);
 
         $d90harea->groupBy('bill_cycle')
@@ -261,7 +261,7 @@ class BilcodataserahCekBayarController extends Controller
             ->orderBy('hlr_region','DESC')
             ->orderBy('bill_cycle','ASC')
             ->orderBy('kpi','ASC');
-        $d90h->where('tahap_date',$startx->format('Y-m-d'));
+        $d90h->where('tahap_date',$startx);
         if($tahap_d > 0) $d90h->where('tahap_periode',$tahap_d);
 
         $d90h =$d90h->union($d90harea)->get()->toArray();
@@ -343,6 +343,7 @@ class BilcodataserahCekBayarController extends Controller
             $kpis = ['MoM',$end,$startx->format('Y-m-d')];
         }
         $kpis = array_reverse($kpis);
+        //dd($d30h);
         $bcx = 0;
         foreach ($d30h as $row){
             if($row['totalmsisdn'] != null){
@@ -380,32 +381,32 @@ class BilcodataserahCekBayarController extends Controller
                             $bmsisdn = $row['mb30'] + $row['mb60'] + $row['mb90'] + $row['mb120'] + $row['mb30s'] + $row['mb60s'] + $row['mb90s'] + $row['mb120s'];
                             break;
                         case 30:
-                                $dataserah = $row['a30'] + $row['a30s'];
-                                $collection = $row['h30'] + $row['h30s'];
-                                $total  = $dataserah;
-                                $nmsisdn = $row['ma30'] + $row['ma30s'];
-                                $bmsisdn = $row['mb30'] + $row['mb30s'];
+                            $dataserah = $row['a30'] + $row['a30s'];
+                            $collection = $row['h30'] + $row['h30s'];
+                            $total  = $dataserah;
+                            $nmsisdn = $row['ma30'] + $row['ma30s'];
+                            $bmsisdn = $row['mb30'] + $row['mb30s'];
                             break;
                         case 60:
-                                $dataserah = $row['a60'] + $row['a60s'];
-                                $collection = $row['h60'] + $row['h60s'];
-                                $nmsisdn = $row['ma60'] + $row['ma60s'];
-                                $bmsisdn = $row['mb60'] + $row['mb60s'];
-                                $total = $dataserah;
+                            $dataserah = $row['a60'] + $row['a60s'];
+                            $collection = $row['h60'] + $row['h60s'];
+                            $nmsisdn = $row['ma60'] + $row['ma60s'];
+                            $bmsisdn = $row['mb60'] + $row['mb60s'];
+                            $total = $dataserah;
                             break;
                         case 90:
-                                $dataserah = $row['a90'] + $row['a90s'];
-                                $collection = $row['h90'] + $row['h90s'];
-                                $total = $dataserah;
-                                $nmsisdn = $row['ma90'] + $row['ma90s'];
-                                $bmsisdn = $row['mb90'] + $row['mb90s'];
+                            $dataserah = $row['a90'] + $row['a90s'];
+                            $collection = $row['h90'] + $row['h90s'];
+                            $total = $dataserah;
+                            $nmsisdn = $row['ma90'] + $row['ma90s'];
+                            $bmsisdn = $row['mb90'] + $row['mb90s'];
                             break;
                         case 120:
-                                $dataserah = $row['a120'] + $row['a120s'];
-                                $collection = $row['h120'] + $row['h120s'];
-                                $total = $dataserah;
-                                $nmsisdn = $row['ma120'] + $row['ma120s'];
-                                $bmsisdn = $row['mb120'] + $row['mb120s'];
+                            $dataserah = $row['a120'] + $row['a120s'];
+                            $collection = $row['h120'] + $row['h120s'];
+                            $total = $dataserah;
+                            $nmsisdn = $row['ma120'] + $row['ma120s'];
+                            $bmsisdn = $row['mb120'] + $row['mb120s'];
                             break;
                         default:
                             $dataserah = $row['total'];
@@ -1009,70 +1010,70 @@ class BilcodataserahCekBayarController extends Controller
                     $collection = $row['a30'] + $row['a60'] + $row['a90'] + $row['a120'] - $row['b30'] - $row['b60'] - $row['b90'] - $row['b120'];
                     $total  = $row['a30'] + $row['a60'] + $row['a90'] + $row['a120'] ;
 
-                        $uncollected = $total - $collection;
-                        $pcollection = 0;
-                        if($total > 0){
-                            $pcollection = ($collection/$dataserah);
-                        }
-                        $sum[$row['regional']]['period'][$p]['uncollected'] = number_format($uncollected);
-                        $sum[$row['regional']]['period'][$p]['pcollection'] = number_format(($pcollection)*100,2).'%';
-                        $sum[$row['regional']]['period'][$p]['collection'] = number_format($collection);
-
-                        $sum[$row['regional']]['period'][$p]['totalmsisdn'] = number_format($dataserah);
-                        $sum[$row['regional']]['period'][$p]['total'] = $row['total'];
+                    $uncollected = $total - $collection;
+                    $pcollection = 0;
+                    if($total > 0){
+                        $pcollection = ($collection/$dataserah);
                     }
-                    $row['x'][$p]['total'] = $row['total'];
-                    $row['x'][$p]['totalmsisdn'] = $row['totalmsisdn'];
-                    $loop = 0;
-                    foreach ($param as $bc){
-                        //dd($newc);
-                        //var_dump($row);
-                        //echo $newc[$row['AREA Sumatra']][$bc][$p]['kpi'];
-                        //          dd(sprintf('$newc[%s][%s][%s][total]',$row['regional'],$bc,$p));
-                        //echo sprintf('$newc[%s][%s][%s][total]',$row['regional'],$bc,$p);
-                        if(isset($newc[$row['regional']][$bc])){
-                            if($request->has('outs') === false OR $request->get('outs') === 'false'){
-                                $ncperiod[$loop]= array(
-                                    'kpi' => $bc,
-                                    'id' => sprintf('sub%s/%s#%s#%s#%s',$l,$loop,$row['regional'],$row['periodes'],$row['kpi']),
-                                    'regional' => ''
-                                );
-                            }else{
-                                $ncperiod[$loop]= array(
-                                    'kpi' => $bc,
-                                    'id' => sprintf('sub%s/%s#%s#%s#%s',$l,$loop,$row['regional'],$row['periodes'],$row['kpi']),
-                                    'regional' => $row['regional']
-                                );
-                            }
+                    $sum[$row['regional']]['period'][$p]['uncollected'] = number_format($uncollected);
+                    $sum[$row['regional']]['period'][$p]['pcollection'] = number_format(($pcollection)*100,2).'%';
+                    $sum[$row['regional']]['period'][$p]['collection'] = number_format($collection);
 
-                            foreach ($period as $px) {
-                                if(isset($newc[$row['regional']][$bc][$px])){
-                                    $dataserah = $child['ab30'] + $child['ab60'] + $child['ab90'] + $child['ab120'];
-                                    $collection = $child['a30'] + $child['a60'] + $child['a90'] + $child['a120'] - $child['b30'] - $child['b60'] - $child['b90'] - $row['b120'];
-                                    $total  = $child['a30'] + $child['a60'] + $child['a90'] + $child['a120'] ;
-                                    $uncollected = $total - $collection;
-                                    $pcollection = 0;
-                                    if($total > 0){
-                                        $pcollection = ($collection/$dataserah);
-                                    }
-                                    $child['period'][$p]['total'] = number_format($total);
-                                    $child['period'][$p]['uncollected'] = number_format($uncollected);
-                                    $child['period'][$p]['pcollection'] = number_format(($pcollection)*100,2).'%';
-                                    $child['period'][$p]['collection'] = number_format($collection);
-                                    $child['period'][$p]['totalmsisdn'] = number_format($dataserah);
-                                    $child['period'][$p]['total'] = $row['total'];
-                                    $ncperiod[$loop]['period'][$px] = array(
-                                        'total' => number_format($newc[$row['regional']][$bc][$px]['total']),
-                                        'uncollected' => null,
-                                        'totalmsisdn' => number_format($newc[$row['regional']][$bc][$px]['totalmsisdn']));
-                                }
-                            }
-                            $loop++;
-                        }
-
-                    }
-                    $sum[$row['regional']]['period'][$p]['totalmsisdn'] = $row['totalmsisdn'];
+                    $sum[$row['regional']]['period'][$p]['totalmsisdn'] = number_format($dataserah);
                     $sum[$row['regional']]['period'][$p]['total'] = $row['total'];
+                }
+                $row['x'][$p]['total'] = $row['total'];
+                $row['x'][$p]['totalmsisdn'] = $row['totalmsisdn'];
+                $loop = 0;
+                foreach ($param as $bc){
+                    //dd($newc);
+                    //var_dump($row);
+                    //echo $newc[$row['AREA Sumatra']][$bc][$p]['kpi'];
+                    //          dd(sprintf('$newc[%s][%s][%s][total]',$row['regional'],$bc,$p));
+                    //echo sprintf('$newc[%s][%s][%s][total]',$row['regional'],$bc,$p);
+                    if(isset($newc[$row['regional']][$bc])){
+                        if($request->has('outs') === false OR $request->get('outs') === 'false'){
+                            $ncperiod[$loop]= array(
+                                'kpi' => $bc,
+                                'id' => sprintf('sub%s/%s#%s#%s#%s',$l,$loop,$row['regional'],$row['periodes'],$row['kpi']),
+                                'regional' => ''
+                            );
+                        }else{
+                            $ncperiod[$loop]= array(
+                                'kpi' => $bc,
+                                'id' => sprintf('sub%s/%s#%s#%s#%s',$l,$loop,$row['regional'],$row['periodes'],$row['kpi']),
+                                'regional' => $row['regional']
+                            );
+                        }
+
+                        foreach ($period as $px) {
+                            if(isset($newc[$row['regional']][$bc][$px])){
+                                $dataserah = $child['ab30'] + $child['ab60'] + $child['ab90'] + $child['ab120'];
+                                $collection = $child['a30'] + $child['a60'] + $child['a90'] + $child['a120'] - $child['b30'] - $child['b60'] - $child['b90'] - $row['b120'];
+                                $total  = $child['a30'] + $child['a60'] + $child['a90'] + $child['a120'] ;
+                                $uncollected = $total - $collection;
+                                $pcollection = 0;
+                                if($total > 0){
+                                    $pcollection = ($collection/$dataserah);
+                                }
+                                $child['period'][$p]['total'] = number_format($total);
+                                $child['period'][$p]['uncollected'] = number_format($uncollected);
+                                $child['period'][$p]['pcollection'] = number_format(($pcollection)*100,2).'%';
+                                $child['period'][$p]['collection'] = number_format($collection);
+                                $child['period'][$p]['totalmsisdn'] = number_format($dataserah);
+                                $child['period'][$p]['total'] = $row['total'];
+                                $ncperiod[$loop]['period'][$px] = array(
+                                    'total' => number_format($newc[$row['regional']][$bc][$px]['total']),
+                                    'uncollected' => null,
+                                    'totalmsisdn' => number_format($newc[$row['regional']][$bc][$px]['totalmsisdn']));
+                            }
+                        }
+                        $loop++;
+                    }
+
+                }
+                $sum[$row['regional']]['period'][$p]['totalmsisdn'] = $row['totalmsisdn'];
+                $sum[$row['regional']]['period'][$p]['total'] = $row['total'];
             }
             //dd($ncperiod);
             $ncx = [];
