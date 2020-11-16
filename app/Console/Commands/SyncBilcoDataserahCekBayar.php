@@ -134,7 +134,13 @@ class SyncBilcoDataserahCekBayar extends Command
                             'msisdn' => $y['msisdn'],
                             'hlr_region' => $y['hlr_region']
                         );
-                        dd(SyncBilcoDataserahCekBayarLog::where([$insertx])->first());
+                        $check =  [
+                            ['periode', '=', $y['tahap_date']],
+                            ['periode_upd', '=',$row],
+                            ['tahap', '=',  $y['tahap_periode']],
+                            ['account', '=', $y['account']],
+                        ]
+                        dd(SyncBilcoDataserahCekBayarLog::where([$check])->exists());
                         if($y['c60'] != $y['b60']){
 
                             $update = null;
