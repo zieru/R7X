@@ -116,9 +116,9 @@ class SyncBilcoDataserahCekBayar extends Command
                 //dd($xdata);
                 $startdate = Carbon::createFromFormat('Y-m-d',$xdata[0]->periode)->format('Ymd');
                 $currdate = Carbon::createFromFormat('Ymd',explode('_',$row)[0])->format('Ymd');
-                $this->info('skip periode :'. $basedate->format('Y-m-d') .':' .$row .'');
+                $this->warn('periode :'. $basedate->format('Y-m-d') .' process :' .$row .'');
 
-                if($currdate >= $startdate){
+                if($currdate > $startdate){
                     echo ' startfrom :'.$startdate;
                     $updatedate = $row;
                     echo 'update :' . $updatedate;
