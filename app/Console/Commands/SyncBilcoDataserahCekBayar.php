@@ -213,6 +213,27 @@ class SyncBilcoDataserahCekBayar extends Command
                                 ->where('account', $y['account'])
                                 ->update(['b120' => $y['c120'], 'update_date' => $updatedate,'last_update' => $row]);
                         }
+                        $updold = $update;
+                        $update = [
+                            'full_120' => $updold['full_120'],
+                            'full_90' => $updold['full_90'],
+                            'full_60' => $updold['full_60'],
+                            'full_30' => $updold['full_30'],
+                            'h120' =>  $y['b120'] - $y['c120'],
+                            'h120f' =>  $y['c120'],
+                            'h90' =>  $y['b90'] - $y['c90'],
+                            'h90f' =>  $y['c90'],
+                            'h60' =>  $y['b60'] - $y['c60'],
+                            'h60f' =>  $y['c60'],
+                            'h30' =>  $y['b30'] - $y['c30'],
+                            'h30f' =>  $y['c30']
+                        ];
+                        if($record->exists()){
+                            $record->update($update);
+
+                        }else{
+                            SyncBilcoDataserahCekBayarLog::insert(array_merge($insertx,$update));
+                        }
                     }
                 }
                 $importer->status = 'finish';
