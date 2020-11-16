@@ -138,7 +138,8 @@ class SyncBilcoDataserahCekBayar extends Command
                             'account' => $y['account'],
                             'customer_id' => $y['customer_id'],
                             'msisdn' => $y['msisdn'],
-                            'hlr_region' => $y['hlr_region']
+                            'hlr_region' => $y['hlr_region'],
+                            'bill_cycle' => $y['bill_cycle']
                         );
                         $check =  [
                             ['periode', '=', $y['tahap_date']],
