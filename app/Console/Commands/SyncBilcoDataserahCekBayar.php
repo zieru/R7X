@@ -239,10 +239,11 @@ class SyncBilcoDataserahCekBayar extends Command
                             SyncBilcoDataserahCekBayarLog::insert(array_merge($insertx,$update));
                         }
                     }
+
+                    $bar->finish();
                 }
                 $importer->status = 'finish';
                 $importer->save();
-                $bar->finish();
             }
 
         }
