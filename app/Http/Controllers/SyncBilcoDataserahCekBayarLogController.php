@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\API\SyncBilcoDataserahCekBayarLog;
+use App\SyncBilcoDataserahCekBayarLog;
 use Illuminate\Http\Request;
 
 class SyncBilcoDataserahCekBayarLogController extends Controller
