@@ -155,7 +155,7 @@ class SyncBilcoDataserahCekBayar extends Command
                             if($record->exists()){
                                 $record->update($update);
                             }else{
-                                SyncBilcoDataserahCekBayarLog::insert(array_merge($insertx,$update))
+                                SyncBilcoDataserahCekBayarLog::insert(array_merge($insertx,$update));
                             }
                             //SyncBilcoDataserahCekBayarLog::updateOrCreate($insertx,$update);
                             BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
