@@ -143,6 +143,7 @@ class SyncBilcoDataserahCekBayar extends Command
                             }else{
                                 $update['detil_pembayaran'] = sprintf('Dibayar partial kpi 60 pada %s total tagihan dibayar = %s', $row, $y['b60']+$y['c60']);
                             }
+                            $this->info('60 '. $update['h60']);
                             SyncBilcoDataserahCekBayarLog::updateOrCreate($insert,$update);
                             BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
                                 ->where('tahap_periode', $tahap)
@@ -157,6 +158,7 @@ class SyncBilcoDataserahCekBayar extends Command
                             }else{
                                 $update['detil_pembayaran'] = sprintf('Dibayar partial kpi 30 pada %s total tagihan dibayar = %s', $row, $y['b30']+$y['c30']);
                             }
+                            $this->info('30 '. $update['h30']);
                             SyncBilcoDataserahCekBayarLog::updateOrCreate($insert,$update);
                             BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
                                 ->where('tahap_periode', $tahap)
