@@ -277,6 +277,8 @@ class SyncBilcoDataserahCekBayar extends Command
                 'tipe' => 'dataserah:cekbayar',
                 'filename' => 'dataserah:cekbayar '.$date->format('Ymd')
             ));
+            $bar = $this->output->createProgressBar($x->count());
+            $bar->setFormat('debug')->start();
             foreach ($x->get()->toArray() as $row){
                 $row = (array) $row;
                 $date = Carbon::createFromFormat('Y-m-d', $row['periode']);
@@ -320,7 +322,10 @@ class SyncBilcoDataserahCekBayar extends Command
                 $importer->importedRow =sizeof($row);
                 $importer->status = 'finish';
                 $importer->save();
+
+                $bar->advance();
             }
+            $bar->finish();
         }else{
             $this->update($date,$tahap,$from);
         }
