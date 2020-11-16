@@ -140,7 +140,7 @@ class SyncBilcoDataserahCekBayar extends Command
                             ['tahap', '=',  $y['tahap_periode']],
                             ['account', '=', $y['account']],
                         ];
-                        dd(SyncBilcoDataserahCekBayarLog::where($check)->exists());
+                        var_dump(SyncBilcoDataserahCekBayarLog::where($check)->exists());
                         if($y['c60'] != $y['b60']){
 
                             $update = null;
