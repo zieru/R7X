@@ -209,7 +209,7 @@ class BilcodataserahCekBayarController extends Controller
         if($bill_cycle!=null){
             $d30harea->where('bill_cycle',$bill_cycle);
         }
-        $d30harea->where('tahap_date',$startx);
+        $d30harea->where('tahap_date',$startx->format('Y-m-d'));
         if($tahap_d > 0) $d30harea->where('tahap_periode',$tahap_d);
         $d30harea
             ->orderBy('hlr_region','DESC')
@@ -223,7 +223,7 @@ class BilcodataserahCekBayarController extends Controller
         if($bill_cycle!=null){
             $d30h->where('bill_cycle',$bill_cycle);
         }
-        $d30h->where('tahap_date',$startx);
+        $d30h->where('tahap_date',$startx->format('Y-m-d'));
         if($tahap_d > 0) $d30h->where('tahap_periode',$tahap_d);
         $d30h
             ->orderBy('hlr_region','ASC')
@@ -236,7 +236,7 @@ class BilcodataserahCekBayarController extends Controller
         if($bill_cycle!=null){
             $d90harea->where('bill_cycle',$bill_cycle);
         }
-        $d90harea->where('tahap_date',$startx);
+        $d90harea->where('tahap_date',$startx->format('Y-m-d'));
         if($tahap_d > 0) $d90harea->where('tahap_periode',$tahap_d);
 
         $d90harea->groupBy('bill_cycle')
@@ -261,7 +261,7 @@ class BilcodataserahCekBayarController extends Controller
             ->orderBy('hlr_region','DESC')
             ->orderBy('bill_cycle','ASC')
             ->orderBy('kpi','ASC');
-        $d90h->where('tahap_date',$startx);
+        $d90h->where('tahap_date',$startx->format('Y-m-d'));
         if($tahap_d > 0) $d90h->where('tahap_periode',$tahap_d);
 
         $d90h =$d90h->union($d90harea)->get()->toArray();
@@ -343,7 +343,6 @@ class BilcodataserahCekBayarController extends Controller
             $kpis = ['MoM',$end,$startx->format('Y-m-d')];
         }
         $kpis = array_reverse($kpis);
-        //dd($d30h);
         $bcx = 0;
         foreach ($d30h as $row){
             if($row['totalmsisdn'] != null){
