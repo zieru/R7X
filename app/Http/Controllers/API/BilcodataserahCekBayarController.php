@@ -109,11 +109,25 @@ class BilcodataserahCekBayarController extends Controller
 
 
         try {
-            $date = Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(-2);
+            if($request->has('end')){
+                $startx = Carbon::createFromFormat('Y-m-d', $start);
+                $startx->startOfMonth();
+                $end = Carbon::createFromFormat('Y-m-d', $start)->addDay(15);
+            }else{
+                $startx = Carbon::createFromFormat('Y-m-d', $start.'-01');
+                $end = Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(15);
+            }
         }
         catch (\Exception $e){AppHelper::sendErrorAndExit('Periode is invalid');}
         try {
-            $end = Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(15);
+            if($request->has('end')){
+                $startx = Carbon::createFromFormat('Y-m-d', $start);
+                $startx->startOfMonth();
+                $end = Carbon::createFromFormat('Y-m-d', $start)->addDay(15);
+            }else{
+                $startx = Carbon::createFromFormat('Y-m-d', $start.'-01');
+                $end = Carbon::createFromFormat('Y-m-d', $start.'-01')->addDay(15);
+            }
         }
         catch (\Exception $e){AppHelper::sendErrorAndExit('End Periode is invalid');}
         $tahap = [];
@@ -127,14 +141,13 @@ class BilcodataserahCekBayarController extends Controller
                 $tahap_dx = 0;
             }
         }
-        //dd($tahap);
         if($request->has('outs') === true){
             $selectbillcycle = 'bill_cycle as bill_cycles,';
         }
 
         if($request->has('end')){
             $end = null;
-            $end = Carbon::createFromFormat('Y-m-d', $request->end.'-01')->format('Y-m-d');
+            $end = Carbon::createFromFormat('Y-m-d', $request->end)->format('Y-m-d');
         }
         $generalcolumn = '
         SUM(IF(tahap_periode != 1, a30, 0)) as a30,
@@ -165,22 +178,22 @@ class BilcodataserahCekBayarController extends Controller
         count(a60) as c60,
         count(a90) as c90,
         count(a120) as c120,
-        SUM(if(a30 > 0 AND tahap_periode > 1, 1, 0)) AS ma30,
-        SUM(if(a60 > 0 AND tahap_periode > 1, 1, 0)) AS ma60,
-        SUM(if(a90 > 0 AND tahap_periode > 1, 1, 0)) AS ma90,
-        SUM(if(a120 > 0 AND tahap_periode > 1, 1, 0)) AS ma120,
-        SUM(if(b30 > 0 AND tahap_periode > 1, 1, 0)) AS mb30,
-        SUM(if(b60 > 0 AND tahap_periode > 1, 1, 0)) AS mb60,
-        SUM(if(b90 > 0 AND tahap_periode > 1, 1, 0)) AS mb90,
-        SUM(if(b120 > 0 AND tahap_periode > 1, 1, 0)) AS mb120,
-        SUM(if(a30 > 0 AND tahap_periode = 1, 1, 0)) AS ma30s,
-        SUM(if(a60 > 0 AND tahap_periode = 1, 1, 0)) AS ma60s,
-        SUM(if(a90 > 0 AND tahap_periode = 1, 1, 0)) AS ma90s,
+        SUM(if(a30 >0 AND h30 > 0 AND tahap_periode > 1, 1, 0)) AS ma30,
+        SUM(if(a60 >0 AND h60 > 0 AND tahap_periode > 1, 1, 0)) AS ma60,
+        SUM(if(a90 >0 AND h90 > 0 AND tahap_periode > 1, 1, 0)) AS ma90,
+        SUM(if(a120 >0 AND h120 > 0 AND tahap_periode > 1, 1, 0)) AS ma120,
+        SUM(if(a30 > 0 AND tahap_periode > 1, 1, 0)) AS mb30,
+        SUM(if(a60 > 0 AND tahap_periode > 1, 1, 0)) AS mb60,
+        SUM(if(a90 > 0 AND tahap_periode > 1, 1, 0)) AS mb90,
+        SUM(if(a120 > 0 AND tahap_periode > 1, 1, 0)) AS mb120,
+        SUM(if(h30 > 0 AND tahap_periode = 1, 1, 0)) AS ma30s,
+        SUM(if(h60 > 0 AND tahap_periode = 1, 1, 0)) AS ma60s,
+        SUM(if(h90 > 0 AND tahap_periode = 1, 1, 0)) AS ma90s,
         SUM(if(a120 > 0 AND tahap_periode = 1, 1, 0)) AS ma120s,
-        SUM(if(b30 > 0 AND tahap_periode = 1, 1, 0)) AS mb30s,
-        SUM(if(b60 > 0 AND tahap_periode = 1, 1, 0)) AS mb60s,
-        SUM(if(b90 > 0 AND tahap_periode = 1, 1, 0)) AS mb90s,
-        SUM(if(b120 > 0 AND tahap_periode = 1, 1, 0)) AS mb120s,
+        SUM(if(a30 > 0 AND tahap_periode = 1, 1, 0)) AS mb30s,
+        SUM(if(a60 > 0 AND tahap_periode = 1, 1, 0)) AS mb60s,
+        SUM(if(a90 > 0 AND tahap_periode = 1, 1, 0)) AS mb90s,
+        SUM(if(a120 > 0 AND tahap_periode = 1, 1, 0)) AS mb120s,
         sum(ab30) as ab30,sum(ab60) as ab60,sum(ab90) as ab90,sum(ab120) as ab120,
         sum(bb30) as bb30,sum(bb60) as bb60,sum(bb90) as bb90,sum(bb120) as bb120,
         sum(total_outstanding) as total,
@@ -196,7 +209,7 @@ class BilcodataserahCekBayarController extends Controller
         if($bill_cycle!=null){
             $d30harea->where('bill_cycle',$bill_cycle);
         }
-        $d30harea->where('tahap_date',$request->get('periode').'-01');
+        $d30harea->where('tahap_date',$startx);
         if($tahap_d > 0) $d30harea->where('tahap_periode',$tahap_d);
         $d30harea
             ->orderBy('hlr_region','DESC')
@@ -210,7 +223,7 @@ class BilcodataserahCekBayarController extends Controller
         if($bill_cycle!=null){
             $d30h->where('bill_cycle',$bill_cycle);
         }
-        $d30h->where('tahap_date',$request->get('periode').'-01');
+        $d30h->where('tahap_date',$startx);
         if($tahap_d > 0) $d30h->where('tahap_periode',$tahap_d);
         $d30h
             ->orderBy('hlr_region','ASC')
@@ -223,7 +236,7 @@ class BilcodataserahCekBayarController extends Controller
         if($bill_cycle!=null){
             $d90harea->where('bill_cycle',$bill_cycle);
         }
-        $d90harea->where('tahap_date',$request->get('periode').'-01');
+        $d90harea->where('tahap_date',$startx);
         if($tahap_d > 0) $d90harea->where('tahap_periode',$tahap_d);
 
         $d90harea->groupBy('bill_cycle')
@@ -248,7 +261,7 @@ class BilcodataserahCekBayarController extends Controller
             ->orderBy('hlr_region','DESC')
             ->orderBy('bill_cycle','ASC')
             ->orderBy('kpi','ASC');
-        $d90h->where('tahap_date',$request->get('periode').'-01');
+        $d90h->where('tahap_date',$startx);
         if($tahap_d > 0) $d90h->where('tahap_periode',$tahap_d);
 
         $d90h =$d90h->union($d90harea)->get()->toArray();
@@ -327,7 +340,7 @@ class BilcodataserahCekBayarController extends Controller
 
         $kpis = [30,60,90,120,0];
         if($request->has('end')){
-            $kpis = ['MoM',$end,$request->periode.'-01'];
+            $kpis = ['MoM',$end,$startx->format('Y-m-d')];
         }
         $kpis = array_reverse($kpis);
         //dd($d30h);
@@ -405,9 +418,10 @@ class BilcodataserahCekBayarController extends Controller
 
                     $pcollection = 0;
                     if($msisdn === true){
-                        $collection = $nmsisdn - $bmsisdn;
-                        $dataserah = $nmsisdn;
+                        $collection = $nmsisdn;
+                        $dataserah = $bmsisdn;
                     }
+                    //dd(array($nmsisdn,$bmsisdn,$p));
 
                     $uncollected = $dataserah - $collection;
                     if($total > 0 AND $collection > 0){
@@ -445,47 +459,47 @@ class BilcodataserahCekBayarController extends Controller
                                     $dataserah = $child['total'];
                                     $collection = $child['h30'] + $child['h30s'] + $child['h60'] + $child['h60s'] + $child['h90'] + $child['h90s'] + $child['h120'] + $child['h120s'];
                                     $total  = $dataserah ;
-                                    $nmsisdn = $child['ma30'] + $child['ma60'] + $child['ma90'] + $child['ma120'];
-                                    $bmsisdn = $child['mb30'] + $child['mb60'] + $child['mb90'] + $child['mb120'];
+                                    $nmsisdn = $child['ma30'] + $child['ma60'] + $child['ma90'] + $child['ma120'] +  $child['ma30s'] + $child['ma60s'] + $child['ma90s'] + $child['ma120s'];
+                                    $bmsisdn = $child['mb30'] + $child['mb60'] + $child['mb90'] + $child['mb120'] +  $child['mb30s'] + $child['mb60s'] + $child['mb90s'] + $child['mb120s'];;
                                     break;
                                 case 30:
                                     $dataserah = $child['a30'] + $child['a30s'];
                                     $collection = $child['h30'] + $child['h30s'];
-                                    $nmsisdn = $child['ma30'];
-                                    $bmsisdn = $child['mb30'];
+                                    $nmsisdn = $child['ma30']+ $child['ma30s'];
+                                    $bmsisdn = $child['mb30']+$child['mb30s'];
                                     $total  = $dataserah;
                                     break;
                                 case 60:
                                     $dataserah = $child['a60'] + $child['a60s'];
                                     $collection = $child['h60'] + $child['h60s'];
-                                    $nmsisdn =$child['ma60'];
-                                    $bmsisdn = $child['mb60'];
+                                    $nmsisdn =$child['ma60'] + $child['ma60s'];
+                                    $bmsisdn = $child['mb60'] + $child['mb60s'];
                                     $total  = $dataserah;
                                     break;
                                 case 90:
                                     $dataserah = $child['a90'] + $child['a90s'];
                                     $collection = $child['h90'] + $child['h90s'];
-                                    $nmsisdn = $child['ma90'];
-                                    $bmsisdn = $child['mb90'];
+                                    $nmsisdn = $child['ma90'] + $child['ma90s'];
+                                    $bmsisdn = $child['mb90'] + $child['mb90s'];
                                     $total  = $dataserah;
                                     break;
                                 case 120:
                                     $dataserah = $child['a120'] + $child['a120s'];
                                     $collection = $child['h120'] + $child['h120s'];
-                                    $nmsisdn = $child['ma120'];
-                                    $bmsisdn = $child['mb120'];
+                                    $nmsisdn = $child['ma120'] + $child['ma120s'];
+                                    $bmsisdn = $child['mb120'] + $child['mb120s'];
                                     $total  = $dataserah;
                                     break;
                                 default:
                                     $dataserah = $child['total'];
                                     $collection = $child['h30'] + $child['h30s'] + $child['h60'] + $child['h60s'] + $child['h90'] + $child['h90s'] + $child['h120'] + $child['h120s'];
                                     $total  = $dataserah ;
-                                    $nmsisdn = $child['ma30'] + $child['ma60'] + $child['ma90'] + $child['ma120'];
-                                    $bmsisdn = $child['mb30'] + $child['mb60'] + $child['mb90'] + $child['mb120'];
+                                    $nmsisdn = $child['ma30'] + $child['ma60'] + $child['ma90'] + $child['ma120'] +  $child['ma30s'] + $child['ma60s'] + $child['ma90s'] + $child['ma120s'];
+                                    $bmsisdn = $child['mb30'] + $child['mb60'] + $child['mb90'] + $child['mb120'] +  $child['mb30s'] + $child['mb60s'] + $child['mb90s'] + $child['mb120s'];;
                             }
                             if($msisdn === true){
-                                $dataserah = $nmsisdn;
-                                $collection = $nmsisdn - $bmsisdn;
+                                $dataserah = $bmsisdn;
+                                $collection = $nmsisdn;
                                 //$sum[$row['regional']]['period'][$p]['totalmsisdn'] = number_format($row['totalmsisdn']);
                             }
                             $uncollected = $dataserah - $collection;
