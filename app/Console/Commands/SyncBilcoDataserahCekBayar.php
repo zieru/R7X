@@ -145,9 +145,9 @@ class SyncBilcoDataserahCekBayar extends Command
                             $update = null;
                             $update = ['h30' =>  $y['b30'] - $y['c30'],'h30f' =>  $y['c30']];
                             if($y['c30']==0){
-                                $update['full_129'] = 1;
+                                $update['full_30'] = 1;
                             }else{
-                                $update['full_129'] = 0;
+                                $update['full_30'] = 0;
                             }
                             $this->info('30 '. $update['h30']);
                             if($record->exists()){
@@ -164,9 +164,9 @@ class SyncBilcoDataserahCekBayar extends Command
                             $update = null;
                             $update = ['h60' =>  $y['b60'] - $y['c60'],'h60f' =>  $y['c60']];
                             if($y['c60']==0){
-                                $update['full_129'] = 1;
+                                $update['full_60'] = 1;
                             }else{
-                                $update['full_129'] = 0;
+                                $update['full_60'] = 0;
                             }
                             $this->info('60 '. $update['h60']);
                             if($record->exists()){
@@ -183,9 +183,9 @@ class SyncBilcoDataserahCekBayar extends Command
                             $update = null;
                             $update = ['h90' =>  $y['b90'] - $y['c90'],'h90f' =>  $y['c90']];
                             if($y['c90']==0){
-                                $update['full_129'] = 1;
+                                $update['full_90'] = 1;
                             }else{
-                                $update['full_129'] = 0;
+                                $update['full_90'] = 0;
                             }
                             $this->info('90 '. $update['h90']);
                             if($record->exists()){
@@ -202,9 +202,9 @@ class SyncBilcoDataserahCekBayar extends Command
                             $update = null;
                             $update = ['h120' =>  $y['b120'] - $y['c120'],'h120f' =>  $y['c120']];
                             if($y['c120']==0){
-                                $update['full_129'] = 1;
+                                $update['full_120'] = 1;
                             }else{
-                                $update['full_129'] = 0;
+                                $update['full_120'] = 0;
                             }
                             $this->info('120 '. $update['h120']);
                             if($record->exists()){
