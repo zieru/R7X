@@ -140,7 +140,7 @@ class SyncBilcoDataserahCekBayar extends Command
                             ['tahap', '=',  $y['tahap_periode']],
                             ['account', '=', $y['account']],
                         ];
-                        var_dump(SyncBilcoDataserahCekBayarLog::where($check)->exists());
+                        $record = SyncBilcoDataserahCekBayarLog::where($check);
                         if($y['c60'] != $y['b60']){
 
                             $update = null;
@@ -152,8 +152,12 @@ class SyncBilcoDataserahCekBayar extends Command
                                 $update['detil_pembayaran'] = sprintf('Dibayar partial kpi 60 pada %s total tagihan dibayar = %s', $row, $y['b60']+$y['c60']);
                             }
                             $this->info('60 '. $update['h60']);
-                            var_dump($update);
-                            SyncBilcoDataserahCekBayarLog::updateOrCreate($insertx,$update);
+                            if($record->exists()){
+                                $record->update($update);
+                            }else{
+                                SyncBilcoDataserahCekBayarLog::insert(array_merge($insertx,$update))
+                            }
+                            //SyncBilcoDataserahCekBayarLog::updateOrCreate($insertx,$update);
                             BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
                                 ->where('tahap_periode', $tahap)
                                 ->where('account', $y['account'])
@@ -168,8 +172,11 @@ class SyncBilcoDataserahCekBayar extends Command
                                 $update['detil_pembayaran'] = sprintf('Dibayar partial kpi 30 pada %s total tagihan dibayar = %s', $row, $y['b30']+$y['c30']);
                             }
                             $this->info('30 '. $update['h30']);
-                            var_dump($update);
-                            SyncBilcoDataserahCekBayarLog::updateOrCreate($insertx,$update);
+                            if($record->exists()){
+                                $record->update($update);
+                            }else{
+                                SyncBilcoDataserahCekBayarLog::insert(array_merge($insertx,$update))
+                            }
                             BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
                                 ->where('tahap_periode', $tahap)
                                 ->where('account', $y['account'])
