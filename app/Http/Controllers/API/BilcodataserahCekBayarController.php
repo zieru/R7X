@@ -134,10 +134,10 @@ class BilcodataserahCekBayarController extends Controller
         if($tahap_d > 0){
             $tahap_dx = 0;
             if($tahap_d == 1){
-                $tahap = [$date,Carbon::createFromFormat('Y-m-d', $date->format('Y-m-d'))->addDay(2)] ;
+                //$tahap = [$date,Carbon::createFromFormat('Y-m-d', $start->format('Y-m-d'))->addDay(2)] ;
                 $tahap_dx = -1;
             }else{
-                $tahap = [Carbon::createFromFormat('Y-m-d', $end->format('Y-m-d'))->addDay(-6),Carbon::createFromFormat('Y-m-d', $end->format('Y-m-d'))->addDay(3)] ;
+                //$tahap = [Carbon::createFromFormat('Y-m-d', $end->format('Y-m-d'))->addDay(-6),Carbon::createFromFormat('Y-m-d', $end->format('Y-m-d'))->addDay(3)] ;
                 $tahap_dx = 0;
             }
         }
