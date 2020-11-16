@@ -132,14 +132,14 @@ class SyncBilcoDataserahCekBayar extends Command
                             'account' => $y['account'],
                             'customer_id' => $y['customer_id'],
                             'msisdn' => $y['msisdn'],
-                            'hlr_region' => $y['hlr_region'],
-                            'import_batch' => $importer->id
+                            'hlr_region' => $y['hlr_region']
                         );
 
 
                         if($y['c60'] != $y['b60']){
                             $update = null;
                             $update = ['h60' =>  $y['b60'] - $y['c60'],'h60f' =>  $y['c60']];
+                            $update['import_batch'] = $importer->id;
                             if($y['c60']==0){
                                 $update['detil_pembayaran'] = sprintf('Dibayar penuh kpi 60 pada %s total tagihan dibayar = %s', $row, $y['b60']+$y['c60']);
                             }else{
@@ -155,6 +155,7 @@ class SyncBilcoDataserahCekBayar extends Command
                         }
                         if($y['c30'] != $y['b30']){
                             $update = null;
+                            $update['import_batch'] = $importer->id;
                             $update = ['h30' =>  $y['b30'] - $y['c30'],'h30f' =>  $y['c30']];
                             if($y['c30']==0){
                                 $update['detil_pembayaran'] = sprintf('Dibayar penuh kpi 30 pada %s total tagihan dibayar = %s', $row, $y['b30']+$y['c30']);
