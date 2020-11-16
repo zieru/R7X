@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 class SyncBilcoDataserahCekBayar extends Command
 {
@@ -277,8 +278,10 @@ class SyncBilcoDataserahCekBayar extends Command
                 'tipe' => 'dataserah:cekbayar',
                 'filename' => 'dataserah:cekbayar '.$date->format('Ymd')
             ));
-            $bar = $this->output->createProgressBar($x->count());
-            $bar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%')->start();
+            $bar = new ProgressBar($x->count());;
+            //$bar = $this->output->createProgressBar();
+            $bar->setFormat('debug');
+            $bar->start();
             foreach ($x->get()->toArray() as $row){
                 $row = (array) $row;
                 $date = Carbon::createFromFormat('Y-m-d', $row['periode']);
