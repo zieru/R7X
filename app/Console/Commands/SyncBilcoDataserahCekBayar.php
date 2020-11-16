@@ -124,6 +124,19 @@ class SyncBilcoDataserahCekBayar extends Command
                     echo 'update :' . $updatedate;
                     foreach ($xdata as $y){
                         $y = (array) $y;
+
+                        $insertx = array(
+                            'periode' => $y['tahap_date'],
+                            'periode_upd' => $row,
+                            'tahap' => $y['tahap_periode'],
+                            'account' => $y['account'],
+                            'customer_id' => $y['customer_id'],
+                            'msisdn' => $y['msisdn'],
+                            'hlr_region' => $y['hlr_region'],
+                            'import_batch' => $importer->id
+                        );
+
+
                         if($y['c60'] != $y['b60']){
                             $update = null;
                             $update = ['h60' =>  $y['b60'] - $y['c60'],'h60f' =>  $y['c60']];
@@ -134,16 +147,7 @@ class SyncBilcoDataserahCekBayar extends Command
                             }
                             $this->info('60 '. $update['h60']);
 
-                            $insertx = array(
-                                'periode' => $y['tahap_date'],
-                                'periode_upd' => $row,
-                                'tahap' => $y['tahap_periode'],
-                                'account' => $y['account'],
-                                'customer_id' => $y['customer_id'],
-                                'msisdn' => $y['msisdn'],
-                                'hlr_region' => $y['hlr_region'],
-                                'import_batch' => $importer->id
-                            );
+                            SyncBilcoDataserahCekBayarLog::updateOrCreate($insertx,$update);
                             BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
                                 ->where('tahap_periode', $tahap)
                                 ->where('account', $y['account'])
