@@ -149,7 +149,6 @@ class SyncBilcoDataserahCekBayar extends Command
                             }else{
                                 $update['full_30'] = 0;
                             }
-                            $this->info('30 '. $update['h30']);
                             if($record->exists()){
                                 $record->update($update);
                             }else{
@@ -168,7 +167,6 @@ class SyncBilcoDataserahCekBayar extends Command
                             }else{
                                 $update['full_60'] = 0;
                             }
-                            $this->info('60 '. $update['h60']);
                             if($record->exists()){
                                 $record->update($update);
                             }else{
@@ -187,7 +185,6 @@ class SyncBilcoDataserahCekBayar extends Command
                             }else{
                                 $update['full_90'] = 0;
                             }
-                            $this->info('90 '. $update['h90']);
                             if($record->exists()){
                                 $record->update($update);
                             }else{
@@ -206,7 +203,6 @@ class SyncBilcoDataserahCekBayar extends Command
                             }else{
                                 $update['full_120'] = 0;
                             }
-                            $this->info('120 '. $update['h120']);
                             if($record->exists()){
                                 $record->update($update);
                             }else{
