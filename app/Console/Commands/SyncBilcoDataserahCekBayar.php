@@ -278,7 +278,7 @@ class SyncBilcoDataserahCekBayar extends Command
                 'filename' => 'dataserah:cekbayar '.$date->format('Ymd')
             ));
             $bar = $this->output->createProgressBar($x->count());
-            $bar->setFormat('debug')->start();
+            $bar->setFormat(' %current%/%max% [%bar%] %percent:3s%% %elapsed:6s%/%estimated:-6s%')->start();
             foreach ($x->get()->toArray() as $row){
                 $row = (array) $row;
                 $date = Carbon::createFromFormat('Y-m-d', $row['periode']);
