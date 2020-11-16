@@ -124,17 +124,6 @@ class SyncBilcoDataserahCekBayar extends Command
                     echo 'update :' . $updatedate;
                     foreach ($xdata as $y){
                         $y = (array) $y;
-                        $insertx = array(
-                            'periode' => $y['tahap_date'],
-                            'periode_upd' => $row,
-                            'tahap' => $y['tahap_periode'],
-                            'account' => $y['account'],
-                            'customer_id' => $y['customer_id'],
-                            'msisdn' => $y['msisdn'],
-                            'hlr_region' => $y['hlr_region'],
-                            'import_batch' => $importer->id
-                        );
-
                         if($y['c60'] != $y['b60']){
                             $update = null;
                             $update = ['h60' =>  $y['b60'] - $y['c60'],'h60f' =>  $y['c60']];
@@ -144,6 +133,18 @@ class SyncBilcoDataserahCekBayar extends Command
                                 $update['detil_pembayaran'] = sprintf('Dibayar partial kpi 60 pada %s total tagihan dibayar = %s', $row, $y['b60']+$y['c60']);
                             }
                             $this->info('60 '. $update['h60']);
+
+                            $insertx = array(
+                                'periode' => $y['tahap_date'],
+                                'periode_upd' => $row,
+                                'tahap' => $y['tahap_periode'],
+                                'account' => $y['account'],
+                                'customer_id' => $y['customer_id'],
+                                'msisdn' => $y['msisdn'],
+                                'hlr_region' => $y['hlr_region'],
+                                'import_batch' => $importer->id
+                            );
+
                             SyncBilcoDataserahCekBayarLog::updateOrCreate($insertx,$update);
                             BilcodataserahCekBayar::where('tahap_date',$y['tahap_date'])
                                 ->where('tahap_periode', $tahap)
@@ -151,6 +152,18 @@ class SyncBilcoDataserahCekBayar extends Command
                                 ->update(['b60' => $y['c60'], 'update_date' => $updatedate]);
                         }
                         if($y['c30'] != $y['b30']){
+
+                            $insertx = array(
+                                'periode' => $y['tahap_date'],
+                                'periode_upd' => $row,
+                                'tahap' => $y['tahap_periode'],
+                                'account' => $y['account'],
+                                'customer_id' => $y['customer_id'],
+                                'msisdn' => $y['msisdn'],
+                                'hlr_region' => $y['hlr_region'],
+                                'import_batch' => $importer->id
+                            );
+
                             $update = null;
                             $update = ['h30' =>  $y['b30'] - $y['c30'],'h30f' =>  $y['c30']];
                             if($y['c30']==0){
@@ -166,6 +179,18 @@ class SyncBilcoDataserahCekBayar extends Command
                                 ->update(['b30' => $y['c30'], 'update_date' => $updatedate,'last_update' => $row]);
                         }
                         if($y['c90'] != $y['b90']){
+
+                            $insertx = array(
+                                'periode' => $y['tahap_date'],
+                                'periode_upd' => $row,
+                                'tahap' => $y['tahap_periode'],
+                                'account' => $y['account'],
+                                'customer_id' => $y['customer_id'],
+                                'msisdn' => $y['msisdn'],
+                                'hlr_region' => $y['hlr_region'],
+                                'import_batch' => $importer->id
+                            );
+
                             $update = ['h90' =>  $y['b90'] - $y['c90'],'h90f' =>  $y['c90']];
                             if($y['c90']==0){
                                 $update['detil_pembayaran'] = sprintf('Dibayar penuh kpi 90 pada %s total tagihan dibayar = %s', $row, $y['b90']+$y['c90']);
@@ -179,6 +204,18 @@ class SyncBilcoDataserahCekBayar extends Command
                                 ->update(['b90' => $y['c90'], 'update_date' => $updatedate]);
                         }
                         if($y['c120'] != $y['b120']){
+
+                            $insertx = array(
+                                'periode' => $y['tahap_date'],
+                                'periode_upd' => $row,
+                                'tahap' => $y['tahap_periode'],
+                                'account' => $y['account'],
+                                'customer_id' => $y['customer_id'],
+                                'msisdn' => $y['msisdn'],
+                                'hlr_region' => $y['hlr_region'],
+                                'import_batch' => $importer->id
+                            );
+
                             $update = ['h120' =>  $y['b120'] - $y['c120'],'h120f' =>  $y['c120']];
                             if($y['c120']==0){
                                 $insert['detil_pembayaran'] = sprintf('Dibayar penuh kpi 120 pada %s total tagihan dibayar = %s', $row, $y['b120']+$y['c120']);
