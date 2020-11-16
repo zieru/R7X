@@ -134,9 +134,9 @@ class SyncBilcoDataserahCekBayar extends Command
                             'msisdn' => $y['msisdn'],
                             'hlr_region' => $y['hlr_region']
                         );
-
-
+                        dd(SyncBilcoDataserahCekBayarLog::where([$insertx]));
                         if($y['c60'] != $y['b60']){
+
                             $update = null;
                             $update = ['h60' =>  $y['b60'] - $y['c60'],'h60f' =>  $y['c60']];
                             $update['import_batch'] = $importer->id;
@@ -155,7 +155,6 @@ class SyncBilcoDataserahCekBayar extends Command
                         }
                         if($y['c30'] != $y['b30']){
                             $update = null;
-                            $update['import_batch'] = $importer->id;
                             $update = ['h30' =>  $y['b30'] - $y['c30'],'h30f' =>  $y['c30']];
                             if($y['c30']==0){
                                 $update['detil_pembayaran'] = sprintf('Dibayar penuh kpi 30 pada %s total tagihan dibayar = %s', $row, $y['b30']+$y['c30']);
