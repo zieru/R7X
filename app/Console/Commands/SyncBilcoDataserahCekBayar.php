@@ -147,7 +147,6 @@ class SyncBilcoDataserahCekBayar extends Command
                                 'msisdn' => $y['msisdn'],
                                 'hlr_region' => $y['hlr_region'],
                                 'nominal_bayar' => $y['b30'] - $y['c30'],
-                                'kpi' => 30,
                                 'import_batch' => $importer->id
                             );
                             if($y['c30']==0){
