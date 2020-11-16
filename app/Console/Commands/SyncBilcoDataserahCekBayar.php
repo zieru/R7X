@@ -10,7 +10,6 @@ use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Symfony\Component\Console\Helper\ProgressBar;
 
 class SyncBilcoDataserahCekBayar extends Command
 {
@@ -112,6 +111,8 @@ class SyncBilcoDataserahCekBayar extends Command
                     })
                     ->where('a.tahap_date',Carbon::createFromFormat('Ymd',$basedate->format('Ymd'))->startOfMonth())
                     ->where('a.tahap_periode',$tahap);
+
+
                 $xdata = $x->get()->toArray();
                 //echo Carbon::createFromFormat('Ymd',$basedate->format('Ymd'))->startOfMonth();
                 //dd($xdata);
@@ -123,7 +124,11 @@ class SyncBilcoDataserahCekBayar extends Command
                     echo ' startfrom :'.$startdate;
                     $updatedate = $row;
                     echo 'update :' . $updatedate;
+                    $bar = $this->output->createProgressBar($x->count());
+                    $bar->setFormat("%current%/%max% [%bar%] %percent:3s%%");
+                    $bar->start();
                     foreach ($xdata as $y){
+                        $bar->advance();
                         $y = (array) $y;
 
                         $insertx = array(
@@ -237,7 +242,7 @@ class SyncBilcoDataserahCekBayar extends Command
                 }
                 $importer->status = 'finish';
                 $importer->save();
-
+                $bar->finish();
             }
 
         }
@@ -278,9 +283,9 @@ class SyncBilcoDataserahCekBayar extends Command
                 'tipe' => 'dataserah:cekbayar',
                 'filename' => 'dataserah:cekbayar '.$date->format('Ymd')
             ));
-            $bar = new ProgressBar($x->count());;
-            //$bar = $this->output->createProgressBar();
-            $bar->setFormat('debug');
+
+            $bar = $this->output->createProgressBar($x->count());
+            $bar->setFormat("%current%/%max% [%bar%] %percent:3s%%");
             $bar->start();
             foreach ($x->get()->toArray() as $row){
                 $row = (array) $row;
