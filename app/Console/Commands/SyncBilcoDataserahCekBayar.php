@@ -141,6 +141,7 @@ class SyncBilcoDataserahCekBayar extends Command
                             ['account', '=', $y['account']],
                         ];
                         $record = SyncBilcoDataserahCekBayarLog::where($check);
+                        $update = [];
                         if($y['c30'] != $y['b30']){
                             $update = null;
                             $update = ['h30' =>  $y['b30'] - $y['c30'],'h30f' =>  $y['c30']];
@@ -213,12 +214,8 @@ class SyncBilcoDataserahCekBayar extends Command
                                 ->where('account', $y['account'])
                                 ->update(['b120' => $y['c120'], 'update_date' => $updatedate,'last_update' => $row]);
                         }
-                        $updold = $update;
+                        //$updold = $update;
                         $update = [
-                            'full_120' => $updold['full_120'],
-                            'full_90' => $updold['full_90'],
-                            'full_60' => $updold['full_60'],
-                            'full_30' => $updold['full_30'],
                             'h120' =>  $y['b120'] - $y['c120'],
                             'h120f' =>  $y['c120'],
                             'h90' =>  $y['b90'] - $y['c90'],
@@ -228,6 +225,7 @@ class SyncBilcoDataserahCekBayar extends Command
                             'h30' =>  $y['b30'] - $y['c30'],
                             'h30f' =>  $y['c30']
                         ];
+
                         if($record->exists()){
                             $record->update($update);
 
