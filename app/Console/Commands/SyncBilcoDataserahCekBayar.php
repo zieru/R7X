@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\AppHelper;
 use App\Http\Controllers\API\BilcodataserahCekBayarController;
 use App\Importer;
 use App\Models\BilcodataserahCekBayar;
@@ -470,14 +471,30 @@ class SyncBilcoDataserahCekBayar extends Command
     public function handle()
     {
         $from  = null;
-        if($this->option('from') != 'null'){
-            $from = $this->option('from');
-        }
-        $update = $this->option('update');
-        $controller = new BilcodataserahCekBayarController();
-        $datex = $this->argument('date');
         $tahap = (int) $this->argument('tahap');
-        $date = Carbon::createFromFormat('Y-m-d',$datex.'-01');
+        $datex = $this->argument('date');
+        $update = $this->option('update');
+        if($this->option('from') != 'null'){
+            ($update == false) ? exit('--From must specify --update'): false;
+            try {$min_range = Carbon::createFromFormat('Y-m-d-',$datex.'-'.$from);}
+            catch (\Exception $e){exit($this->error('from value is invalid'));}
+            switch($tahap){
+                case 1; $min_range->addDay(0); break;
+                case 2; $min_range->addDay(6); break;
+                case 3; $min_range->addDay(12); break;
+            }
+            $from = $this->option('from');
+            $max_range = Carbon::createFromFormat('Ymd',$min_range->format('Ymd'))->endOfMonth();
+            $param = [ 'min_range' => (int) $min_range->format('d'), 'max_range' => (int)$max_range->format('d')+1];
+
+            $from = filter_var(
+                (int) $from,FILTER_VALIDATE_INT, array('options' => $param)
+            );
+            ($from == false) ? exit($this->error('From is not in allowed range :'.$min_range->format('d').'-'.$param['max_range'])):false;
+        }
+        try {$date = Carbon::createFromFormat('Y-m-d',$datex.'-01');}
+        catch (\Exception $e){exit($this->error('date value is invalid'));}
+
         if($update != true){
             if($tahap == 1){
                 $date = $date->addDay(-1);
@@ -489,46 +506,53 @@ class SyncBilcoDataserahCekBayar extends Command
                 $date = $date->addDay(13-1);
             }
 
+            $controller = new BilcodataserahCekBayarController();
             $x = $controller->fetch($date,$tahap);
-            $importer  = Importer::create(array(
-                'importedRow'=>0,
-                'storedRow'=>0,
-                'status' => 'QUEUE',
-                'tipe' => 'dataserah:cekbayar',
-                'filename' => 'dataserah:cekbayar '.$date->format('Ymd')
-            ));
-
-            $bar = $this->output->createProgressBar($x->count());
-            $bar->setFormat("%current%/%max% [%bar%] %percent:3s%%");
-            $bar->start();
-            foreach ($x->get()->toArray() as $row){
-                $row = (array) $row;
-                $date = Carbon::createFromFormat('Y-m-d', $row['periode']);
-                $bilcoenddate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2)->endOfMonth();
-                $bilcodate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2);
-                $tahap = 0;
-                switch ($bilcodate->format('d')){
-                    case $bilcoenddate->format('d'):
-                        $tahap = 1;
-                        break;
-                    default:
-                        $tahap = 2;
-                }
-                $row['tahap'] = $tahap;
-                $row['total_outstanding'] = $row['a120'] + $row['a90'] + $row['a60'] + $row['a30'];
-                $row['update_date'] = $date;
-                $row['import_batch'] = $importer->id;
-                BilcodataserahCekBayar::insert($row);
-                $importer->importedRow =sizeof($row);
-                $importer->status = 'finish';
-                $importer->save();
-
-                $bar->advance();
-            }
-            $bar->finish();
+            $this->processDatacekbayar($x,$date,$tahap);
         }else{
+
             $this->update($date,$tahap,$from);
         }
         return 0;
     }
+
+    private function processDatacekbayar($dataserah,$date,$tahap,$update_date_from = null,$update_date_to = null){
+        $importer  = Importer::create(array(
+            'importedRow'=>0,
+            'storedRow'=>0,
+            'status' => 'QUEUE',
+            'tipe' => 'dataserah:cekbayar',
+            'filename' => 'dataserah:cekbayar '.$date->format('Ymd')
+        ));
+
+        $bar = $this->output->createProgressBar($dataserah->count());
+        $bar->setFormat("%current%/%max% [%bar%] %percent:3s%%");
+        $bar->start();
+        foreach ($dataserah->get()->toArray() as $row){
+            $row = (array) $row;
+            $date = Carbon::createFromFormat('Y-m-d', $row['periode']);
+            $bilcodate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2);
+            $bilcoenddate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2)->endOfMonth();
+            $tahap = 0;
+            switch ($bilcodate->format('d')){
+                case $bilcoenddate->format('d'):
+                    $tahap = 1;
+                    break;
+                default:
+                    $tahap = 2;
+            }
+            $row['tahap'] = $tahap;
+            $row['total_outstanding'] = $row['a120'] + $row['a90'] + $row['a60'] + $row['a30'];
+            $row['update_date'] = $date;
+            $row['import_batch'] = $importer->id;
+            BilcodataserahCekBayar::insert($row);
+            $importer->importedRow =sizeof($row);
+            $importer->status = 'finish';
+            $importer->save();
+
+            $bar->advance();
+        }
+        $bar->finish();
+    }
+
 }
