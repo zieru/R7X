@@ -495,28 +495,67 @@ class SyncBilcoDataserahCekBayar extends Command
         try {$date = Carbon::createFromFormat('Y-m-d',$datex.'-01');}
         catch (\Exception $e){exit($this->error('date value is invalid'));}
 
+        ($tahap == 1) ? $date->addDay(-1):false;
+        ($tahap == 2) ? $date->addDay(7-1):false;
+        ($tahap == 3) ? $date->addDay(13-1):false;
         if($update != true){
-            if($tahap == 1){
-                $date = $date->addDay(-1);
-            }
-            if($tahap == 2){
-                $date = $date->addDay(7-1);
-            }
-            if($tahap == 3){
-                $date = $date->addDay(13-1);
-            }
 
-            $controller = new BilcodataserahCekBayarController();
-            $x = $controller->fetch($date,$tahap);
-            $this->processDatacekbayar($x,$date,$tahap);
+            $this->processDatacekbayar($date,$tahap);
         }else{
+            $updfrom = ($from == null) ? Carbon::createFromFormat('Ymd',$date->format('Ymd'))->addDay(1):Carbon::createFromFormat('Y-m-d-',$datex.$from);
 
-            $this->update($date,$tahap,$from);
+            $this->processDatacekbayar($date,$tahap,$updfrom);
         }
         return 0;
     }
 
-    private function processDatacekbayar($dataserah,$date,$tahap,$update_date_from = null,$update_date_to = null){
+    public function checkSabyanTable($date){
+            $basedate = Carbon::createFromFormat('Ymd',$date->format('Ymd'));
+            //$basedate = Carbon::createFromFormat('Ymd',$date->format('Ymd'));
+            $x =  Carbon::createFromFormat('Ymd',$basedate->format('Ymd'))->format("Ymd");
+            $x_endofmonth = Carbon::createFromFormat('Ymd',$date->format('Ymd'))->endOfMonth();
+            $date = [$date,$x_endofmonth];
+            $existtable = [];
+
+            while($x <= $date[1]->format('Ymd')){
+                $table = sprintf('%s_Sumatra',$x);
+                $exist = Schema::connection('mysql2')->hasTable($table);
+                echo 'cek : '.$table;
+                echo ($exist ? ' exist' : ' not exist');
+                echo PHP_EOL;
+
+                if($exist == 1){
+                    $existtable[] = $x;
+                }
+                $x++;
+            }
+            return $existtable;
+        }
+
+    private function processDatacekbayar($date,$tahap,$update_date_from = null,$update_date_to = null){
+        $dataserahdate = $date;
+        if($update_date_from != null){
+            $update_date_from = $this->checkSabyanTable($update_date_from);
+        }
+
+        $controller = new BilcodataserahCekBayarController();
+        if(is_array($update_date_from))
+        {
+            $this->info('Proses Multiple');
+            foreach ($update_date_from as $xdate){
+                $this->info('Proses '. $xdate);
+                $x = $controller->fetch($date,$tahap,Carbon::createFromFormat('Ymd',$xdate));
+                $this->fetch($x,$date,Carbon::createFromFormat('Ymd',$xdate));
+            }
+        }else{
+            $x = $controller->fetch($date,$tahap);
+            $this->fetch($x,$date);
+        }
+
+    }
+
+    private function fetch($dataserah,$date,$bdate = null){
+
         $importer  = Importer::create(array(
             'importedRow'=>0,
             'storedRow'=>0,
@@ -524,13 +563,14 @@ class SyncBilcoDataserahCekBayar extends Command
             'tipe' => 'dataserah:cekbayar',
             'filename' => 'dataserah:cekbayar '.$date->format('Ymd')
         ));
-
+        $this->info('The import id was : ' . $importer->id);
         $bar = $this->output->createProgressBar($dataserah->count());
         $bar->setFormat("%current%/%max% [%bar%] %percent:3s%%");
         $bar->start();
         foreach ($dataserah->get()->toArray() as $row){
             $row = (array) $row;
             $date = Carbon::createFromFormat('Y-m-d', $row['periode']);
+
             $bilcodate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2);
             $bilcoenddate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2)->endOfMonth();
             $tahap = 0;
@@ -541,9 +581,10 @@ class SyncBilcoDataserahCekBayar extends Command
                 default:
                     $tahap = 2;
             }
+
             $row['tahap'] = $tahap;
             $row['total_outstanding'] = $row['a120'] + $row['a90'] + $row['a60'] + $row['a30'];
-            $row['update_date'] = $date;
+            $row['last_update']  = $row['update_date'] = ($bdate) ? $bdate->format('Y-m-d') :   $date;
             $row['import_batch'] = $importer->id;
             BilcodataserahCekBayar::insert($row);
             $importer->importedRow =sizeof($row);
@@ -554,5 +595,4 @@ class SyncBilcoDataserahCekBayar extends Command
         }
         $bar->finish();
     }
-
 }
