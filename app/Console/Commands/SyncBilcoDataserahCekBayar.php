@@ -563,6 +563,7 @@ class SyncBilcoDataserahCekBayar extends Command
             'tipe' => 'dataserah:cekbayar',
             'filename' => 'dataserah:cekbayar '.$date->format('Ymd')
         ));
+        $this->info('The import id was : ' . $importer->id);
         $bar = $this->output->createProgressBar($dataserah->count());
         $bar->setFormat("%current%/%max% [%bar%] %percent:3s%%");
         $bar->start();
