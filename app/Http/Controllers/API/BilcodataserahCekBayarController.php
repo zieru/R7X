@@ -35,7 +35,7 @@ class BilcodataserahCekBayarController extends Controller
                 'a.bill_amount_03 as ab90',
                 'a.bill_amount_02 as ab60',
                 'a.bill_amount_01 as ab30',
-                //'"0" as a30',
+                '"0" as a30',
                 'a.bucket_1 as a60',
                 'a.bucket_2 as a90',
                 'a.bucket_3 as a120',
