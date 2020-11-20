@@ -23,6 +23,7 @@ class BilcodataserahCekBayarController extends Controller
 
         $bdate = ($bdate == null) ? Carbon::createFromFormat('Ymd', $date)->addDay(1): $bdate;
 
+        dd($date,$bdate);
         $x= DB::table('sabyan_r7s.bilco_data_serahs AS a');
 
 
@@ -325,6 +326,7 @@ class BilcodataserahCekBayarController extends Controller
                             BilcodataserahCekBayar::selectRaw($generalcolumn.'hlr_region as regional')
                                 ->groupBy('hlr_region');
         $ret->where('tahap_date',$date->format('Y-m-d'));
+        $ret->where('update_date',"2020-11-17");
         ($tahap > 0)  ? $ret->where('tahap_periode',$tahap) : false;
         ($ischild AND $ismom == false) ? $ret->groupBy('bill_cycle')->orderBy('bill_cycle','ASC'): false;
         ($ismom) ? $ret->groupBy('kpi')->orderBy('kpi','ASC'): false;
