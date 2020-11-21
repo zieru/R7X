@@ -460,6 +460,54 @@ class BillingCollectionController extends Controller
         return $bilco->toJson();
     }
 
+    public function factoryDashboardPoc($date,$bc,$area = false){
+
+        DB::statement(DB::raw('SET @rankarea60h = 0;'));
+        DB::statement(DB::raw('SET @rankarea90h = 0;'));
+        $xdate = Carbon::createFromFormat('Y-m-d',$date);
+
+        $dat['area'] = $area;
+        $dat['select_area'] = ($area) ?  '"AREA" AS LABEL,IF(area NOT IN ("AREA I","AREA II","AREA III","AREA IV"), "NON AREA", area) as regional,' : '"REGIONAL" AS LABEL, CONCAT("-- " ,bc.regional) AS regional,';
+        $dat['select_billing'] = ($xdate->endOfMonth()) ? '( Sum( bc.bill_amount_3 ) - Sum( bc.bucket_3 ) ) / sum( bc.bill_amount_3 ) AS billing_1,
+                                        ( Sum( bc.bill_amount_4 ) - Sum( bc.bucket_4 ) ) / sum( bc.bill_amount_4 ) AS billing_2':
+                                        '( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) AS billing_1,
+                                        ( Sum( bc.bill_amount_3 ) - Sum( bc.bucket_3 ) ) / sum( bc.bill_amount_3 ) AS billing_2';
+        $ret = BillingCollectionPoc::selectRaw('
+            *,billing_1 - billing_2 AS selisih')
+            ->fromSub(function ($query) use($date,$bc,$dat) {
+                $query->selectRaw('*')
+                    ->fromSub(function ($query) use($date,$bc,$dat) {
+                        $query->selectRaw('*,@rankarea60h := @rankarea60h + 1 AS rank60h')
+                            ->fromSub(function ($query) use($date,$bc,$dat) {
+                                $query->selectRaw('*,@rankarea90h := @rankarea90h + 1 AS rank90h')
+                                    ->fromSub(function ($query) use($date,$bc,$dat) {
+                                        $group = array();
+                                        if($bc){
+                                            $group[] = 'bill_cycle';
+                                        }
+                                        $group[] =  ($dat['area']) ?'bc.area' : 'bc.regional';
+                                        $query->selectRaw($dat['select_area'] . 'area,
+                                        regional AS subarea,
+                                        bc.bill_cycle,'.$dat['select_billing'])
+                                            ->from('billing_collections_poc','bc')
+                                            ->orderBy('billing_2','DESC')
+                                            ->groupBy( $group)
+                                            ->where('bc.periode','=' ,$date)
+                                            ->where('bc.customer_type','=','S');
+                                            ($dat['area'])  ? $query->whereIn('bc.area', ['AREA I', 'AREA II', 'AREA III', 'AREA IV']) : $query->where('bc.regional','!=' ,'**************');
+                                        if($bc){
+                                            if($bc){
+                                                $query->where('bill_cycle','=',$bc);
+                                            }
+                                        }
+                                    }, 'sub');
+                            },'order_billing_2')
+                            ->orderBy('billing_1','DESC');
+                    },'order_biling_1')->orderBy('area');
+            },'sub1');
+        return $ret;
+    }
+
     public function dashboardApiCompare(Request $request){
         ini_set('xdebug.var_display_max_depth', '10');
         ini_set('xdebug.var_display_max_children', '256');
@@ -467,16 +515,15 @@ class BillingCollectionController extends Controller
         DB::connection()->enableQueryLog();
 
 
-        $bc = false;
+        $bc_val = $bc = false;
         if($request->has('bc')){
             $bc = true;
         }
+        $bc_val = ($request->has('bc')) ? $request->bc : false;
 
 
-        DB::statement(DB::raw('SET @rankarea60h = 0;'));
-        DB::statement(DB::raw('SET @rankarea90h = 0;'));
 
-        $d60h = BillingCollectionPoc::selectRaw('
+        /*$d60h = BillingCollectionPoc::selectRaw('
             *,billing_1 - billing_2 AS selisih')
             ->fromSub(function ($query) use($request,$bc) {
                 $query->selectRaw('*')
@@ -514,9 +561,10 @@ class BillingCollectionController extends Controller
                             },'order_billing_2')
                             ->orderBy('billing_1','DESC');
                     },'order_biling_1')->orderBy('area');
-            },'sub1');
-
-        DB::statement(DB::raw('SET @rankregional60h = 0;'));
+            },'sub1');*/
+        $d60h = $this->factoryDashboardPoc($request->start,$bc_val,true);
+        $d90h = $this->factoryDashboardPoc($request->start,$bc_val,false);
+        /*DB::statement(DB::raw('SET @rankregional60h = 0;'));
         DB::statement(DB::raw('SET @rankregional90h = 0;'));
         $d90h = BillingCollectionPoc::selectRaw('
             *,billing_1 - billing_2 AS selisih')
@@ -525,7 +573,6 @@ class BillingCollectionController extends Controller
                     ->fromSub(function ($query) use($request,$bc) {
                         $query->selectRaw('*,@rankregional60h := @rankregional60h + 1 AS rank60h')
                             ->fromSub(function ($query) use($request,$bc) {
-
                                 $query->selectRaw('*, @rankregional90h := @rankregional90h + 1 AS rank90h')
                                     ->fromSub(function ($query) use($request,$bc) {
                                         $group = array();
@@ -557,9 +604,9 @@ class BillingCollectionController extends Controller
                             },'order_billing_2')
                             ->orderBy('billing_1','DESC');
                     },'order_biling_1');
-            },'sub1');
+            },'sub1');*/
 
-        DB::statement(DB::raw('SET @rankarea60h = 0;'));
+        /*DB::statement(DB::raw('SET @rankarea60h = 0;'));
         DB::statement(DB::raw('SET @rankarea90h = 0;'));
         $d60h2 = BillingCollectionPoc::selectRaw('
             *,billing_1 - billing_2 AS selisih')
@@ -581,7 +628,7 @@ class BillingCollectionController extends Controller
                                         regional AS subarea,
                                         bc.bill_cycle,
                                         ( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) AS billing_1,
-                                        ( Sum( bc.bill_amount_3 ) - Sum( bc.bucket_3 ) ) / sum( bc.bill_amount_3 ) AS billing_2   
+                                        ( Sum( bc.bill_amount_3 ) - Sum( bc.bucket_3 ) ) / sum( bc.bill_amount_3 ) AS billing_2
                                     ')
                                             ->from('billing_collections_poc','bc')
                                             ->orderBy('billing_2','DESC')
@@ -598,47 +645,10 @@ class BillingCollectionController extends Controller
                             },'order_billing_2')
                             ->orderBy('billing_1','DESC');
                     },'order_biling_1')->orderBy('area');
-            },'sub1');
-        DB::statement(DB::raw('SET @rankregional60h = 0;'));
-        DB::statement(DB::raw('SET @rankregional90h = 0;'));
-        $d90h2 = BillingCollectionPoc::selectRaw('
-            *,billing_1 - billing_2 AS selisih')
-            ->fromSub(function ($query) use($request,$bc) {
-                $query->selectRaw('*')
-                    ->fromSub(function ($query) use($request, $bc) {
-                        $query->selectRaw('*,@rankregional60h := @rankregional60h + 1 AS rank60h')
-                            ->fromSub(function ($query) use($request, $bc) {
-                                $query->selectRaw('*, @rankregional90h := @rankregional90h + 1 AS rank90h')
-                                    ->fromSub(function ($query) use($request, $bc) {
-                                        if($bc){
-                                            $group[] = 'bill_cycle';
-                                        }
-                                        $group[] = 'bc.regional';
-                                        $query->selectRaw('
-                                        "REGIONAL" AS LABEL,
-                                        CONCAT("-- " ,bc.regional) AS regional,
-                                        area,
-                                        regional AS subarea,
-                                        bc.bill_cycle,
-                                        ( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) AS billing_1,
-                                        ( Sum( bc.bill_amount_3 ) - Sum( bc.bucket_3 ) ) / sum( bc.bill_amount_3 ) AS billing_2   
-                                    ')
-                                            ->from('billing_collections_poc','bc')
-                                            ->orderBy('billing_2','DESC')
-                                            ->groupBy( $group)
-                                            ->where('bc.periode','=' ,$request->get('end'))
-                                            ->where('bc.regional','!=' ,'**************')
-                                            ->where('bc.customer_type','=','S');
-                                        if($bc){
-                                            if($request->has('bc_val')){
-                                                $query->where('bill_cycle','=',$request->get('bc_val'));
-                                            }
-                                        }
-                                    }, 'sub');
-                            },'order_billing_2')
-                            ->orderBy('billing_1','DESC');
-                    },'order_biling_1');
-            },'sub1');
+            },'sub1');*/
+
+        $d60h2  = $this->factoryDashboardPoc($request->end,$bc_val,true);
+        $d90h2 = $this->factoryDashboardPoc($request->end,$bc_val,false);
 
 
 
