@@ -90,6 +90,9 @@ class BilcodataserahCekBayarController extends Controller
         return $x;
     }
 
+    public function cekupdate(){
+        return datatables()->of($this->factoryCekBayarLastUpdate())->toJson();
+    }
     /**
      * Display a listing of the resource.
      *
@@ -159,45 +162,6 @@ class BilcodataserahCekBayarController extends Controller
         //////////////////////
 
         if($request->has('end')){
-            $generalcolumnmom = 'sum( h120f ) as h120f,
-                                 sum( h90f )  as h90f,
-                                 sum( h60f )  as h60f,
-                                 sum( h30f )  as h30f,
-                                 bill_cycle,';
-            $d30hareamom = SyncBilcoDataserahCekBayarLog::selectRaw($generalcolumnmom.'"AREA Sumatra" AS regional')
-                ->where('periode_upd',$start)->groupBy('hlr_region');
-            if($tahap_d > 0) $d30hareamom->where('tahap',$tahap_d);
-            $d30hareamom->orderBy('hlr_region','DESC');
-
-            $d30hmom = SyncBilcoDataserahCekBayarLog::selectRaw($generalcolumnmom.'hlr_region AS regional')
-                ->where('periode_upd',$start)->groupBy('hlr_region');
-            if($tahap_d > 0) $d30hmom->where('tahap',$tahap_d);
-            $d30hmom->orderBy('hlr_region','DESC');
-            $d30hmom = $d30hmom->union($d30hareamom)->get()->toArray();
-            if(sizeof($d30hmom) > 0){
-                $d30hmomv = [];
-                foreach ($d30hmom as $row){
-                    $d30hmomv[$row['regional']]['All BC'] = $row;
-                }
-            }
-            $d90hareamom = SyncBilcoDataserahCekBayarLog::selectRaw($generalcolumnmom.'"AREA Sumatra" AS regional')
-                ->where('periode_upd',$start)->groupBy('hlr_region')->groupBy('bill_cycle');;
-            if($tahap_d > 0) $d90hareamom->where('tahap',$tahap_d);
-            $d90hareamom->orderBy('hlr_region','DESC');
-
-            $d90hmom = SyncBilcoDataserahCekBayarLog::selectRaw($generalcolumnmom.'hlr_region AS regional')
-                ->where('periode_upd',$start)->groupBy('hlr_region')->groupBy('bill_cycle');
-            if($tahap_d > 0) $d90hmom->where('tahap',$tahap_d);
-            $d90hmom->orderBy('hlr_region','DESC');
-            $d90hmom = $d90hmom->union($d90hareamom)->get()->toArray();
-            $d90hmomv = [];
-            if(sizeof($d90hmomv) > 0){
-                $d90hmomv = [];
-                foreach ($d90hmomv as $row){
-                    $d90hmomv[$row['regional']][$row['bill_cycle']] = $row;
-                }
-            }
-
             $d30harea2 = $this->factoryCekBayar($endx,$tahap_d,false,false,$momparam,false,$request->outs);
             $d30h2 = $this->factoryCekBayar($endx,$tahap_d,true,false,$momparam,false,$request->outs);
             $d30h2 =$d30h2->union($d30harea2)->get()->toArray();
@@ -230,7 +194,13 @@ class BilcodataserahCekBayarController extends Controller
         return datatables()->of($finalsum)->with(['last_update'=>$dateupdate,'datecolumn' => $kpis ,'endparam'=> $request->has('end'), 'startx' => $startx->format('Y-m-d'),'msisdnparam' => $msisdnparam, 'momparam' => $momparam])->toJson();
     }
 
-    protected function factoryCekBayarLastUpdate($date,$tahap){
+    /**
+     * @param Carbon $date
+     * @param int $tahap
+     * @return array|bool|null
+     */
+    protected function factoryCekBayarLastUpdate($date = null, $tahap = 0){
+        if($date == null ) $date= Carbon::now()->startOfMonth();
         $ret = false;
         if($tahap > 0){
             $x = BilcodataserahCekBayar::select('tahap_periode','update_date')->where('tahap_date',$date->format('Y-m-d'))->orderBy('update_date','DESC')->first();
