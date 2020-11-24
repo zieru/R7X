@@ -461,19 +461,26 @@ class BillingCollectionController extends Controller
     }
 
     public function factoryDashboardPoc($date,$bc,$area = false,$offset = 0){
-
-        DB::statement(DB::raw('SET @rankarea60h = 0;'));
-        DB::statement(DB::raw('SET @rankarea90h = 0;'));
+        $ranklabel=[];
+      if($area){
+          $ranklabel['60'] = '@rankarea60h';
+          $ranklabel['90'] = '@rankarea90h';
+      }else{
+          $ranklabel['60'] = '@rankreg60h';
+          $ranklabel['90'] = '@rankreg90h';
+      }
+        DB::statement(DB::raw('SET '.$ranklabel['60'].' = 0;'));
+        DB::statement(DB::raw('SET '.$ranklabel['90'].' = 0;'));
         $xdate = Carbon::createFromFormat('Y-m-d',$date);
 
         $dat['area'] = $area;
         $dat['select_area'] = ($area) ?  '"AREA" AS LABEL,IF(area NOT IN ("AREA I","AREA II","AREA III","AREA IV"), "NON AREA", area) as regional,' : '"REGIONAL" AS LABEL, CONCAT("-- " ,bc.regional) AS regional,';
 
         if($offset > 0){
-            $bil3 = 2 - (int) $offset;
-            $bil4 = 3 - (int) $offset;
-            $dat['select_billing'] = '(Sum( bc.bill_amount_'. $bil3 .' ) - Sum( bc.bucket_'. $bil3 .' ) ) / sum( bc.bill_amount_'. $bil3 .') AS billing_1,
-                                        (Sum( bc.bill_amount_'. $bil4 .' ) - Sum( bc.bucket_'. $bil4 .' ) ) / sum( bc.bill_amount_'. $bil4 .' ) AS billing_2';
+            $bil2 = 2 + (int) $offset;
+            $bil3 = 3 + (int) $offset;
+            $dat['select_billing'] = '(Sum( bc.bill_amount_'. $bil2 .' ) - Sum( bc.bucket_'. $bil2 .' ) ) / sum( bc.bill_amount_'. $bil2 .') AS billing_1,
+                                        (Sum( bc.bill_amount_'. $bil3 .' ) - Sum( bc.bucket_'. $bil3 .' ) ) / sum( bc.bill_amount_'. $bil3 .' ) AS billing_2';
         }else{
             $dat['select_billing']   = '( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) AS billing_1,
                                         ( Sum( bc.bill_amount_3 ) - Sum( bc.bucket_3 ) ) / sum( bc.bill_amount_3 ) AS billing_2';
@@ -481,12 +488,12 @@ class BillingCollectionController extends Controller
 
         $ret = BillingCollectionPoc::selectRaw('
             *,billing_1 - billing_2 AS selisih')
-            ->fromSub(function ($query) use($date,$bc,$dat) {
+            ->fromSub(function ($query) use($date,$bc,$dat,$ranklabel) {
                 $query->selectRaw('*')
-                    ->fromSub(function ($query) use($date,$bc,$dat) {
-                        $query->selectRaw('*,@rankarea60h := @rankarea60h + 1 AS rank60h')
-                            ->fromSub(function ($query) use($date,$bc,$dat) {
-                                $query->selectRaw('*,@rankarea90h := @rankarea90h + 1 AS rank90h')
+                    ->fromSub(function ($query) use($ranklabel,$date,$bc,$dat) {
+                    $query->selectRaw('*,'.$ranklabel['60'].' := '.$ranklabel['60'].' + 1 AS rank60h')
+                            ->fromSub(function ($query) use($date,$bc,$dat,$ranklabel) {
+                                $query->selectRaw('*,'.$ranklabel['90'].' := '.$ranklabel['90'].' + 1 AS rank90h')
                                     ->fromSub(function ($query) use($date,$bc,$dat) {
                                         $group = array();
                                         if($bc){
@@ -512,6 +519,7 @@ class BillingCollectionController extends Controller
                             ->orderBy('billing_1','DESC');
                     },'order_biling_1')->orderBy('area');
             },'sub1');
+        //($area == false) ? dd($ret->get()) : false;
         return $ret;
     }
 
