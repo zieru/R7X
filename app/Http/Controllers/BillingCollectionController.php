@@ -470,8 +470,8 @@ class BillingCollectionController extends Controller
         $dat['select_area'] = ($area) ?  '"AREA" AS LABEL,IF(area NOT IN ("AREA I","AREA II","AREA III","AREA IV"), "NON AREA", area) as regional,' : '"REGIONAL" AS LABEL, CONCAT("-- " ,bc.regional) AS regional,';
 
         if($offset > 0){
-            $bil3 = 3 - (int) $offset;
-            $bil4 = 4 - (int) $offset;
+            $bil3 = 2 - (int) $offset;
+            $bil4 = 3 - (int) $offset;
             $dat['select_billing'] = '(Sum( bc.bill_amount_'. $bil3 .' ) - Sum( bc.bucket_'. $bil3 .' ) ) / sum( bc.bill_amount_'. $bil3 .') AS billing_1,
                                         (Sum( bc.bill_amount_'. $bil4 .' ) - Sum( bc.bucket_'. $bil4 .' ) ) / sum( bc.bill_amount_'. $bil4 .' ) AS billing_2';
         }else{

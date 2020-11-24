@@ -149,10 +149,10 @@ class BilcodataserahCekBayarController extends Controller
         $dateupdate = $this->factoryCekBayarLastUpdate($startx,$tahap_d);
         $d30harea = $this->factoryCekBayar($startx,$tahap_d,false,false,$momparam,false,$request->outs);
         $d30h = $this->factoryCekBayar($startx,$tahap_d,true,false,$momparam,false,$request->outs);
+
         //dd($d30harea->get()->toArray());
         ///union all///
         $d30h =$d30harea->union($d30h)->get()->toArray();
-
         $d90harea = $this->factoryCekBayar($startx,$tahap_d,false,true,$momparam,false,$request->outs);
         $d90h = $this->factoryCekBayar($startx,$tahap_d,true,true,$momparam,false,$request->outs);
         //unionall
@@ -162,12 +162,15 @@ class BilcodataserahCekBayarController extends Controller
         //////////////////////
 
         if($request->has('end')){
-            $d30harea2 = $this->factoryCekBayar($endx,$tahap_d,false,false,$momparam,false,$request->outs);
-            $d30h2 = $this->factoryCekBayar($endx,$tahap_d,true,false,$momparam,false,$request->outs);
+
+            $momparamend = $momparam;
+            $momparamend[3] = 'end';
+            $d30harea2 = $this->factoryCekBayar($endx,$tahap_d,false,false,$momparamend,false,$request->outs);
+            $d30h2 = $this->factoryCekBayar($endx,$tahap_d,true,false,$momparamend,false,$request->outs);
             $d30h2 =$d30h2->union($d30harea2)->get()->toArray();
 
-            $d90harea2 = $this->factoryCekBayar($endx,$tahap_d,false,true,$momparam,false,$request->outs);
-            $d90h2 = $this->factoryCekBayar($endx,$tahap_d,true,true,$momparam,false,$request->outs);
+            $d90harea2 = $this->factoryCekBayar($endx,$tahap_d,false,true,$momparamend,false,$request->outs);
+            $d90h2 = $this->factoryCekBayar($endx,$tahap_d,true,true,$momparamend,false,$request->outs);
             $d90h2 =$d90h2->union($d90harea2)->get()->toArray();
         }
 
@@ -184,16 +187,150 @@ class BilcodataserahCekBayarController extends Controller
 
         $sum2 = $sum = $i  = [];
         $kpis = ($request->has('end')) ? [$start,$end,'MoM'] : [0,120,90,60,30];
+        $sumfinal = [];
         $sum = $this->DataCekBayar($d30h,$d90h,$kpis,$momparam,$msisdnparam);
+        $sum2 = $this->DataCekBayar($d30h2,$d90h2,$kpis,$momparam,$msisdnparam);
 
+        if($momparam){
+            //combining 2 mom
+            foreach ($sum as $xi => $x){
+                $sumfinal[$x['regional']] = $x;
+                $zindex = $yindex = 0;
+                foreach ($x['period'] as $yi => $y){
+                    if($yindex > 0){
+                        if($yindex == 1)$sumfinal[$x['regional']]['period'][$yi] = $this->findmom($yindex,$x,$sum,$sum2,$yi);
+                        if($yindex == 2)$sumfinal[$x['regional']]['period']['MoM'] = $this->findmom($yindex,$x,$sum,$sum2,$yi);
+                    }
+                    $yindex++;
+                }
+                foreach ($x['children'] as $childid => $period){
+                    foreach ($period['period'] as $zi => $z) {
+                        ///0var_dump($zi,$zindex);
+                        if($zindex > 0){
+                            if($zindex == 1){
+                                dd($this->findmomchild($x['regional'],$zindex,$period['period'],$sum,$sum2,$zi,$childid,1));
+                                $sumfinal[$x['regional']]['children'][$childid]['period'][$zi] = $this->findmomchild($zindex,$z,$sum,$sum2,$zi,$xi);
+                                //dd($sumfinal[$x['regional']]['children'][$childid]['period'][$zi]);
+                                //dd($this->findmom($zindex,$x,$sum,$sum2,$zi));
+                            }
+                            if($zindex == 2){
+                                $sumfinal[$x['regional']]['children'][$childid]['period']['MoM'] = $this->findmomchild($zindex,$x,$sum,$sum2,$zi);
+                            }
+
+                            //dd($this->findmom($zindex,$x,$sum,$sum2,$zi));
+                        }
+                        $zindex++;
+                    }
+                }
+            }
+        }else{
+            $sumfinal = $sum;
+        }
+
+        //dd($sumfinal);
         //$finalsum = [];
-        $finalsum = $sum;
+        $finalsum = $sumfinal;
         //dd(DB::getQueryLog());
 
         //dd($finalsum);
         return datatables()->of($finalsum)->with(['last_update'=>$dateupdate,'datecolumn' => $kpis ,'endparam'=> $request->has('end'), 'startx' => $startx->format('Y-m-d'),'msisdnparam' => $msisdnparam, 'momparam' => $momparam])->toJson();
     }
 
+    private function findmom($yindex,$x,$sum,$sum2,$yi,$debug =false){
+        $ret = false;
+        if($yindex == 1){
+            if(array_key_exists($x['regional'],$sum2)){
+                $ret = $sum2[$x['regional']]['period'][$yi];
+            }else{
+                $ret = array(
+                    'uncollected' => 0,
+                    'pcollection' => 0,
+                    'collection' => 0,
+                    'totalmsisdn' => 0,
+                    'total' => 0,
+                );
+            }
+        }
+        if($yindex == 2){
+            if(array_key_exists($x['regional'],$sum2)) {
+                $xmom = array(
+                    'uncollected' => number_format($this->helperSanitize($sum2[$x['regional']]['period'][$yi]['uncollected']) - $this->helperSanitize($sum[$x['regional']]['period'][$yi]['uncollected'])),
+                    'pcollection' => number_format($this->helperSanitize($sum2[$x['regional']]['period'][$yi]['pcollection']) - $this->helperSanitize($sum[$x['regional']]['period'][$yi]['pcollection'])) . '%',
+                    'collection' => number_format($this->helperSanitize($sum2[$x['regional']]['period'][$yi]['collection']) - $this->helperSanitize($sum[$x['regional']]['period'][$yi]['collection'])),
+                    'totalmsisdn' => number_format($this->helperSanitize($sum2[$x['regional']]['period'][$yi]['totalmsisdn']) - $this->helperSanitize($sum[$x['regional']]['period'][$yi]['totalmsisdn'])),
+                    'total' => number_format($this->helperSanitize($sum2[$x['regional']]['period'][$yi]['total']) - $this->helperSanitize($sum[$x['regional']]['period'][$yi]['total'])),
+                );
+            }else{
+                $xmom = array(
+                    'uncollected' => 0,
+                    'pcollection' => 0,
+                    'collection' => 0,
+                    'totalmsisdn' => 0,
+                    'total' => 0,
+                );
+            }
+            $ret = $xmom;
+        }
+
+        return $ret;
+    }
+    private function findmomchild($region,$yindex,$x,$sum,$sum2,$yi,$childid,$debug =false){
+        $ret = false;
+        $sum2 = $sum2[$region]['children'][$childid]['period'][$yi];
+        $ret = $x;
+        //if($debug) echo 'x';dd($x);
+
+        $rindex =0;
+        foreach ($ret as $ri => $rv){
+            echo $rindex;
+            if($rindex = 1){
+                $ret[$ri] ='x';
+            }
+            $rindex+1;
+        }
+        dd($ret);
+        die();
+        if($yindex == 1){
+            if(array_key_exists($x['regional'],$sum2)){
+                $ret = $sum2[$x['regional']]['period'][$yi];
+            }else{
+                $ret = array(
+                    'uncollected' => 0,
+                    'pcollection' => 0,
+                    'collection' => 0,
+                    'totalmsisdn' => 0,
+                    'total' => 0,
+                );
+            }
+        }
+        if($yindex == 2){
+            if(array_key_exists($x['regional'],$sum2)) {
+                $xmom = array(
+                    'uncollected' => number_format($this->helperSanitize($sum2[$x['regional']]['period'][$yi]['uncollected']) - $this->helperSanitize($sum[$x['regional']]['period'][$yi]['uncollected'])),
+                    'pcollection' => number_format($this->helperSanitize($sum2[$x['regional']]['period'][$yi]['pcollection']) - $this->helperSanitize($sum[$x['regional']]['period'][$yi]['pcollection'])) . '%',
+                    'collection' => number_format($this->helperSanitize($sum2[$x['regional']]['period'][$yi]['collection']) - $this->helperSanitize($sum[$x['regional']]['period'][$yi]['collection'])),
+                    'totalmsisdn' => number_format($this->helperSanitize($sum2[$x['regional']]['period'][$yi]['totalmsisdn']) - $this->helperSanitize($sum[$x['regional']]['period'][$yi]['totalmsisdn'])),
+                    'total' => number_format($this->helperSanitize($sum2[$x['regional']]['period'][$yi]['total']) - $this->helperSanitize($sum[$x['regional']]['period'][$yi]['total'])),
+                );
+            }else{
+                $xmom = array(
+                    'uncollected' => 0,
+                    'pcollection' => 0,
+                    'collection' => 0,
+                    'totalmsisdn' => 0,
+                    'total' => 0,
+                );
+            }
+            $ret = $xmom;
+        }
+
+        return $ret;
+    }
+
+    private function helperSanitize($num){
+
+        return (float) str_replace(',', '', $num);
+    }
     /**
      * @param Carbon $date
      * @param int $tahap
@@ -222,7 +359,6 @@ class BilcodataserahCekBayarController extends Controller
 
         //cek jika mom tidak usah cek lastupdate karna melalui tanggal
         $lastupdate = ($ismom == false) ? $dateupdate = $this->factoryCekBayarLastUpdate($date,$tahap): false;
-
         $selectbillcycle = ($isbc) ? 'bill_cycle as bill_cycles,' : null;
         //$kpiselect = ($ismom) ? "bill_cycle as kpis,":"kpi as kpis,";
         $generalcolumn = 'SUM(a30) AS a30,
@@ -271,6 +407,11 @@ class BilcodataserahCekBayarController extends Controller
         /////maintitle/////
         //////////////////
         ///AREA///
+        if($ismom){
+            //dd($ismom);
+        }
+
+
         $ret = ($isregion) ? BilcodataserahCekBayar::selectRaw($generalcolumn.'"AREA Sumatra" AS regional') :
                             BilcodataserahCekBayar::selectRaw($generalcolumn.'hlr_region as regional')
                                 ->groupBy('hlr_region');
@@ -290,7 +431,19 @@ class BilcodataserahCekBayarController extends Controller
             });
             }
         }
-        ($ismom)  ? $ret->where('update_date',$ismom[0]->format('Y-m-d')): false;
+        if($ismom) {
+            if(array_key_exists(3,$ismom)){
+                if($ismom[3] == 'start'){
+                    $ret->where('update_date',$ismom[0]->format('Y-m-d'));
+                }
+                elseif($ismom[3] == 'end'){
+                    $ret->where('update_date',$ismom[1]->format('Y-m-d'));
+                }
+            }else{
+
+                $ret->where('update_date',$ismom[0]->format('Y-m-d'));
+            }
+        };
         ($tahap > 0)  ? $ret->where('tahap_periode',$tahap) : false;
         ($ischild AND $ismom == false) ? $ret->groupBy('bill_cycle')->orderBy('bill_cycle','ASC'): false;
         //($ismom) ? $ret->groupBy('kpi')->orderBy('kpi','ASC'): false;
@@ -302,6 +455,8 @@ class BilcodataserahCekBayarController extends Controller
     protected function dataCekBayar($d30h,$d90h,$kpis,$mom = false,$msisdn = false){
         $sum = [];
         $l = $bcx = 0;
+
+
         foreach ($d30h as $row){
             if($row['totalmsisdn'] != null){
                 $row['id'] = sprintf('%s#%s#%s#%s',$l,$row['regional'],$row['periodes'],$row['kpi']);
