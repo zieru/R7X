@@ -476,7 +476,7 @@ class BillingCollectionController extends Controller
         $dat['area'] = $area;
         $dat['select_area'] = ($area) ?  '"AREA" AS LABEL,IF(area NOT IN ("AREA I","AREA II","AREA III","AREA IV"), "NON AREA", area) as regional,' : '"REGIONAL" AS LABEL, CONCAT("-- " ,bc.regional) AS regional,';
 
-        if($offset > 0){
+        if($xdate->endOfMonth()->format('Y-m-d') == $date){
             $bil2 = 2 + (int) $offset;
             $bil3 = 3 + (int) $offset;
             $dat['select_billing'] = '(Sum( bc.bill_amount_'. $bil2 .' ) - Sum( bc.bucket_'. $bil2 .' ) ) / sum( bc.bill_amount_'. $bil2 .') AS billing_1,
@@ -485,7 +485,8 @@ class BillingCollectionController extends Controller
             $dat['select_billing']   = '( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) AS billing_1,
                                         ( Sum( bc.bill_amount_3 ) - Sum( bc.bucket_3 ) ) / sum( bc.bill_amount_3 ) AS billing_2';
         }
-
+        $dat['select_billing']   = '( Sum( bc.bill_amount_2 ) - Sum( bc.bucket_2 ) ) / sum( bc.bill_amount_2 ) AS billing_1,
+                                        ( Sum( bc.bill_amount_3 ) - Sum( bc.bucket_3 ) ) / sum( bc.bill_amount_3 ) AS billing_2';
         $ret = BillingCollectionPoc::selectRaw('
             *,billing_1 - billing_2 AS selisih')
             ->fromSub(function ($query) use($date,$bc,$dat,$ranklabel) {
