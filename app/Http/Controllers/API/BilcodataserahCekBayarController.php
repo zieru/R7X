@@ -23,7 +23,6 @@ class BilcodataserahCekBayarController extends Controller
 
         $bdate = ($bdate == null) ? Carbon::createFromFormat('Ymd', $date)->addDay(1): $bdate;
 
-        dd($date,$bdate);
         $x= DB::table('sabyan_r7s.bilco_data_serahs AS a');
 
 
@@ -189,7 +188,8 @@ class BilcodataserahCekBayarController extends Controller
         $kpis = ($request->has('end')) ? [$start,$end,'MoM'] : [0,120,90,60,30];
         $sumfinal = [];
         $sum = $this->DataCekBayar($d30h,$d90h,$kpis,$momparam,$msisdnparam);
-        $sum2 = $this->DataCekBayar($d30h2,$d90h2,$kpis,$momparam,$msisdnparam);
+
+        $sum2 = ($request->has('end')) ? $this->DataCekBayar($d30h2,$d90h2,$kpis,$momparam,$msisdnparam) : false;
 
         if($momparam){
             //combining 2 mom
@@ -204,23 +204,22 @@ class BilcodataserahCekBayarController extends Controller
                     $yindex++;
                 }
                 foreach ($x['children'] as $childid => $period){
+                    $zindex=0;
                     foreach ($period['period'] as $zi => $z) {
                         ///0var_dump($zi,$zindex);
-                        if($zindex > 0){
-                            if($zindex == 1){
-                                dd($this->findmomchild($x['regional'],$zindex,$period['period'],$sum,$sum2,$zi,$childid,1));
-                                $sumfinal[$x['regional']]['children'][$childid]['period'][$zi] = $this->findmomchild($zindex,$z,$sum,$sum2,$zi,$xi);
-                                //dd($sumfinal[$x['regional']]['children'][$childid]['period'][$zi]);
-                                //dd($this->findmom($zindex,$x,$sum,$sum2,$zi));
-                            }
-                            if($zindex == 2){
-                                $sumfinal[$x['regional']]['children'][$childid]['period']['MoM'] = $this->findmomchild($zindex,$x,$sum,$sum2,$zi);
-                            }
-
-                            //dd($this->findmom($zindex,$x,$sum,$sum2,$zi));
+                        ///
+                        /*echo 'zi :'.$zi.'</br>';
+                        echo 'zindex :'.$zindex.'</br>';
+                        echo '$childid :'.$childid.'</br>';*/
+                        if($zindex == 1){
+                            $sumfinal[$x['regional']]['children'][$childid]['period'] = $this->findmomchild($x['regional'],$zindex,$period['period'],$sum,$sum2,$zi,$childid);
+                            $sumfinal[$x['regional']]['children'][$childid]['period']['iscal'] = true;
                         }
+
                         $zindex++;
                     }
+
+
                 }
             }
         }else{
@@ -281,49 +280,29 @@ class BilcodataserahCekBayarController extends Controller
         //if($debug) echo 'x';dd($x);
 
         $rindex =0;
+        array(
+            'uncollected' => 0,
+            'pcollection' => 0,
+            'collection' => 0,
+            'totalmsisdn' => 0,
+            'total' => 0,
+        );
+        $main = 0;
         foreach ($ret as $ri => $rv){
-            echo $rindex;
-            if($rindex = 1){
-                $ret[$ri] ='x';
+            if($rindex == 0) {
+                $main = $ri;
             }
-            $rindex+1;
-        }
-        dd($ret);
-        die();
-        if($yindex == 1){
-            if(array_key_exists($x['regional'],$sum2)){
-                $ret = $sum2[$x['regional']]['period'][$yi];
-            }else{
-                $ret = array(
-                    'uncollected' => 0,
-                    'pcollection' => 0,
-                    'collection' => 0,
-                    'totalmsisdn' => 0,
-                    'total' => 0,
+            if($rindex == 1)$ret[$ri] = $sum2;
+            if($rindex == 2 AND $main > 0)
+                $ret[$ri] =  array(
+                    'uncollected' => number_format($this->helperSanitize($sum2['uncollected']) - $this->helperSanitize($ret[$main]['uncollected'])),
+                    'pcollection' => number_format($this->helperSanitize($sum2['pcollection']) - $this->helperSanitize($ret[$main]['pcollection'])) . '%',
+                    'collection' => number_format($this->helperSanitize($sum2['collection']) - $this->helperSanitize($ret[$main]['collection'])),
+                    'totalmsisdn' => number_format($this->helperSanitize($sum2['totalmsisdn']) - $this->helperSanitize($ret[$main]['totalmsisdn'])),
+                    'total' => number_format($this->helperSanitize($sum2['total']) - $this->helperSanitize($ret[$main]['total'])),
                 );
-            }
+            $rindex++;
         }
-        if($yindex == 2){
-            if(array_key_exists($x['regional'],$sum2)) {
-                $xmom = array(
-                    'uncollected' => number_format($this->helperSanitize($sum2[$x['regional']]['period'][$yi]['uncollected']) - $this->helperSanitize($sum[$x['regional']]['period'][$yi]['uncollected'])),
-                    'pcollection' => number_format($this->helperSanitize($sum2[$x['regional']]['period'][$yi]['pcollection']) - $this->helperSanitize($sum[$x['regional']]['period'][$yi]['pcollection'])) . '%',
-                    'collection' => number_format($this->helperSanitize($sum2[$x['regional']]['period'][$yi]['collection']) - $this->helperSanitize($sum[$x['regional']]['period'][$yi]['collection'])),
-                    'totalmsisdn' => number_format($this->helperSanitize($sum2[$x['regional']]['period'][$yi]['totalmsisdn']) - $this->helperSanitize($sum[$x['regional']]['period'][$yi]['totalmsisdn'])),
-                    'total' => number_format($this->helperSanitize($sum2[$x['regional']]['period'][$yi]['total']) - $this->helperSanitize($sum[$x['regional']]['period'][$yi]['total'])),
-                );
-            }else{
-                $xmom = array(
-                    'uncollected' => 0,
-                    'pcollection' => 0,
-                    'collection' => 0,
-                    'totalmsisdn' => 0,
-                    'total' => 0,
-                );
-            }
-            $ret = $xmom;
-        }
-
         return $ret;
     }
 
