@@ -471,19 +471,21 @@ class SyncBilcoDataserahCekBayar extends Command
     public function handle()
     {
         $from  = null;
+
+        $from = $this->option('from');
         $tahap = (int) $this->argument('tahap');
         $datex = $this->argument('date');
         $update = $this->option('update');
         if($this->option('from') != 'null'){
             ($update == false) ? exit('--From must specify --update'): false;
-            try {$min_range = Carbon::createFromFormat('Y-m-d-',$datex.'-'.$from);}
+            echo $datex.'-'.$from;
+            try {$min_range = Carbon::createFromFormat('Y-m-d',$datex.'-'.$from);}
             catch (\Exception $e){exit($this->error('from value is invalid'));}
             switch($tahap){
                 case 1; $min_range->addDay(0); break;
                 case 2; $min_range->addDay(6); break;
                 case 3; $min_range->addDay(12); break;
             }
-            $from = $this->option('from');
             $max_range = Carbon::createFromFormat('Ymd',$min_range->format('Ymd'))->endOfMonth();
             $param = [ 'min_range' => (int) $min_range->format('d'), 'max_range' => (int)$max_range->format('d')+1];
 
@@ -502,7 +504,7 @@ class SyncBilcoDataserahCekBayar extends Command
 
             $this->processDatacekbayar($date,$tahap);
         }else{
-            $updfrom = ($from == null) ? Carbon::createFromFormat('Ymd',$date->format('Ymd'))->addDay(1):Carbon::createFromFormat('Y-m-d-',$datex.$from);
+            $updfrom = ($from == null) ? Carbon::createFromFormat('Ymd',$date->format('Ymd'))->addDay(1):Carbon::createFromFormat('Y-m-d',$datex.'-'.$from);
 
             $this->processDatacekbayar($date,$tahap,$updfrom);
         }
