@@ -27,4 +27,7 @@ class FormRefund extends Model
 
         return $ret;
     }
+    public function User(){
+        return $this->belongsTo('App\User','author');
+    }
 }

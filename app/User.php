@@ -46,6 +46,9 @@ class User extends Authenticatable
     public function FormAdjustment(){
       return $this->hasMany(FormAdjustment::class);
     }
+    public function FormRefund(){
+        return $this->hasMany(FormRefund::class);
+    }
 
     public function setPasswordAttribute($password)
     {
