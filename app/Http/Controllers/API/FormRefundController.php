@@ -46,10 +46,10 @@ class FormRefundController extends Controller
         }
         $data = [];
         $f= FormRefund::groupBy($tbl_grup)
-            ->selectRaw("$tbl_grup_select,author as user_eksekutor,author,count(msisdn) as msisdn,reason as reasonh,format(amount),format(sum(new_balance) - sum(balance),0) as nominal")->with('user')
+            ->selectRaw("$tbl_grup_select,author as user_eksekutor,author,count(msisdn) as msisdn,reason as reasonh,format(amount,0) as amount,format(sum(new_balance) - sum(balance),0) as nominal")->with('user')
             ->whereBetween('tanggal_eksekusi',[$period->format('Y-m-1'),$period->format('Y-m-t')]);
 
-        $x= FormRefund::selectRaw('author,author as user_eksekutor,reason, msisdn,format(amount),format(new_balance - balance,0) as nominal')->with('user')
+        $x= FormRefund::selectRaw('author,author as user_eksekutor,reason, msisdn,format(amount,0) as amount,format(new_balance - balance,0) as nominal')->with('user')
             ->whereBetween('tanggal_eksekusi',[$period->format('Y-m-1'),$period->format('Y-m-t')]);
         $loop= 0;
         //dd($x->get());
