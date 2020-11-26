@@ -36,23 +36,30 @@ class FormRefundController extends Controller
         }
         switch(strtoupper($grup)){
             case 'USER':
-                $tbl_grup = 'user_eksekutor';
+                $tbl_grup = 'author';
+                $tbl_grup_select = $tbl_grup;
                 break;
             case 'REASON':
                 $tbl_grup = 'reason';
+                $tbl_grup_select = $tbl_grup;
                 break;
         }
         $data = [];
         $f= FormRefund::groupBy($tbl_grup)
-            ->selectRaw("$tbl_grup,count(msisdn) as msisdn,format(sum(new_balance) - sum(balance),0) as nominal")
+            ->selectRaw("$tbl_grup_select,author as user_eksekutor,author,count(msisdn) as msisdn,reason as reasonh,amount,format(sum(new_balance) - sum(balance),0) as nominal")->with('user')
             ->whereBetween('tanggal_eksekusi',[$period->format('Y-m-1'),$period->format('Y-m-t')]);
 
-        $x= FormRefund::selectRaw('user_eksekutor,reason, msisdn,format(new_balance - balance,0) as nominal')
+        $x= FormRefund::selectRaw('author,author as user_eksekutor,reason, msisdn,amount,format(new_balance - balance,0) as nominal')->with('user')
             ->whereBetween('tanggal_eksekusi',[$period->format('Y-m-1'),$period->format('Y-m-t')]);
         $loop= 0;
+        //dd($x->get());
         foreach ($f->get()->toArray() as $head){
+            if($head['reasonh'] == 'Transfer Pulsa Gagal Pulsa Terpotong') $head['nominal'] = $head['amount'];
+            $head['user_eksekutor'] =  $head['user']['name'];
             $data[$loop] = $head;
             foreach ($x->get()->toArray() as $child){
+                if($child['reason'] == 'Transfer Pulsa Gagal Pulsa Terpotong') $child['nominal'] = $child['amount'];
+                $child['user_eksekutor'] =  $child['user']['name'];
                 if($child[$tbl_grup] === $head[$tbl_grup]) $data[$loop]['children'][] = $child;
             }
             $loop++;
