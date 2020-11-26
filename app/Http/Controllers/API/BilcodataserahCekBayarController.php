@@ -26,7 +26,7 @@ class BilcodataserahCekBayarController extends Controller
         $x= DB::table('sabyan_r7s.bilco_data_serahs AS a');
 
 
-        if($tahap === 1 AND $isupdate){
+        if($tahap === 1 and $isupdate == false){
             $x->select('a.periode',
                 'a.account',
                 'a.msisdn',
