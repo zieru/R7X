@@ -483,8 +483,8 @@ class SyncBilcoDataserahCekBayar extends Command
             catch (\Exception $e){exit($this->error('from value is invalid'));}
             switch($tahap){
                 case 1; $min_range->addDay(0); break;
-                case 2; $min_range->addDay(6); break;
-                case 3; $min_range->addDay(12); break;
+                case 2; $min_range->addDay(0); break;
+                case 3; $min_range->addDay(0); break;
             }
             $max_range = Carbon::createFromFormat('Ymd',$min_range->format('Ymd'))->endOfMonth();
             $param = [ 'min_range' => (int) $min_range->format('d'), 'max_range' => (int)$max_range->format('d')+1];
@@ -493,6 +493,7 @@ class SyncBilcoDataserahCekBayar extends Command
                 (int) $from,FILTER_VALIDATE_INT, array('options' => $param)
             );
             ($from == false) ? exit($this->error('From is not in allowed range :'.$min_range->format('d').'-'.$param['max_range'])):false;
+
         }
         try {$date = Carbon::createFromFormat('Y-m-d',$datex.'-01');}
         catch (\Exception $e){exit($this->error('date value is invalid'));}
