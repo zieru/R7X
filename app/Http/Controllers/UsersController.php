@@ -311,7 +311,11 @@ class UsersController extends Controller
         $user['disk_capacity_mb']= 1000000;
         $user['disk_size_mb'] = $file_size;
         $user['disk_capacity_percent'] = ($user['disk_capacity_mb'] - $file_size)/$user['disk_capacity_mb'] ;
-        $user['datetime'] =  Carbon::now()->toDateTimeString();
+        $user['datetime'] =  Carbon::now()->setTimezone('Asia/Jakarta')->toDateTimeString();
+        return response()->json($user, $this->successStatus);
+    }
+    public function datetime(){
+        $user['datetime'] =  Carbon::now()->setTimezone('Asia/Jakarta')->toDateTimeString();
         return response()->json($user, $this->successStatus);
     }
 
