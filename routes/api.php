@@ -80,9 +80,7 @@ Route::group(['prefix' => 'v1'], function () {
 
     Route::get('/unauthorized', 'UsersController@unauthorized');
     Route::group(['middleware' => ['CheckClientCredentials','auth:api']], function() {
-
-
-
+        Route::get('datetime', 'UsersController@datetime')->name('api.v1.manage.user.datetime');
         Route::post('logout', 'UsersController@logout');
         Route::get('details', 'UsersController@details');
     });
