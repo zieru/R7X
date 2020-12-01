@@ -316,7 +316,7 @@ class BilcodataserahCekBayarController extends Controller
      * @return array|bool|null
      */
     protected function factoryCekBayarLastUpdate($date = null, $tahap = 0){
-        if($date == null ) $date= Carbon::now()->startOfMonth();
+        if($date == null ) $date= Carbon::now()->addDays(-2)->startOfMonth();
         $ret = false;
         if($tahap > 0){
             $x = BilcodataserahCekBayar::select('tahap_periode','update_date')->where('tahap_date',$date->format('Y-m-d'))->orderBy('update_date','DESC')->first();
