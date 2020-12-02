@@ -305,6 +305,9 @@ class BilcodataserahCekBayarController extends Controller
         }
         return $ret;
     }
+    public function export(Request $request){
+        var_dump($request->all());
+    }
 
     private function helperSanitize($num){
 
