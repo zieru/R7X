@@ -575,6 +575,7 @@ class SyncBilcoDataserahCekBayar extends Command
         $bar = $this->output->createProgressBar($dataserah->count());
         $bar->setFormat("%current%/%max% [%bar%] %percent:3s%%");
         $bar->start();
+        $insertdata = [];
         foreach ($dataserah->get()->toArray() as $row){
             $row = (array) $row;
             $date = Carbon::createFromFormat('Y-m-d', $row['periode']);
@@ -600,8 +601,9 @@ class SyncBilcoDataserahCekBayar extends Command
             $bar->advance();
         }
         $insertdata = collect($insertdata);
-        foreach ($insertdata->chunk(10000) as $x){
-            BilcodataserahCekBayar::insert($x);
+        $chunks = $insertdata->chunk(10000);
+        foreach ($chunks as $chunk){
+            BilcodataserahCekBayar::insert($chunk);
         }
         $importer->status = 'finish';
         $importer->save();
