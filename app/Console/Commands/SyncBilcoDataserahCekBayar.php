@@ -473,41 +473,46 @@ class SyncBilcoDataserahCekBayar extends Command
         $from  = null;
 
         $from = $this->option('from');
-        $tahap = (int) $this->argument('tahap');
+        $tahap = $this->argument('tahap');
+        $tahap_x = explode(',',$tahap);
         $datex = $this->argument('date');
         $update = $this->option('update');
-        if($this->option('from') != 'null'){
-            ($update == false) ? exit('--From must specify --update'): false;
-            echo $datex.'-'.$from;
-            try {$min_range = Carbon::createFromFormat('Y-m-d',$datex.'-'.$from);}
-            catch (\Exception $e){exit($this->error('from value is invalid'));}
-            switch($tahap){
-                case 1; $min_range->addDay(0); break;
-                case 2; $min_range->addDay(0); break;
-                case 3; $min_range->addDay(0); break;
+        foreach ($tahap_x as $tahap){
+            $this->info('begin tahap '.$tahap);
+            if($this->option('from') != 'null'){
+                ($update == false) ? exit('--From must specify --update'): false;
+                echo $datex.'-'.$from;
+                try {$min_range = Carbon::createFromFormat('Y-m-d',$datex.'-'.$from);}
+                catch (\Exception $e){exit($this->error('from value is invalid'));}
+                /*switch($tahap){
+                    case 1; $min_range->addDay(0); break;
+                    case 2; $min_range->addDay(0); break;
+                    case 3; $min_range->addDay(0); break;
+                }*/
+                $max_range = Carbon::createFromFormat('Ymd',$min_range->format('Ymd'))->endOfMonth();
+                $param = [ 'min_range' => (int) $min_range->format('d'), 'max_range' => (int)$max_range->format('d')+1];
+
+                dd($param);
+                $from = filter_var(
+                    (int) $from,FILTER_VALIDATE_INT, array('options' => $param)
+                );
+                ($from == false) ? exit($this->error('From is not in allowed range :'.$min_range->format('d').'-'.$param['max_range'])):false;
+
             }
-            $max_range = Carbon::createFromFormat('Ymd',$min_range->format('Ymd'))->endOfMonth();
-            $param = [ 'min_range' => (int) $min_range->format('d'), 'max_range' => (int)$max_range->format('d')+1];
+            try {$date = Carbon::createFromFormat('Y-m-d',$datex.'-01');}
+            catch (\Exception $e){exit($this->error('date value is invalid'));}
 
-            $from = filter_var(
-                (int) $from,FILTER_VALIDATE_INT, array('options' => $param)
-            );
-            ($from == false) ? exit($this->error('From is not in allowed range :'.$min_range->format('d').'-'.$param['max_range'])):false;
+            ($tahap == 1) ? $date->addDay(-1):false;
+            ($tahap == 2) ? $date->addDay(7-1):false;
+            ($tahap == 3) ? $date->addDay(13-1):false;
+            if($update != true){
 
-        }
-        try {$date = Carbon::createFromFormat('Y-m-d',$datex.'-01');}
-        catch (\Exception $e){exit($this->error('date value is invalid'));}
+                $this->processDatacekbayar($date,$tahap);
+            }else{
+                $updfrom = ($from == null) ? Carbon::createFromFormat('Ymd',$date->format('Ymd'))->addDay(1):Carbon::createFromFormat('Y-m-d',$datex.'-'.$from);
 
-        ($tahap == 1) ? $date->addDay(-1):false;
-        ($tahap == 2) ? $date->addDay(7-1):false;
-        ($tahap == 3) ? $date->addDay(13-1):false;
-        if($update != true){
-
-            $this->processDatacekbayar($date,$tahap);
-        }else{
-            $updfrom = ($from == null) ? Carbon::createFromFormat('Ymd',$date->format('Ymd'))->addDay(1):Carbon::createFromFormat('Y-m-d',$datex.'-'.$from);
-
-            $this->processDatacekbayar($date,$tahap,$updfrom);
+                $this->processDatacekbayar($date,$tahap,$updfrom);
+            }
         }
         return 0;
     }
@@ -589,13 +594,17 @@ class SyncBilcoDataserahCekBayar extends Command
             $row['total_outstanding'] = $row['a120'] + $row['a90'] + $row['a60'] + $row['a30'];
             $row['last_update']  = $row['update_date'] = ($bdate) ? $bdate->format('Y-m-d') :   $date;
             $row['import_batch'] = $importer->id;
-            BilcodataserahCekBayar::insert($row);
+            $insertdata[] = $row;
             $importer->importedRow =sizeof($row);
-            $importer->status = 'finish';
             $importer->save();
-
             $bar->advance();
         }
+        $insertdata = collect($insertdata);
+        foreach ($insertdata->chunk(10000) as $x){
+            BilcodataserahCekBayar::insert($x);
+        }
+        $importer->status = 'finish';
+        $importer->save();
         $bar->finish();
     }
 }

@@ -362,7 +362,16 @@ class BillingCollectionController extends Controller
             ->where('bc.regional', '!=', '**************')
             ->where('bc.area', '=', 'AREA I')
             ->where('bc.customer_type', '=', 'S');
-            $targetArea = BillingCollectionTarget::select('target')->where('periode',$d->format('Y-m-1'))->where('regional','AREA1')->get()->toArray()[0]['target'];
+            $targetArea = BillingCollectionTarget::select('target')
+                ->where('periode',$d->format('Y-m-1'))
+                ->where('regional','AREA1')
+                ->get()
+                ->toArray();
+            if($targetArea){
+                $targetArea = $targetArea[0]['target'];
+            }else{
+                AppHelper::sendErrorAndExit('Target not available');
+            }
         if($bc){
             if($request->has('bc_val')){
                 $d90h->where('bc.bill_cycle','=',$request->get('bc_val'));
