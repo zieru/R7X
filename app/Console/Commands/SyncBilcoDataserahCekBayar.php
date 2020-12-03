@@ -603,7 +603,7 @@ class SyncBilcoDataserahCekBayar extends Command
         $insertdata = collect($insertdata);
         $chunks = $insertdata->chunk(10000);
         foreach ($chunks as $chunk){
-            BilcodataserahCekBayar::insert($chunk)->toArray();
+            BilcodataserahCekBayar::insert($chunk->toArray());
         }
         $importer->status = 'finish';
         $importer->save();
