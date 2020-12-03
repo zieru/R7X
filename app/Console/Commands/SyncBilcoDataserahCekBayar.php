@@ -600,13 +600,18 @@ class SyncBilcoDataserahCekBayar extends Command
             $importer->save();
             $bar->advance();
         }
+        $bar->finish();
         $insertdata = collect($insertdata);
-        $chunks = $insertdata->chunk(10000);
+        $chunks = $insertdata->chunk(500);
+        $this->info('chunking');
+        $bar = $this->output->createProgressBar(sizeof($chunks));
+        $bar->start();
         foreach ($chunks as $chunk){
+            $bar->advance();
             BilcodataserahCekBayar::insert($chunk->toArray());
         }
+        $bar->finish();
         $importer->status = 'finish';
         $importer->save();
-        $bar->finish();
     }
 }
