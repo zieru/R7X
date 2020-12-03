@@ -327,13 +327,12 @@ class BilcodataserahCekBayarController extends Controller
         }
         else{
             $x = BilcodataserahCekBayar::select('tahap_periode','update_date')->where('tahap_date',$date->format('Y-m-d'))->where('tahap_periode',1)->orderBy('update_date','DESC')->first();
-            $ret[] = ($x->update_date)? $x->update_date: null;
+            $ret[] = ($x)? $x->update_date: 'Not started';
             $x = BilcodataserahCekBayar::select('tahap_periode','update_date')->where('tahap_date',$date->format('Y-m-d'))->where('tahap_periode',2)->orderBy('update_date','DESC')->first();
-            $ret[] = ($x->update_date)? $x->update_date: null;
+            $ret[] = ($x)? $x->update_date: 'Not started';
             $x = BilcodataserahCekBayar::select('tahap_periode','update_date')->where('tahap_date',$date->format('Y-m-d'))->where('tahap_periode',3)->orderBy('update_date','DESC')->first();
-            $ret[] = ($x->update_date)? $x->update_date: null;
+            $ret[] = ($x)? $x->update_date: 'Not started';
         }
-
         return $ret;
     }
     protected function factoryCekBayar($date,$tahap,$isregion,$ischild,$ismom,$ishistoric,$isbc = false){;
