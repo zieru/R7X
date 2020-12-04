@@ -315,7 +315,7 @@ class UsersController extends Controller
         return response()->json($user, $this->successStatus);
     }
     public function datetime(){
-        $user['datetime'] =  Carbon::now()->setTimezone('Asia/Jakarta')->toDateTimeString();
+        $user['datetime'] =  Carbon::now()->toDateTimeString();
         return response()->json($user, $this->successStatus);
     }
 
