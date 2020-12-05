@@ -492,7 +492,7 @@ class SyncBilcoDataserahCekBayar extends Command
                 $max_range = Carbon::createFromFormat('Ymd',$min_range->format('Ymd'))->endOfMonth();
                 $param = [ 'min_range' => (int) $min_range->format('d'), 'max_range' => (int)$max_range->format('d')+1];
 
-                dd($param);
+                //dd($param);
                 $from = filter_var(
                     (int) $from,FILTER_VALIDATE_INT, array('options' => $param)
                 );
