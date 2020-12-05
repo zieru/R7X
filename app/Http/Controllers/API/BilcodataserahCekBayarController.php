@@ -275,6 +275,7 @@ class BilcodataserahCekBayarController extends Controller
     }
     private function findmomchild($region,$yindex,$x,$sum,$sum2,$yi,$childid,$debug =false){
         $ret = false;
+
         $sum2 = $sum2[$region]['children'][$childid]['period'][$yi];
         $ret = $x;
         //if($debug) echo 'x';dd($x);

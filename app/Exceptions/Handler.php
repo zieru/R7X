@@ -58,8 +58,32 @@ class Handler extends ExceptionHandler
 
         header('Access-Control-Allow-Methods: GET, POST');
         header("Access-Control-Allow-Headers: X-Requested-With");*/
-        if ($request->is('api/*')) {
-          //  return response()->json($exception);
+        if ($request->wantsJson() or $request->is('api/*')) {
+            // Define the response
+            $response = [
+                'errors' => 'Sorry, something went wrong.',
+                'message' => 'Sorry, something went wrong.'
+            ];
+
+            // If the app is in debug mode
+            if (config('app.debug')) {
+                // Add the exception class name, message and stack trace to response
+                $response['exception'] = get_class($exception); // Reflection might be better here
+                $response['message'] = $exception->getMessage();
+                $response['trace'] = $exception->getTrace();
+            }
+
+            // Default response of 400
+            $status = 400;
+            // If this exception is an instance of HttpException
+            if ($this->isHttpException($exception)) {
+                // Grab the HTTP status code from the Exception
+                $status = $exception->getStatusCode();
+            }
+            $response['errors'] = $status;
+
+            // Return a JSON response with the response array and status code
+            return response()->json($response, $status);
         }
 
         return parent::render($request, $exception);
