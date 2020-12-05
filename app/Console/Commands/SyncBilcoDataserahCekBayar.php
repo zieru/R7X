@@ -509,8 +509,7 @@ class SyncBilcoDataserahCekBayar extends Command
 
                 $this->processDatacekbayar($date,$tahap);
             }else{
-                $updfrom = ($from == null) ? Carbon::createFromFormat('Ymd',$date->format('Ymd'))->addDay(1):Carbon::createFromFormat('Y-m-d',$datex.'-'.$from);
-
+                $updfrom = ($from == "null"  ) ? Carbon::createFromFormat('Ymd',$date->format('Ymd'))->addDay(1):Carbon::createFromFormat('Y-m-d',$datex.'-'.$from);
                 $this->processDatacekbayar($date,$tahap,$updfrom);
             }
         }
