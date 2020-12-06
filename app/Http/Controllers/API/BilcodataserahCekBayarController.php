@@ -19,10 +19,11 @@ class BilcodataserahCekBayarController extends Controller
         DB::enableQueryLog();
         $isupdate =false;
         $date = $date->format('Ymd');
+
         $adate = Carbon::createFromFormat('Ymd', $date);
 
         $bdate = ($bdate == null) ? Carbon::createFromFormat('Ymd', $date)->addDay(1): $bdate;
-
+        //dd($adate->format('Y-m-d'),$bdate->format('Y-m-d'),$tahap,$isupdate);
         $x= DB::table('sabyan_r7s.bilco_data_serahs AS a');
 
 
