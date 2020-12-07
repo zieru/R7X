@@ -542,7 +542,7 @@ class SyncBilcoDataserahCekBayar extends Command
     private function processDatacekbayar($date,$tahap,$update_date_from = null,$update_date_to = null){
         $dataserahdate = $date;
         if($update_date_from != null){
-            $update_date_from = $this->checkSabyanTable($update_date_from);
+            $update_date_from = $this->checkSabyanTable($update_date_from->addday(1));
         }
 
         $controller = new BilcodataserahCekBayarController();
@@ -562,7 +562,6 @@ class SyncBilcoDataserahCekBayar extends Command
     }
 
     private function fetch($dataserah,$date,$bdate = null){
-
         $importer  = Importer::create(array(
             'importedRow'=>0,
             'storedRow'=>0,
@@ -592,7 +591,7 @@ class SyncBilcoDataserahCekBayar extends Command
 
             $row['tahap'] = $tahap;
             $row['total_outstanding'] = $row['a120'] + $row['a90'] + $row['a60'] + $row['a30'];
-            $row['last_update']  = $row['update_date'] = ($bdate) ? $bdate->format('Y-m-d') :   $date;
+            $row['last_update']  = $row['update_date'] = ($bdate) ? $bdate->format('Y-m-d') :   $date->addDay(1);
             $row['import_batch'] = $importer->id;
             $insertdata[] = $row;
             $importer->importedRow =sizeof($row);
