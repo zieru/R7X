@@ -83,8 +83,8 @@ echo 'batch';
             if($this->option('testing') == "false")
             {
                 $this->info('proses sum'. PHP_EOL);
-                echo $filename;
-                dd(Storage::size($filename));
+                echo '/bilcollection/csv/'.$filename;
+                dd(Storage::size('/bilcollection/csv/'.$filename));
                 $controller->create($filename,null,1);
             }
 
