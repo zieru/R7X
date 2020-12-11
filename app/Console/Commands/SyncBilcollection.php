@@ -82,6 +82,7 @@ echo 'batch';
             if($this->option('testing') == "false")
             {
                 $this->info('proses sum'. PHP_EOL);
+                echo $filename;
                 dd(Storage::size($filename));
                 $controller->create($filename,null,1);
             }
