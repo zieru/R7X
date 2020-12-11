@@ -4,8 +4,7 @@ namespace App\Console\Commands;
 use App\Notifier;
 use Artisan;
 use Carbon\Carbon;
-use App\Http\Controllers\BillingCollectionController;
-use League\Flysystem\File;
+use App\Http\Controllers\BillingCollectionController
 use Storage;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
