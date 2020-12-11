@@ -84,8 +84,9 @@ echo 'batch';
             {
                 $this->info('proses sum'. PHP_EOL);
                 echo '/bilcollection/csv/'.$filename;
-                dd(Storage::size('/bilcollection/csv/'.$filename));
-                $controller->create($filename,null,1);
+                if(Storage::size('/bilcollection/csv/'.$filename) > 1){
+                    $controller->create($filename,null,1);
+                }
             }
 
         };
