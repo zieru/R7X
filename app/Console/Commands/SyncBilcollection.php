@@ -5,6 +5,7 @@ use App\Notifier;
 use Artisan;
 use Carbon\Carbon;
 use App\Http\Controllers\BillingCollectionController;
+use League\Flysystem\File;
 use Storage;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
@@ -82,6 +83,7 @@ echo 'batch';
             if($this->option('testing') == "false")
             {
                 $this->info('proses sum'. PHP_EOL);
+                dd(File::size($filename));
                 $controller->create($filename,null,1);
             }
 
