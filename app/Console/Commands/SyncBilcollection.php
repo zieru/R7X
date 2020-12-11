@@ -17,7 +17,7 @@ class SyncBilcollection extends Command
      *
      * @var string
      */
-    protected $signature = 'SyncBilcollection {--file=} {--testing=false} {--nodownload=false}';
+    protected $signature = 'syncbilcollection {--file=} {--testing=false} {--nodownload=false}';
 
     /**
      * The console command description.
@@ -62,8 +62,8 @@ class SyncBilcollection extends Command
         if(is_array($filename)){
 echo 'batch';
             foreach ($filename as $name){
-                echo shell_exec(sprintf("php artisan syncbilcollection --file=%s >> log.log",$name));
-                //Artisan::call("syncbilcollection --file=".$name);
+                //echo shell_exec(sprintf("php artisan syncbilcollection --file=%s >> log.log",$name));
+                Artisan::call("syncbilcollection --file=".$name);
 
             }
             Artisan::call('db:backup');
