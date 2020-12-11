@@ -62,8 +62,8 @@ class SyncBilcollection extends Command
         if(is_array($filename)){
 echo 'batch';
             foreach ($filename as $name){
-                //echo shell_exec(sprintf("php artisan Syncbilcollection --file=%s >> log.log",$name));
-                Artisan::call("syncbilcollection --file=".$name);
+                echo shell_exec(sprintf("php artisan syncbilcollection --file=%s >> log.log",$name));
+                //Artisan::call("syncbilcollection --file=".$name);
 
             }
             Artisan::call('db:backup');
