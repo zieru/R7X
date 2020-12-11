@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 use App\Notifier;
 use Artisan;
 use Carbon\Carbon;
-use App\Http\Controllers\BillingCollectionController
+use App\Http\Controllers\BillingCollectionController;
 use Storage;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
@@ -62,7 +62,8 @@ class SyncBilcollection extends Command
         if(is_array($filename)){
 echo 'batch';
             foreach ($filename as $name){
-                echo shell_exec(sprintf("php artisan Syncbilcollection --file=%s >> log.log",$name));
+                //echo shell_exec(sprintf("php artisan Syncbilcollection --file=%s >> log.log",$name));
+                $this->call("Syncbilcollection --file=%s");
 
             }
             Artisan::call('db:backup');
