@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 use App\Helpers\AppHelper;
+use App\Http\Controllers\BillingCollectionController;
+use App\Importer;
 use App\Notifier;
 use App\BackupMan;
 use Carbon\Carbon;
@@ -56,6 +58,11 @@ class DBBackup extends Command
             }
         }else{
             $this->backupdate = Carbon::now()->subDays(2)->format('Ymd');
+        }
+
+        if(Importer::where('status','finish')->where('tipe','bilcollection:import')->where('filename','like',$this->backupdate.'%')->get()->count() <= 12){
+            $this->error('not completed ('.Importer::where('status','finish')->where('tipe','bilcollection:import')->where('filename','like',$this->backupdate.'%')->get()->count().'/12)');
+            die();
         }
 
 
