@@ -78,7 +78,7 @@ echo 'batch';
             }else{
                 echo $this->guzzleDownload($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/bilcollection/csv/');
             }
-                echo $this->guzzleDownload($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/bilcollection/csv/');
+            echo $this->guzzleDownload($filename,'http://10.250.191.103/collection/consumer/'.$filename,'/bilcollection/csv/');
             $this->info('Downloaded :'.$filename);
             if($this->option('testing') == "false")
             {
