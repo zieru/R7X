@@ -9,6 +9,7 @@ use App\BackupMan;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -48,19 +49,37 @@ class DBBackup extends Command
         return shell_exec($x1);
     }
 
+    public function updateDataserah($date){
+        //dd($date->format('d'));
+        $tahap = [1];
+        switch (true){
+            case $date->format('d') - 1 < 7:
+                array_push($tahap,2);
+                    break;
+            case $date->format('d') - 1 < 13:
+                array_push($tahap,2,3);
+                    break;
+        }
+        Artisan::call(sprintf('syncbilcodataserah:cekbayar %s %s --update --from=%d',$date->format('Y-m'),implode(',',$tahap),$date->format('d') - 1));
+        return true;
+    }
+
     public function backup(){
+        $carbonDate = null;
         if($this->option('date')){
             try {
-                $this->backupdate = Carbon::createFromFormat('d-m-Y', $this->option('date'))->format('Ymd');
+                $carbonDate = Carbon::createFromFormat('d-m-Y', $this->option('date'));
+                $this->backupdate = $carbonDate->format('Ymd');
             }
             catch (\Exception $e){
                 $this->error('date is invalid');
             }
         }else{
-            $this->backupdate = Carbon::now()->subDays(2)->format('Ymd');
+            $carbonDate = Carbon::now()->subDays(2);
+            $this->backupdate = $carbonDate->format('Ymd');
         }
 
-        if(Importer::where('status','finish')->where('tipe','bilcollection:import')->where('filename','like',$this->backupdate.'%')->get()->count() <= 12){
+        if(Importer::where('status','finish')->where('tipe','bilcollection:import')->where('filename','like',$this->backupdate.'%')->get()->count() < 12){
             $this->error('not completed ('.Importer::where('status','finish')->where('tipe','bilcollection:import')->where('filename','like',$this->backupdate.'%')->get()->count().'/12)');
             die();
         }
@@ -105,6 +124,7 @@ class DBBackup extends Command
 
         $this->mergeCollectionCSV();
         $this->importCollectionToDB();
+        $this->updateDataserah($carbonDate);
 
 //    die();
         $this->info('Dump DB');
