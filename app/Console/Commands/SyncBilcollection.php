@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Console\Commands;
+use App\Importer;
 use App\Notifier;
 use Artisan;
 use Carbon\Carbon;
@@ -60,11 +61,15 @@ class SyncBilcollection extends Command
         $controller = new BillingCollectionController();
         //var_dump($this->option('testing'));
         if(is_array($filename)){
-echo 'batch';
+            echo 'batch';
             foreach ($filename as $name){
+                if(Importer::where('status','finish')->where('tipe','bilcollection:import')->where('filename',$name)->get()->count() < 1){
+                    $this->info($name);
+                    Artisan::call("syncbilcollection --file=".$name);
+                }else{
+                $this->info($name .' Already Exist, Skip');
+                }
                 //echo shell_exec(sprintf("php artisan syncbilcollection --file=%s >> log.log",$name));
-                Artisan::call("syncbilcollection --file=".$name);
-
             }
             Artisan::call('db:backup');
         }else{
@@ -120,8 +125,14 @@ echo 'batch';
                 'subject' => 'Collection Import',
                 'message' => 'Importing Collection at '.$date,
             ]);
-            foreach($areas as $area){
-                $filename[] = sprintf('%s_%s.csv',$date,$area);
+            if(Importer::where('status','finish')->where('tipe','bilcollection:import')->where('filename','like',$date.'%')->get()->count() < 12) {
+                $this->info('not completed ('.Importer::where('status','finish')->where('tipe','bilcollection:import')->where('filename','like',$date.'%')->get()->count().'/12)');
+                foreach ($areas as $area) {
+                    $filename[] = sprintf('%s_%s.csv', $date, $area);
+                }
+            }else{
+                $this->info('All Done');
+                die();
             }
         }
         $this->proses($filename);

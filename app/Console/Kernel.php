@@ -38,6 +38,18 @@ class Kernel extends ConsoleKernel
         $schedule->command('SyncBilcollection')
             ->at('08:30')
             ->appendOutputTo(storage_path() . "/logs/mail.recent");
+        $schedule->command('SyncBilcollection')
+            ->at('09:30')
+            ->appendOutputTo(storage_path() . "/logs/mail.recent");
+        $schedule->command('SyncBilcollection')
+            ->at('10:30')
+            ->appendOutputTo(storage_path() . "/logs/mail.recent");
+        $schedule->command('SyncBilcollection')
+            ->at('11:30')
+            ->appendOutputTo(storage_path() . "/logs/mail.recent");
+        $schedule->command('SyncBilcollection')
+            ->at('14:30')
+            ->appendOutputTo(storage_path() . "/logs/mail.recent");
 	//$schedule->exec('touch lol.txt')->dailyAt('00:24');
     }
 
