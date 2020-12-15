@@ -16,17 +16,16 @@ use URL;
 class BilcodataserahCekBayarController extends Controller
 {
     public function fetch($date,$tahap = null,$bdate = null){
+
         DB::enableQueryLog();
         $isupdate =false;
         $date = $date->format('Ymd');
 
         $adate = Carbon::createFromFormat('Ymd', $date);
 
-        $bdate = ($bdate == null) ? Carbon::createFromFormat('Ymd', $date)->addDay(1): $bdate;
+        $bdate = ($bdate == null) ? $adate : $bdate;
         //dd($adate->format('Y-m-d'),$bdate->format('Y-m-d'),$tahap,$isupdate);
         $x= DB::table('sabyan_r7s.bilco_data_serahs AS a');
-
-
         if((int)$tahap === 1 and $isupdate == false){
             $x->select('a.periode',
                 'a.account',
