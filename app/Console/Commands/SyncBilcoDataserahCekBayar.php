@@ -505,8 +505,7 @@ class SyncBilcoDataserahCekBayar extends Command
             ($tahap == 1) ? $date->addDay(-1):false;
             ($tahap == 2) ? $date->addDay(7-1):false;
             ($tahap == 3) ? $date->addDay(13-1):false;
-            if($update != true){
-
+            if($update == false){
                 $this->processDatacekbayar($date,$tahap);
             }else{
                 $updfrom = ($from == "null"  ) ? Carbon::createFromFormat('Ymd',$date->format('Ymd'))->addDay(1):Carbon::createFromFormat('Y-m-d',$datex.'-'.$from);
@@ -542,7 +541,7 @@ class SyncBilcoDataserahCekBayar extends Command
     private function processDatacekbayar($date,$tahap,$update_date_from = null,$update_date_to = null){
         $dataserahdate = $date;
         if($update_date_from != null){
-            $update_date_from = $this->checkSabyanTable($update_date_from->addday(1));
+            $update_date_from = $this->checkSabyanTable($update_date_from);
         }
 
         $controller = new BilcodataserahCekBayarController();
