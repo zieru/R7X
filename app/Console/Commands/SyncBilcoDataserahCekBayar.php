@@ -590,7 +590,7 @@ class SyncBilcoDataserahCekBayar extends Command
 
             $row['tahap'] = $tahap;
             $row['total_outstanding'] = $row['a120'] + $row['a90'] + $row['a60'] + $row['a30'];
-            $row['last_update']  = $row['update_date'] = ($bdate) ? $bdate->format('Y-m-d') :   $date->addDay(1);
+            $row['last_update']  = $row['update_date'] = ($bdate) ? $bdate->format('Y-m-d') :   $date;
             $row['import_batch'] = $importer->id;
             $insertdata[] = $row;
             $importer->importedRow =sizeof($row);
