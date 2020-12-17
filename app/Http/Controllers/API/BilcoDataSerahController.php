@@ -129,7 +129,8 @@ class BilcoDataSerahController extends Controller
                 ->where('aging.bucket_1','>',0)
                 ->where('aging.bucket_3','<=',0)
                 ->where('aging.bucket_4','<=',0)
-                ->where('aging.total_outstanding','>=',50000);
+                ->where('aging.total_outstanding','>=',50000)
+                ->whereIn('aging.bill_cycle', 11);
         }
 
         $x->where('aging.aging_cust_subtype','=','Consumer Reguler')
