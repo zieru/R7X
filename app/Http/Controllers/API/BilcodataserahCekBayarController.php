@@ -84,8 +84,12 @@ class BilcodataserahCekBayarController extends Controller
         })
             ->where('a.periode',$adate->format('Y-m-d'));
 
+        if($tahap >= 2){
+            ($tahap == 2) ? $x->whereIn('a.bill_cycle',[1,6]) : false;
+            ($tahap == 3) ? $x->where('a.bill_cycle',11) : false;
+        }
         //DB::getQueryLog();
-        //dd($x->get());
+        dd($x->get());
         return $x;
     }
 
@@ -103,6 +107,7 @@ class BilcodataserahCekBayarController extends Controller
 
         $msisdnparam  = ($request->has('msisdn') AND  $request->msisdn == 'true') ? true : false;
         $momparam  = ($request->has('end') AND  $request->end != false) ? array(Carbon::createFromFormat('Y-m-d', $request->periode),Carbon::createFromFormat('Y-m-d', $request->end)) : false;
+        $startdate  = ($request->has('date') AND  $request->date != false) ? Carbon::createFromFormat('Y-m-d', $request->date)->format('Y-m-d') : false;
         $selectbillcycle = $end = $date = null;
         $tahap_d = $request->get('tahap');
         $bill_cycle = ($request->has('bc') and $request->get('bc') > 0) ? $bill_cycle = $request->get('bc') : null;
@@ -146,14 +151,14 @@ class BilcodataserahCekBayarController extends Controller
         $end = ($request->has('end')) ? Carbon::createFromFormat('Y-m-d', $request->end)->format('Y-m-d') : $end;
 
         $dateupdate = $this->factoryCekBayarLastUpdate($startx,$tahap_d);
-        $d30harea = $this->factoryCekBayar($startx,$tahap_d,false,false,$momparam,false,$request->outs);
-        $d30h = $this->factoryCekBayar($startx,$tahap_d,true,false,$momparam,false,$request->outs);
+        $d30harea = $this->factoryCekBayar($startx,$tahap_d,false,false,$momparam,false,$request->outs,$startdate);
+        $d30h = $this->factoryCekBayar($startx,$tahap_d,true,false,$momparam,false,$request->outs,$startdate);
 
         //dd($d30harea->get()->toArray());
         ///union all///
         $d30h =$d30harea->union($d30h)->get()->toArray();
-        $d90harea = $this->factoryCekBayar($startx,$tahap_d,false,true,$momparam,false,$request->outs);
-        $d90h = $this->factoryCekBayar($startx,$tahap_d,true,true,$momparam,false,$request->outs);
+        $d90harea = $this->factoryCekBayar($startx,$tahap_d,false,true,$momparam,false,$request->outs,$startdate);
+        $d90h = $this->factoryCekBayar($startx,$tahap_d,true,true,$momparam,false,$request->outs,$startdate);
         //unionall
         $d90h =$d90h->union($d90harea)->get()->toArray();
         //////////////////////
@@ -336,7 +341,7 @@ class BilcodataserahCekBayarController extends Controller
         }
         return $ret;
     }
-    protected function factoryCekBayar($date,$tahap,$isregion,$ischild,$ismom,$ishistoric,$isbc = false){;
+    protected function factoryCekBayar($date,$tahap,$isregion,$ischild,$ismom,$ishistoric,$isbc = false, $startdate = false){;
         $ret = false;
 
         //cek jika mom tidak usah cek lastupdate karna melalui tanggal
@@ -399,18 +404,22 @@ class BilcodataserahCekBayarController extends Controller
                                 ->groupBy('hlr_region');
         $ret->where('tahap_date',$date->format('Y-m-d'));
         if($ismom == false){
-        if($lastupdate){
-            $ret->where(function($query) use ($lastupdate) {
-                if(is_array($lastupdate)){
-                    foreach ($lastupdate as $index => $dateupd) {
-                        $query->orwhere(function ($query) use ($index, $dateupd) {
-                            $query->where('update_date', $dateupd);
-                        });
+            if($startdate == false){
+                if($lastupdate){
+                    $ret->where(function($query) use ($lastupdate) {
+                        if(is_array($lastupdate)){
+                            foreach ($lastupdate as $index => $dateupd) {
+                                $query->orwhere(function ($query) use ($index, $dateupd) {
+                                    $query->where('update_date', $dateupd);
+                                });
+                            }
+                        }else{
+                            $query->where('update_date', $lastupdate);
+                        }
+                    });
                     }
-                }else{
-                    $query->where('update_date', $lastupdate);
-                }
-            });
+            }else{
+                $ret->where('update_date',$startdate);
             }
         }
         if($ismom) {
@@ -431,7 +440,9 @@ class BilcodataserahCekBayarController extends Controller
         //($ismom) ? $ret->groupBy('kpi')->orderBy('kpi','ASC'): false;
         $ret->orderBy('hlr_region','DESC');
 
+        //dd($ret->get());
         return $ret;
+
     }
 
     protected function dataCekBayar($d30h,$d90h,$kpis,$mom = false,$msisdn = false){
@@ -464,6 +475,7 @@ class BilcodataserahCekBayarController extends Controller
 
                 //dd($kpis);
                 ///processing main title///
+                ///
                 foreach ($kpis as $p){
                     $sum[$row['regional']]['period'][$p] = $this->countDataCekBayar($p,$row,$msisdn);
                 }
@@ -561,29 +573,29 @@ class BilcodataserahCekBayarController extends Controller
                 $dataserah = $row['a30'];
                 $collection = $row['h30'];
                 $total = $dataserah;
-                $nmsisdn = $row['ma30'];
-                $bmsisdn = $row['mb30'];
+                $nmsisdn = $row['ma30'] + $row['ma30s'];
+                $bmsisdn = $row['mb30'] + $row['mb30s'];
                 break;
             case 60:
                 $dataserah = $row['a60'];
                 $collection = $row['h60'];
-                $nmsisdn = $row['ma60'];
-                $bmsisdn = $row['mb60'];
+                $nmsisdn = $row['ma60'] + $row['ma60s'];
+                $bmsisdn = $row['mb60'] + $row['mb60s'];
                 $total = $dataserah;
                 break;
             case 90:
                 $dataserah = $row['a90'];
                 $collection = $row['h90'];
                 $total = $dataserah;
-                $nmsisdn = $row['ma90'];
-                $bmsisdn = $row['mb90'];
+                $nmsisdn = $row['ma90'] + $row['ma90s'];
+                $bmsisdn = $row['mb90'] + $row['mb90s'];
                 break;
             case 120:
                 $dataserah = $row['a120'];
                 $collection = $row['h120'];
                 $total = $dataserah;
-                $nmsisdn = $row['ma120'];
-                $bmsisdn = $row['mb120'];
+                $nmsisdn = $row['ma120'] + $row['ma120s'];
+                $bmsisdn = $row['mb120'] + $row['mb120s'];
                 break;
             default:
                 $dataserah = $row['total'];
