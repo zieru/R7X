@@ -89,7 +89,6 @@ class BilcodataserahCekBayarController extends Controller
             ($tahap == 3) ? $x->where('a.bill_cycle',11) : false;
         }
         //DB::getQueryLog();
-        dd($x->get());
         return $x;
     }
 
