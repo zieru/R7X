@@ -65,7 +65,8 @@ class SyncBilcollection extends Command
             foreach ($filename as $name){
                 if(Importer::where('status','finish')->where('tipe','bilcollection:import')->where('filename',$name)->get()->count() < 1){
                     $this->info($name);
-                    Artisan::call("syncbilcollection --file=".$name);
+		    shell_exec(sprintf("php artisan syncbilcollection --file=%s >> log.log",$name));
+                    //Artisan::call("syncbilcollection --file=".$name);
                 }else{
                 $this->info($name .' Already Exist, Skip');
                 }
