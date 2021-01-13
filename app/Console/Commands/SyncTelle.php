@@ -2,13 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Notifier;
-use App\BilcoDataSerah;
-use App\Http\Controllers\API\BilcoDataSerahController;
 use Illuminate\Console\Command;
-use phpDocumentor\Reflection\DocBlock\Tags\Var_;
-use Carbon\Carbon;
-use App\Importer;
 
 class SyncTelle extends Command
 {
@@ -17,7 +11,7 @@ class SyncTelle extends Command
      *
      * @var string
      */
-    protected $signature = 'synctelle {date}';
+    protected $signature = 'synctelle';
     /**
      * The console command description.
      *
@@ -35,7 +29,9 @@ class SyncTelle extends Command
         parent::__construct();
     }
 
-    public function CheckDir
+    public function checkDir(){
+        return Storage::disk('telle');
+    }
     /**
      * Execute the console command.
      *
@@ -44,5 +40,6 @@ class SyncTelle extends Command
     public function handle()
     {
 
+        var_dump($this->checkDir());
     }
 }
