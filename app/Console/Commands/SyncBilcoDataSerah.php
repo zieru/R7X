@@ -17,7 +17,7 @@ class SyncBilcoDataSerah extends Command
      *
      * @var string
      */
-    protected $signature = 'syncbilcodataserah {date}';
+    protected $signature = 'syncbilcodataserah {date} {--tahap=false}';
     /**
      * The console command description.
      *
@@ -48,29 +48,41 @@ class SyncBilcoDataSerah extends Command
         
 	//$date = Carbon::now()->subDays(2);
  $date  = Carbon::createFromFormat('Y-m-d', $this->argument('date'));
- $custom = array('2020-10','2020-11');
+ $custom = array('2020-10','2020-11','2020-12');
 
+	//dd($this->option('tahap'));
 $bilcoenddate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2)->endOfMonth();
 $bilcodate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2);
+//dd($bilcodate);
         $tahap = false;
+
+	if($this->option('tahap') == "false"){
+	//dd($this->option('tahap'));
         switch ($bilcodate->format('d')){
             case $bilcoenddate->format('d'):
                 $tahap = 1;
                 break;
             default:
                 $tahap = 2;
-        }
-        if($tahap == 1){
+    		}
+	    if($tahap == 1){
             if(in_array($date->format('Y-m'),$custom)){
                 $tahap = 2;
             }
         }
+	}else{
+	    $tahap = (int) $this->option('tahap');
+	}
+        
+//dd($tahap);
 	Notifier::create([
                     'type' => 'DataSerahImport',
                     'subject' => 'DataSerah Import file',
                     'message' => 'Import dataserah started',
                 ]);
-        $cx= $controller->fetch($date);
+//dd($date);
+//dd($tahap);
+        $cx= $controller->fetch($date,$tahap);
         $this->info('Query finished');
 Notifier::create([
                     'type' => 'DataSerahImport',
@@ -122,6 +134,7 @@ $x = array();
 
             $i['kpi'] = '';
             if($row->bucket_2 > 0 AND $row->bucket_1 > 0){
+	    //dd($tahap);
               $i['kpi'] = '30-60';
               if($tahap === 1){
                   $i['kpi'] = '60-90';

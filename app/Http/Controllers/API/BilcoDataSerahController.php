@@ -75,12 +75,14 @@ class BilcoDataSerahController extends Controller
         return datatables()->of($ret)->toJson();
     }
 
-    public function fetch($date){
+    public function fetch($date,$tahap = false){
+	//dd($date);
+echo 'x';
         DB::enableQueryLog();
         $bilcoenddate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2)->endOfMonth();
         $bilcodate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-2);
         $agingdate = Carbon::createFromFormat('Ymd', $date->format('Ymd'))->addDays(-1);
-        $tahap = false;
+	if($tahap == false){
         switch ($bilcodate->format('d')){
             case $bilcoenddate->format('d'):
                 $tahap = 1;
@@ -88,6 +90,8 @@ class BilcoDataSerahController extends Controller
             default:
                 $tahap = 2;
         }
+}
+	//dd($tahap);
 //$agingdate = $bilcodate = $date;
         echo(sprintf('tahap :%s bilco : %s Aging : %s',$tahap,$bilcodate->format('Ymd'),$agingdate->format('Ymd')));
 //die();
@@ -105,14 +109,15 @@ class BilcoDataSerahController extends Controller
                 'aging.bbs_RT','aging.bill_amount_04','aging.bill_amount_03','aging.bill_amount_02','aging.bill_amount_01',
                 'aging.bucket_4','aging.bucket_3','aging.bucket_2','aging.bucket_1','aging.blocking_status','aging.note','cmactive.customer_phone',
                 'cmactive.activation_date',DB::raw("str_to_date(activation_date,'%Y%m%d') as activation_date_2"));
+	    $x->where('bilco.customer_type','S');
         if($tahap == 1){
             $x->where(function($query) {
                 $query->where(function ($query)     {
                     $query
                         ->where('aging.bucket_3', '>', 0)
-                        ->Where('aging.bucket_2', '>', 0);
+                        ->Where('aging.bucket_2', '>', 12500);
                 });
-                $query->orWhere(function ($query) {
+            $query->orWhere(function ($query) {
                     $query
                         ->where('aging.bucket_2','>',12500)
                         ->Where('aging.bucket_1','>',0);
@@ -123,6 +128,7 @@ class BilcoDataSerahController extends Controller
                 ->where('aging.bucket_5','<=',0)
                 ->where('aging.bucket_6','<=',0)
                 ->where('aging.bucket_4','<=',0)
+                //->where('aging.bucket_3','<=',0)
                 ->where('aging.osbalance','>=',50000);
         }elseif($tahap == 2){
             $x->where('aging.bucket_2','>',12500)
@@ -130,7 +136,7 @@ class BilcoDataSerahController extends Controller
                 ->where('aging.bucket_3','<=',0)
                 ->where('aging.bucket_4','<=',0)
                 ->where('aging.total_outstanding','>=',50000)
-                ->whereIn('aging.bill_cycle', 11);
+                ->whereIn('aging.bill_cycle', [11]);
         }
 
         $x->where('aging.aging_cust_subtype','=','Consumer Reguler')
@@ -146,6 +152,7 @@ class BilcoDataSerahController extends Controller
        // dd(DB::getQueryLog());
 
         //dd($x->get()->toArray()[0]);
+echo 'finish';
         return $x;
     }
 
@@ -188,6 +195,7 @@ class BilcoDataSerahController extends Controller
         return (new FastExcel($x))->download('DATASERAH-'.$regional_title.'_'.$start.'.xlsx', function ($row) {
            //dd($row);
             return [
+		//'periode' => $row->periode,
                 'tahap' => $row->tahap_periode,
                 'account' => $row->account,
                 'customer_id' => $row->customer_id,
