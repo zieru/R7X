@@ -17,7 +17,7 @@ class SyncTelle extends Command
      *
      * @var string
      */
-    protected $signature = 'syncbilcodataserah {date}';
+    protected $signature = 'synctelle {date}';
     /**
      * The console command description.
      *
