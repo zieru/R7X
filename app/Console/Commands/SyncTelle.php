@@ -1,8 +1,10 @@
 <?php
 
 namespace App\Console\Commands;
-
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Console\Command;
+use File;
+
 
 class SyncTelle extends Command
 {
@@ -30,7 +32,8 @@ class SyncTelle extends Command
     }
 
     public function checkDir(){
-        return Storage::disk('telle');
+
+        return Storage::disk('telle')->allFiles();
     }
     /**
      * Execute the console command.

@@ -40,7 +40,9 @@ return [
     | Supported Drivers: "local", "ftp", "s3", "rackspace"
     |
     */
-
+    'links' => [
+        public_path('telle') => storage_path('app/telle'),
+    ],
     'disks' => [
 
         'local' => [
