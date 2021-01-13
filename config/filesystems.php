@@ -47,7 +47,12 @@ return [
             'driver' => 'local',
             'root' => storage_path('app'),
         ],
-
+        'telle' => [
+            'driver' => 'local',
+            'root' => storage_path('app/telle'),
+            'url' => env('APP_URL').'/telle',
+            'visibility' => 'public',
+        ],
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
