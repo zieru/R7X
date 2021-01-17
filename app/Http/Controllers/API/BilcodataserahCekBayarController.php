@@ -192,7 +192,6 @@ class BilcodataserahCekBayarController extends Controller
         $kpis = ($request->has('end')) ? [$start,$end,'MoM'] : [0,120,90,60,30];
         $sumfinal = [];
         $sum = $this->DataCekBayar($d30h,$d90h,$kpis,$momparam,$msisdnparam);
-
         $sum2 = ($request->has('end')) ? $this->DataCekBayar($d30h2,$d90h2,$kpis,$momparam,$msisdnparam) : false;
 
         if($momparam){
@@ -451,6 +450,7 @@ class BilcodataserahCekBayarController extends Controller
 
         foreach ($d30h as $row){
             if($row['totalmsisdn'] != null){
+                $row['order'] = array_search($row['regional'],config("r7s.order"));
                 $row['id'] = sprintf('%s#%s#%s#%s',$l,$row['regional'],$row['periodes'],$row['kpi']);
                 $row['raw_total'] = $row['total'];
                 $row['total_outstanding'] = $row['total'];
@@ -462,6 +462,7 @@ class BilcodataserahCekBayarController extends Controller
 
                 $l++;
                 //$row['totalmsisdn'] = number_format($row['totalmsisdn']);
+                $sum[$row['regional']]['order'] = $row['order'];
                 $sum[$row['regional']]['total'] = $row['total'];
                 $sum[$row['regional']]['totalmsisdn'] = $row['totalmsisdn'];
                 $sum[$row['regional']]['collection'] = $row['total_outstanding'];
@@ -538,6 +539,9 @@ class BilcodataserahCekBayarController extends Controller
             $bcx +=1;
         }
 
+        usort($sum, function($a, $b) {
+            return $a['order'] <=> $b['order'];
+        });
         return $sum;
     }
 

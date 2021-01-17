@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\BilcoDataSerah;
 use App\BillingCollectionPoc;
+use App\Config;
 use App\Helpers\AppHelper;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -433,7 +434,9 @@ echo 'finish';
         $l = 0;
         $sum = $i  = [];
 
+        $order = config('r7s.order');
         foreach ($d30h as $row){
+            $row['order'] = array_search($row['regional'],$order);
             $ncperiod = [];
             $row['total'] = number_format($row['total']);
             $row['id'] = sprintf('%s#%s#%s#%s',$l,$row['regional'],$row['periodes'],$row['kpi']);
@@ -455,7 +458,7 @@ echo 'finish';
             $sum[$row['regional']]['kpi'] = $row['kpi'];
             $sum[$row['regional']]['regional'] = $row['regional'];
             $sum[$row['regional']]['id'] = $row['id'];
-
+            $sum[$row['regional']]['order'] = $row['order'];
             //dd($newc);
             //dd($newc['Sumbagsel'][1]['08-2020']['total']);
             foreach ($period as $p){
@@ -551,6 +554,10 @@ echo 'finish';
             $temp[] = $row ;
         }
 
+        usort($sum, function($a, $b) {
+            return $a['order'] <=> $b['order'];
+        });
+
         return datatables()->of($sum)->with('datecolumn',$period)->toJson();
     }
     /**
@@ -600,7 +607,7 @@ echo 'finish';
 	SUM(IF(tahap_periode!=1 ,bucket_4,bucket_3)) AS bucket_4,
 	sum(total_outstanding) as total_outstanding,';
         $d90harea = BilcoDataSerah::selectRaw($general_select.'
-        "Area Sumatera" as regional')
+        "Area Sumatra" as regional')
             ->whereIn('hlr_region',array('Sumbagut','Sumbagteng','Sumbagsel'))
             ->whereBetween('periode',$periode);
         if($tahap != null)$d90harea->where('tahap_periode',$tahap);
@@ -611,8 +618,12 @@ echo 'finish';
         if($tahap != null)$d90h->where('tahap_periode',$tahap);
         $d90h->union($d90harea);
         $temp = array();
+
+        $order = config('r7s.order');
+
         foreach ($d90h->get()->toArray() as $row)
         {
+            $row['order'] = array_search(strtolower($row['regional']), array_map('strtolower', $order));
             $row['bucket_1'] = number_format($row['bucket_1']);
             $row['bucket_2'] = number_format($row['bucket_2']);
             $row['bucket_3'] = number_format($row['bucket_3']);
@@ -621,6 +632,9 @@ echo 'finish';
             $row['download'] = sprintf('%s?tahap=%s&start=%s&regional=%s',URL::to('/external/bilcodataserahexport'),$tahap_d,$start,$row['regional']);
             $temp[] = $row;
         }
+        usort($temp, function($a, $b) {
+            return $a['order'] <=> $b['order'];
+        });
         return datatables()->of($temp)->toJson();
     }
 
