@@ -36,6 +36,8 @@ Route::prefix('telegram')->group(function(){
 });
 Route::apiResource('notifier', 'NotifierController');
 Route::prefix('v1')->middleware(['CheckClientCredentials','auth:api'])->group(function() {
+    Route::apiResource('kriteria', 'API\KriteriaController');
+    Route::apiResource('alternatif', 'API\AlternatifController');
     Route::apiResource('bilcodataserah', 'API\BilcoDataSerahController');
     Route::apiResource('bilcodataserahcekbayar', 'API\BilcodataserahCekBayarController');
     Route::any('bilcodataserahcekbayars/cekupdate', 'API\BilcodataserahCekBayarController@cekupdate');

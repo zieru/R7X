@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Console\Command;
 use File;
+use Rap2hpoutre\FastExcel\FastExcel;
 
 
 class SyncTelle extends Command
@@ -32,6 +33,16 @@ class SyncTelle extends Command
     }
 
     public function checkDir(){
+        /*$xlsxs = Storage::disk('telle')->allFiles();
+        foreach($xlsxs as $xlsx){
+            dd(
+                (new FastExcel)->import(Storage::disk('telle')->get($xlsx),function ($line) {
+                    return $line;
+                }
+                );
+            );
+
+        }*/
 
         return Storage::disk('telle')->allFiles();
     }
