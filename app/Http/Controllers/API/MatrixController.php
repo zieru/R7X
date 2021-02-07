@@ -52,12 +52,14 @@ class MatrixController extends Controller
         $no = 1;
         foreach ($alternatif as $alt){
 
-            $nilais = Matrix::where('id_alternatif',$alt['id_alternatif'])->get();
+            $nilais = Matrix::where('id_alternatif',$alt['id_alternatif'])->orderby('id_kriteria')->get();
             //dd($nilais->toArray());
             $data[$no]['no'] = $no;
             $data[$no]['nama'] = $alt['nm_alternatif'];
+            $no_kriteria = 1;
             foreach ($nilais as $nilai){
-                $data[$no]['C'. $nilai->id_kriteria]  = $nilai->nilai;
+                $data[$no]['C'. $no_kriteria]  = $nilai->nilai;
+                $no_kriteria++;
             }
             $no++;
         }
