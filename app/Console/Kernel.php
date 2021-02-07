@@ -15,9 +15,6 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         //
-        Commands\SyncBilcoDataSerah::class,
-        Commands\SyncBilcollection::class,
-        Commands\DBBackup::class,
     ];
 
     protected function scheduleTimezone()
