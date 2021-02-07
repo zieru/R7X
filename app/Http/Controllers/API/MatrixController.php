@@ -58,7 +58,16 @@ class MatrixController extends Controller
             $data[$no]['nama'] = $alt['nm_alternatif'];
             $no_kriteria = 1;
             foreach ($nilais as $nilai){
-                $data[$no]['C'. $no_kriteria]  = $nilai->nilai;
+                if($id == 'normalisasi') {
+                    $data[$no]['C' . $no_kriteria] = (0) + ($nilai->nilai * $nilai->nilai);
+                    $data[$no]['C' . $no_kriteria] = round(($nilai->nilai / sqrt($data[$no]['C' . $no_kriteria])), 3);
+                }elseif($id == 'bobotnormalisasi'){
+                    $data[$no]['C' . $no_kriteria] = (0) + ($nilai->nilai * $nilai->nilai);
+                    $data[$no]['C' . $no_kriteria] = round(($nilai->nilai / sqrt($data[$no]['C' . $no_kriteria])), 3);
+                }else{
+                    $data[$no]['C'. $no_kriteria]  = $nilai->nilai;
+                }
+
                 $no_kriteria++;
             }
             $no++;
