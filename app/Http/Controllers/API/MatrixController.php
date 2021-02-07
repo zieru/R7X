@@ -47,7 +47,6 @@ class MatrixController extends Controller
     public function show(Request $request,$id)
     {
         $data= [];
-        $kriteria = Kriteria::all()->toArray();
         $alternatif = Alternatif::all()->toArray();
         $no = 1;
         foreach ($alternatif as $alt){
@@ -58,12 +57,13 @@ class MatrixController extends Controller
             $data[$no]['nama'] = $alt['nm_alternatif'];
             $no_kriteria = 1;
             foreach ($nilais as $nilai){
+                $kriteria = Kriteria::where('id_kriteria', $nilai->id_kriteria)->firstOrFail()->toArray();
                 if($id == 'normalisasi') {
                     $data[$no]['C' . $no_kriteria] = (0) + ($nilai->nilai * $nilai->nilai);
                     $data[$no]['C' . $no_kriteria] = round(($nilai->nilai / sqrt($data[$no]['C' . $no_kriteria])), 3);
                 }elseif($id == 'bobotnormalisasi'){
                     $data[$no]['C' . $no_kriteria] = (0) + ($nilai->nilai * $nilai->nilai);
-                    $data[$no]['C' . $no_kriteria] = round(($nilai->nilai / sqrt($data[$no]['C' . $no_kriteria])), 3);
+                    $data[$no]['C' . $no_kriteria] = round( (($nilai->nilai / sqrt($data[$no]['C' . $no_kriteria])) * $kriteria['bobot']), 3);
                 }else{
                     $data[$no]['C'. $no_kriteria]  = $nilai->nilai;
                 }
