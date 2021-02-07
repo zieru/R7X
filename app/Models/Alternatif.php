@@ -11,4 +11,13 @@ class Alternatif extends Model
     protected $primaryKey = "id_alternatif";
     public $timestamps = false;
     public $table = 'alternatif';
+
+    public function alternatifMatrix()
+    {
+        return $this->hasMany('App\Models\Matrix', 'id_alternatif', 'id_alternatif');
+    }
+    public function kriteria()
+    {
+        return $this->belongsToMany('App\Kriteria','nilai_matrik','id_alternatif','id_alternatif');
+    }
 }
