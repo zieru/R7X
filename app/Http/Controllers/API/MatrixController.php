@@ -49,6 +49,18 @@ class MatrixController extends Controller
         $data= [];
         $alternatif = Alternatif::all()->toArray();
         $no = 1;
+        $nilaix = [];
+        $nilaid = [];
+        $bobotx = [];
+        $nilais = Matrix::get();
+        $bobots = Kriteria::get();
+        foreach ($nilais as $a){
+            $nilaix[$a['id_kriteria']][] = $a['nilai'];
+            $nilaid[$a['id_kriteria']][] = $a['nilai']* $a['nilai'];
+        }
+        foreach ($bobots as $a){
+            $bobotx[$a['id_kriteria']] = $a['bobot'];
+        }
         foreach ($alternatif as $alt){
 
             $nilais = Matrix::where('id_alternatif',$alt['id_alternatif'])->orderby('id_kriteria')->get();
@@ -58,12 +70,12 @@ class MatrixController extends Controller
             $no_kriteria = 1;
             foreach ($nilais as $nilai){
                 $kriteria = Kriteria::where('id_kriteria', $nilai->id_kriteria)->firstOrFail()->toArray();
-                if($id == 'normalisasi') {
-                    $data[$no]['C' . $no_kriteria] = (0) + ($nilai->nilai * $nilai->nilai);
-                    $data[$no]['C' . $no_kriteria] = round(($nilai->nilai / sqrt($data[$no]['C' . $no_kriteria])), 3);
-                }elseif($id == 'bobotnormalisasi'){
-                    $data[$no]['C' . $no_kriteria] = (0) + ($nilai->nilai * $nilai->nilai);
-                    $data[$no]['C' . $no_kriteria] = round( (($nilai->nilai / sqrt($data[$no]['C' . $no_kriteria])) * $kriteria['bobot']), 3);
+                if($id == 'normalisasi' OR $id == 'bobotnormalisasi') {
+                    //$data[$no]['C' . $no_kriteria] = (0) + ($nilai->nilai * $nilai->nilai);
+                    $data[$no]['C' . $no_kriteria] = round(($nilai->nilai / sqrt(array_sum($nilaid[$nilai->id_kriteria]))), 3);
+                    if ($id == 'bobotnormalisasi'){
+                        $data[$no]['C' . $no_kriteria] = $data[$no]['C' . $no_kriteria] * ($kriteria['bobot'] / array_sum($bobotx));
+                    }
                 }else{
                     $data[$no]['C'. $no_kriteria]  = $nilai->nilai;
                 }
