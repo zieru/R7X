@@ -265,7 +265,7 @@ class MatrixController extends Controller
             $cur = 1;
             for ($i = 1; $i <= sizeof($dataori); $i++) {
                 for ($y = 1; $y <= sizeof($carray_count); $y++) {
-                    $dataori[$i]['C'.$y]  = number_format($dataori[$i]['C'.$y] / $newdat[$i],4);
+                        $dataori[$i]['C'.$y]  = number_format($dataori[$i]['C'.$y] / $newdat[$y],4);
                 }
                 $dataori[$i]['no'] = $data[$i]['no'];
                 $dataori[$i]['nama'] = $data[$i]['nama'];
