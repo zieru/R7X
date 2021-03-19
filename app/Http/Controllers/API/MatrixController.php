@@ -154,7 +154,7 @@ class MatrixController extends Controller
     private function preferensi($dataori,$jarakideal,$bobot,$nilais,$alternatif,$normalisasibobot){
         $ret = [];
         foreach($jarakideal as $x => $v){
-            $nilai = (float)$v[0]/((float)$v[0] + (float)$v[1]);
+            $nilai = number_format((float)$v[0]/((float)$v[0] + (float)$v[1]),4);
             $ret[] = array('nama' => $x, 'nilai' => (float) $nilai);
         }
         return $ret;
