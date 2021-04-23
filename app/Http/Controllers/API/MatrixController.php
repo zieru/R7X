@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Kriteria;
+use App\Models\Alat;
+use App\Models\AlatMatrix;
 use App\Models\Alternatif;
 use Illuminate\Http\Request;
 use App\Models\Matrix;
@@ -105,6 +107,12 @@ class MatrixController extends Controller
             $data['data'] = $xs;
             //dd($data);
         }
+        elseif($id == 'alat'){
+            $xs = $this->alat($alternatif,Alat::all()->toArray(),AlatMatrix::all()->toArray());
+            $data = [];
+            $data['data'] = $xs;
+            //dd($data);
+        }
         elseif($id == 'jarakideal'){
             $x = $this->normalisasi($dataori,$data,$kriteria,$nilais,$alternatif);
             $normalisasibobot = $data = $this->normalisasibobot($dataori,$x,$bobots->toArray(),$nilais,$alternatif);
@@ -138,6 +146,22 @@ class MatrixController extends Controller
         //dd($matrix);
         //echo $id . $request->type;
 
+    }
+
+    private function alat($dataori,$alat,$matrix){
+        $res = $datatempat = $dataalat =[];
+
+        foreach ($dataori as $x){
+            $datatempat[$x['id_alternatif']]=$x['nm_alternatif'];
+        }
+        foreach ($alat as $x){
+            $dataalat[$x['id_alternatif']]=$x['nm_alternatif'];
+        }
+        foreach ($matrix as $x){
+            $res[$datatempat[$x['id_alternatif']]][] = $dataalat[$x['id_alat']];
+        }
+
+        return $res;
     }
     private function ranking($dataori,$preferensi,$bobot,$nilais,$alternatif,$normalisasibobot){
         usort($preferensi, function($a, $b) {
@@ -216,7 +240,6 @@ class MatrixController extends Controller
         }
         return $datatemp;
     }
-
     private function normalisasibobot($dataori,$data,$bobot,$nilais,$alternatif){
         $bobotall = [];
         $bobotpros = [];

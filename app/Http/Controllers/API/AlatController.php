@@ -22,7 +22,6 @@ class AlatController extends Controller
     }
 
     public function alatMatrix(Request $request){
-        echo 'x';
         $alat = array();
         AlatMatrix::where('id_alternatif', $request->post('alternatif'))->delete();
         foreach ($request->post('alat') as $alat => $v){
